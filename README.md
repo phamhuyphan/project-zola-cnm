@@ -2,7 +2,7 @@
 
 https://github.com/phamhuyphan/project-zola-cnm
 
-### Contributor:
+### Contributors:
 
 @phuocluuvo
 @phamhuyphan
