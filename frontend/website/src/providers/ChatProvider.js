@@ -7,7 +7,7 @@ const ChatProvider = ({ children }) => {
   const [selectedChat, setSelectedChat] = useState(null);
   const [user, setUser] = useState({});
   const [chats, setChats] = useState([]);
-  const [closeSideBar, setcloseSideBar] = useState(false);
+  const [closeSideBar, setCloseSideBar] = useState(false);
   const navigator = useNavigate();
   return (
     <ChatContext.Provider
@@ -17,7 +17,7 @@ const ChatProvider = ({ children }) => {
         chats,
         setChats,
         closeSideBar,
-        setcloseSideBar,
+        setCloseSideBar,
         user,
         setUser,
       }}

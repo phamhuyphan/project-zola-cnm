@@ -1,8 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import gsap from "gsap";
 import SignIn from "../Components/authentication/SignIn";
-import { Box, Container, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Container,
+  ScaleFade,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import SignUp from "../Components/authentication/SignUp";
 function WelcomePage() {
+  const { isOpen, onToggle } = useDisclosure();
+
+  const navigator = useNavigate();
+  useEffect(() => {
+    //fecth local storage
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (userInfo) navigator("/chats");
+  }, [navigator]);
+  const [show, setShow] = useState(false);
   //Animation
   gsap.fromTo(
     "#square1",
@@ -24,7 +42,7 @@ function WelcomePage() {
       maxW={"100vw"}
       overflow="hidden"
       position="relative"
-      className="bg-gradient-to-b from-dark-blue to-deep-blue h-[100vh]"
+      className="transition-transform bg-gradient-to-b from-dark-blue to-deep-blue h-[100vh]"
     >
       <Box
         id="login_form"
@@ -38,8 +56,7 @@ function WelcomePage() {
         justifyContent={{ lg: "justify-end" }}
         shadow="2xl"
         borderRadius={"xl"}
-        m={"auto"}
-        mt={"24"}
+        mt={"10"}
         zIndex={10}
         className="
         card
@@ -95,7 +112,52 @@ function WelcomePage() {
             ứng dụng mạng xã hội hot nhất hiện nay
           </Text>
         </Box>
-        <SignIn />
+        {show ? (
+          <SignIn setShow={setShow} isOpen={isOpen} />
+        ) : (
+          <SignUp setShow={setShow} isOpen={isOpen} />
+        )}
+        {show ? (
+          <Text textColor={"white"}>
+            don't have an account?{" "}
+            <span className="font-bold">
+              <Button
+                variant="link"
+                colorScheme={"white"}
+                _hover={{
+                  bgClip: "text",
+                  bgGradient: "linear(to-br,blue.300,red.300)",
+                }}
+                onClick={() => {
+                  setShow(!show);
+                  onToggle(false);
+                }}
+              >
+                {!show ? "Sign Up" : "Sign In"}
+              </Button>
+            </span>
+          </Text>
+        ) : (
+          <Text textColor={"white"}>
+            already have an account?{" "}
+            <span className="font-bold">
+              <Button
+                variant="link"
+                colorScheme={"white"}
+                _hover={{
+                  bgClip: "text",
+                  bgGradient: "linear(to-br,blue.300,red.300)",
+                }}
+                onClick={() => {
+                  setShow(true);
+                  onToggle(true);
+                }}
+              >
+                Sign In
+              </Button>
+            </span>
+          </Text>
+        )}
       </Box>
       <Box id="picture_login"></Box>
       <Box id="square1"></Box>

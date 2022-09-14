@@ -3,6 +3,7 @@ import {
   ChevronDownIcon,
   HamburgerIcon,
   InfoIcon,
+  Search2Icon,
   ViewIcon,
   ViewOffIcon,
 } from "@chakra-ui/icons";
@@ -10,8 +11,17 @@ import {
   Avatar,
   AvatarBadge,
   Box,
+  Button,
   Divider,
+  Drawer,
+  DrawerBody,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerOverlay,
   IconButton,
+  Input,
   Menu,
   MenuButton,
   MenuItem,
@@ -20,6 +30,8 @@ import {
   Tooltip,
   useColorMode,
   useColorModeValue,
+  useDisclosure,
+  VStack,
 } from "@chakra-ui/react";
 import React from "react";
 import { ChatState } from "../providers/ChatProvider";
@@ -35,6 +47,9 @@ function SideBarClosed() {
   );
   const { closeSideBar, setCloseSideBar } = ChatState();
   const { colorMode, toggleColorMode } = useColorMode();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = React.useRef();
+
   return (
     <Box
       bgGradient={bg}
@@ -53,7 +68,7 @@ function SideBarClosed() {
         top="0"
         zIndex={10}
       >
-        <Menu>
+        {/* <Menu>
           <MenuButton
             as={IconButton}
             border="none"
@@ -77,7 +92,51 @@ function SideBarClosed() {
             <Divider />
             <MenuItem icon={<ArrowForwardIcon />}>Log out</MenuItem>
           </MenuList>
-        </Menu>
+        </Menu> */}
+
+        <IconButton
+          placement="left"
+          icon={<HamburgerIcon />}
+          ref={btnRef}
+          colorScheme="teal"
+          onClick={onOpen}
+        >
+          Open
+        </IconButton>
+        <Drawer
+          isOpen={isOpen}
+          placement={"left"}
+          onClose={onClose}
+          finalFocusRef={btnRef}
+        >
+          <DrawerOverlay />
+          <DrawerContent>
+            <DrawerCloseButton />
+            <DrawerHeader textAlign={"center"}>Menu</DrawerHeader>
+
+            <DrawerBody>
+              <VStack spacing={0}>
+                <Button w={"full"} leftIcon={<InfoIcon />} variant="ghost">
+                  Profile
+                </Button>
+                <Button
+                  w={"full"}
+                  leftIcon={<ArrowForwardIcon />}
+                  variant="ghost"
+                >
+                  Logout
+                </Button>
+                <Text w={"full"} leftIcon={<Search2Icon />} variant="ghost">
+                  Search chat
+                </Text>
+                <Input placeholder="Type here..." />
+              </VStack>
+            </DrawerBody>
+
+            <DrawerFooter></DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+
         <IconButton
           variant="outline"
           size={"lg"}

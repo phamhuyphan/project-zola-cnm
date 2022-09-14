@@ -3,20 +3,15 @@ const bcrypt = require("bcryptjs");
 const userSchema = mongoose.Schema(
   {
     username: { type: String, required: true },
-
+    fullname: { type: String, required: true, default: "Unknown User" },
     password: { type: String, required: true },
-
     email: { type: String, required: true, unique: true },
-
     pic: {
       type: String,
       default:
         "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
-
-    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
-
-
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   {
     timestamps: true,

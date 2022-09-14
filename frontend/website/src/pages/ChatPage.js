@@ -7,7 +7,6 @@ import { ChatState } from "../providers/ChatProvider";
 
 function ChatPage() {
   const { closeSideBar, setCloseSideBar } = ChatState();
-  useEffect(() => {}, [closeSideBar]);
 
   return (
     <Container

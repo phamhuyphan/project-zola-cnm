@@ -1,17 +1,82 @@
-import { Box, Button, Input, Link, Text } from "@chakra-ui/react";
-import React from "react";
+import {
+  Box,
+  Button,
+  Input,
+  Link,
+  ScaleFade,
+  Text,
+  useToast,
+  VStack,
+} from "@chakra-ui/react";
+import axios from "axios";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-function SignIn() {
+function SignIn({ setShow, isOpen }) {
   const navigator = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  let navigate = useNavigate();
+  const toast = useToast();
+  const [loading, setLoading] = useState(false);
+  const submitHandler = async () => {
+    setLoading(true);
+    if (!email || !password) {
+      toast({
+        title: "Please fill all fields",
+        status: "warning",
+        duration: 2500,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+
+      const { data } = await axios.post(
+        "/api/user/login",
+        { email, password },
+        config
+      );
+      toast({
+        title: "Sign in successfully",
+        status: "success",
+        duration: 2500,
+        isClosable: true,
+        position: "bottom",
+      });
+
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      setLoading(false);
+      navigate("/chats");
+    } catch (error) {
+      toast({
+        title: "Sign in failed",
+        status: "error",
+        duration: 2500,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  };
   return (
-    <Box>
-      <Box marginY={"2.5rem"} flex={true} flexDir={"column"} zIndex={10}>
+    <ScaleFade initialScale={0.9} in={isOpen}>
+      <VStack marginY={"2.5rem"} zIndex={10}>
         <Input
-          type={"text"}
-          placeholder="gmail"
+          type={"email"}
+          value={email}
+          placeholder="Enter your Email"
+          onChange={(e) => setEmail(e.target.value)}
           bgColor={"white"}
           borderRadius="lg"
-          w="full"
+          w="400px"
           h={45}
           marginBottom={"1.25rem"}
           padding="3"
@@ -19,27 +84,29 @@ function SignIn() {
         />
         <Input
           type={"password"}
-          placeholder="password"
+          placeholder="Enter your Password"
+          onChange={(e) => setPassword(e.target.value)}
+          value={password}
           bgColor={"white"}
           borderRadius="lg"
-          w="full"
+          w="400px"
           h={45}
           marginBottom={"1.25rem"}
           padding="3"
           textColor={"gray.500"}
         />
-        <Text
-          transitionDuration={"150ms"}
-          textAlign="right"
-          textColor={"white"}
-          _hover={{
-            bgClip: "text",
-            bgGradient: "linear(to-br,blue.300, pink.400)",
-          }}
-        >
-          forgot password, eh? Press here, bro.
-        </Text>
-      </Box>
+      </VStack>
+      <Text
+        transitionDuration={"150ms"}
+        textAlign="right"
+        textColor={"white"}
+        _hover={{
+          bgClip: "text",
+          bgGradient: "linear(to-br,blue.300, pink.400)",
+        }}
+      >
+        forgot password, eh? Press here, bro.
+      </Text>
       <Box zIndex={10}>
         <Button
           variant={"link"}
@@ -53,28 +120,13 @@ function SignIn() {
             bgGradient: "linear(to-br,red.600,yellow.600)",
           }}
           mb="5"
-          onClick={() => navigator("/chats")}
+          onClick={submitHandler}
+          isLoading={loading}
         >
           Sign In
         </Button>
-        <Text textColor={"white"}>
-          don't have an account?{" "}
-          <span className="font-bold">
-            <Button
-              variant="link"
-              colorScheme={"white"}
-              _hover={{
-                bgClip: "text",
-                bgGradient: "linear(to-br,blue.300,red.300)",
-              }}
-            >
-              Sign Up
-            </Button>
-          </span>
-        </Text>
       </Box>
-    </Box>
+    </ScaleFade>
   );
 }
-
 export default SignIn;
