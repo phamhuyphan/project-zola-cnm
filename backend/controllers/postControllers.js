@@ -7,22 +7,13 @@ const accessPost = asyncHandler(async (req, res) => {
 })
 
 const createPost = asyncHandler(async (req, res) => {
-    if (!req.body.users || !req.body.name) {
-        return res.status(400).send({ message: "Please fill all the field" });
-    }
+   
 
-    var users = JSON.parse(req.body.users);
-  
-    if (users.length < 2) {
-      return res.status(400).send("More than two users required");
-    }
-
-    users.push(req.user);
 
     var createPost = await Post.create({
         content: req.body.content,
         pic:req.body.pic,
-        sender:req.user
+        sender:req.user,
     })
 
     if(createPost){
@@ -62,6 +53,21 @@ const updatePost = asyncHandler(async (req, res) => {
 })
 
 const likePost = asyncHandler(async (req, res) => {
+
+    const { postId, userId } = req.body;
+    const added = await Chat.findByIdAndUpdate(
+      chatId,
+      { $push: { likes: userId } },
+      { new: true }
+    )
+      .populate("likes", "-password")
+      .populate("sender", "-password");
+    if (!added) {
+      res.status(404);
+      throw new Error(`Post not found`);
+    } else {
+      res.json(added);
+    }
 
 })
 
