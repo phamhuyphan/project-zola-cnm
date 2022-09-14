@@ -27,7 +27,7 @@ const createPost = asyncHandler(async (req, res) => {
 
 const deletePost = asyncHandler(async (req, res) => {
     const { postId } = req.body;
-    var deletePost = await Post.deleteOne(postId)
+    var deletePost = await Post.deleteOne({_id:postId})
     if(deletePost){
         res.send("delete "+postId)
     }else{
