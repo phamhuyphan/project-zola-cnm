@@ -67,3 +67,10 @@ const likePost = asyncHandler(async (req, res) => {
 
 
 
+module.exports = {
+    accessPost,
+    createPost,
+    deletePost,
+    updatePost,
+    likePost
+}
