@@ -52,6 +52,9 @@ code {
     scale: 1 !important;
   }
 }
+#bgChatZone {
+  background: url(./asset/userTest.png);
+}
 
 :root {
   --mouseX8: 0;
