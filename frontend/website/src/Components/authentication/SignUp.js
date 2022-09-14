@@ -10,7 +10,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 function SignUp({ setShow, isOpen }) {
-  const [name, setName] = useState("");
+  const [fullname, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -65,7 +65,7 @@ function SignUp({ setShow, isOpen }) {
   }
   const submitHandler = async () => {
     setLoading(true);
-    if (!name || !email || !password || !confirmpassword || !username) {
+    if (!fullname || !email || !password || !confirmpassword || !username) {
       toast({
         title: "Please fill all fields",
         status: "warning",
@@ -97,7 +97,7 @@ function SignUp({ setShow, isOpen }) {
 
       const { data } = await axios.post(
         "/api/user",
-        { username, name, email, password, pic },
+        { username, fullname, email, password, pic },
         config
       );
       toast({
@@ -140,8 +140,8 @@ function SignUp({ setShow, isOpen }) {
         />
         <Input
           type={"name"}
-          value={name}
-          placeholder="Enter your Name"
+          value={fullname}
+          placeholder="Enter your full name"
           onChange={(e) => setName(e.target.value)}
           bgColor={"white"}
           borderRadius="lg"

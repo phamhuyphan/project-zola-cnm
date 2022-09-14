@@ -112,12 +112,12 @@ function WelcomePage() {
             ứng dụng mạng xã hội hot nhất hiện nay
           </Text>
         </Box>
-        {show ? (
-          <SignIn setShow={setShow} isOpen={isOpen} />
+        {!show ? (
+          <SignIn setShow={setShow} isOpen={!isOpen} />
         ) : (
-          <SignUp setShow={setShow} isOpen={isOpen} />
+          <SignUp setShow={setShow} isOpen={!isOpen} />
         )}
-        {show ? (
+        {!show ? (
           <Text textColor={"white"}>
             don't have an account?{" "}
             <span className="font-bold">
@@ -133,7 +133,7 @@ function WelcomePage() {
                   onToggle(false);
                 }}
               >
-                {!show ? "Sign Up" : "Sign In"}
+                Sign Up
               </Button>
             </span>
           </Text>
@@ -149,7 +149,7 @@ function WelcomePage() {
                   bgGradient: "linear(to-br,blue.300,red.300)",
                 }}
                 onClick={() => {
-                  setShow(true);
+                  setShow(!show);
                   onToggle(true);
                 }}
               >

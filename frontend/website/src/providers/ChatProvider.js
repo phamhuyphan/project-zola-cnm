@@ -8,7 +8,17 @@ const ChatProvider = ({ children }) => {
   const [user, setUser] = useState({});
   const [chats, setChats] = useState([]);
   const [closeSideBar, setCloseSideBar] = useState(false);
+
   const navigator = useNavigate();
+  useEffect(() => {
+    //fecth local storage
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    setUser(userInfo);
+    if (!userInfo) {
+      navigator("/");
+    }
+  }, [navigator]);
+
   return (
     <ChatContext.Provider
       value={{

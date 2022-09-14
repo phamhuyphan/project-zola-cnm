@@ -34,7 +34,9 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { ChatState } from "../providers/ChatProvider";
+import ProfileModal from "./ProfileModal";
 
 function SideBarClosed() {
   const bg = useColorModeValue(
@@ -45,9 +47,14 @@ function SideBarClosed() {
     "linear(to-b,#1E2B6F,#193F5F)",
     "linear(to-b,white,#B1AEC6)"
   );
-  const { closeSideBar, setCloseSideBar } = ChatState();
+  const { closeSideBar, setCloseSideBar, user } = ChatState();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigator = useNavigate();
+  const logoutHandler = () => {
+    localStorage.removeItem("userInfo");
+    navigator("/");
+  };
   const btnRef = React.useRef();
 
   return (
@@ -68,32 +75,6 @@ function SideBarClosed() {
         top="0"
         zIndex={10}
       >
-        {/* <Menu>
-          <MenuButton
-            as={IconButton}
-            border="none"
-            aria-label="Options"
-            _hover={{
-              bgColor: "transparent",
-            }}
-            _active={{
-              bgColor: "transparent",
-            }}
-            icon={
-              <HamburgerIcon
-                fontSize={25}
-                textColor={colorMode === "light" ? "white" : "black"}
-              />
-            }
-            variant="outline"
-          />
-          <MenuList>
-            <MenuItem icon={<InfoIcon />}>Infomation</MenuItem>
-            <Divider />
-            <MenuItem icon={<ArrowForwardIcon />}>Log out</MenuItem>
-          </MenuList>
-        </Menu> */}
-
         <IconButton
           placement="left"
           icon={<HamburgerIcon />}
@@ -115,14 +96,17 @@ function SideBarClosed() {
             <DrawerHeader textAlign={"center"}>Menu</DrawerHeader>
 
             <DrawerBody>
-              <VStack spacing={0}>
-                <Button w={"full"} leftIcon={<InfoIcon />} variant="ghost">
-                  Profile
-                </Button>
+              <VStack spacing={0} align="stretch">
+                <ProfileModal user={user}>
+                  <Button w={"full"} leftIcon={<InfoIcon />} variant="ghost">
+                    <Text>Infomation</Text>
+                  </Button>{" "}
+                </ProfileModal>
                 <Button
                   w={"full"}
                   leftIcon={<ArrowForwardIcon />}
                   variant="ghost"
+                  onClick={logoutHandler}
                 >
                   Logout
                 </Button>
@@ -154,14 +138,13 @@ function SideBarClosed() {
         />
         <Box display="flex" w="fit-content" borderRadius="full">
           <Box position="relative">
-            <Tooltip hasArrow label="@iamlouis">
+            <Tooltip hasArrow label={"@" + user?.username}>
               <Avatar
                 id="bgChatZone"
-                name="Louis Vincent"
-                src={
-                  "https://images.pexels.com/photos/1715092/pexels-photo-1715092.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                }
+                name={user?.fullname}
+                src={user?.pic}
                 size="md"
+                outline={"white 2px solid "}
               >
                 <AvatarBadge
                   boxSize={5}
@@ -178,8 +161,8 @@ function SideBarClosed() {
               verticalAlign={"middle"}
               textColor={"white"}
               fontSize={"small"}
-              top={-1}
-              right={-1}
+              top={0}
+              left={0}
               w={5}
               h={5}
             >

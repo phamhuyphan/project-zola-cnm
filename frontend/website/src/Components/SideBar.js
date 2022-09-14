@@ -25,6 +25,8 @@ import {
 import React from "react";
 import ChatList from "./ChatsList";
 import { ChatState } from "../providers/ChatProvider";
+import { useNavigate } from "react-router-dom";
+import ProfileModal from "./ProfileModal";
 function SideBar() {
   const bg = useColorModeValue(
     "linear(to-t,blue.900,purple.900)",
@@ -34,8 +36,13 @@ function SideBar() {
     "linear(to-b,#1E2B6F,#193F5F)",
     "linear(to-b,white,#B1AEC6)"
   );
-  const { closeSideBar, setCloseSideBar } = ChatState();
+  const { closeSideBar, setCloseSideBar, user } = ChatState();
   const { colorMode, toggleColorMode } = useColorMode();
+  const navigator = useNavigate();
+  const logoutHandler = () => {
+    localStorage.removeItem("userInfo");
+    navigator("/");
+  };
   return (
     <Box
       className="scrollbar-thin scrollbar-thumb-blue-900  scrollbar-track-transparent "
@@ -60,45 +67,41 @@ function SideBar() {
           borderRadius="full"
           bgGradient={colorLoggedUser}
           boxShadow="xl"
+          justifyContent={"space-between"}
         >
-          <Box position="relative" mr={3}>
-            <Avatar
-              id="bgChatZone"
-              name="Louis Vincent"
-              src={
-                "https://images.pexels.com/photos/1715092/pexels-photo-1715092.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-              }
-            >
-              <AvatarBadge
-                boxSize={5}
-                bg="green.500"
-                borderColor={colorMode === "light" ? "darkblue" : "white"}
-              ></AvatarBadge>
-            </Avatar>
-            <Text
-              bgColor={"red"}
-              position="absolute"
-              borderRadius={"full"}
-              textAlign="center"
-              verticalAlign={"middle"}
-              textColor={"white"}
-              fontSize={"small"}
-              top={-1}
-              right={-3}
-              w={7}
-              h={7}
-              border={"4px solid transparent"}
-            >
-              12
-            </Text>
-          </Box>
-          <Box textColor={useColorModeValue("white", "black")}>
-            <Text opacity={0.7} fontSize="xs">
-              @iamlouis
-            </Text>
-            <Text fontSize={"lg"} lineHeight={1}>
-              Louis Vincent
-            </Text>
+          <Box display="flex">
+            <Box position="relative" mr={3}>
+              <Avatar id="bgChatZone" name={user?.fullname} src={user?.pic}>
+                <AvatarBadge
+                  boxSize={5}
+                  bg="green.500"
+                  borderColor={colorMode === "light" ? "darkblue" : "white"}
+                ></AvatarBadge>
+              </Avatar>
+              <Text
+                bgColor={"red"}
+                position="absolute"
+                borderRadius={"full"}
+                textAlign="center"
+                verticalAlign={"middle"}
+                textColor={"white"}
+                fontSize={"small"}
+                top={0}
+                left={0}
+                w={5}
+                h={5}
+              >
+                12
+              </Text>
+            </Box>
+            <Box textColor={useColorModeValue("white", "black")}>
+              <Text opacity={0.7} fontSize="xs">
+                @{user?.username}
+              </Text>
+              <Text fontSize={"lg"} lineHeight={1}>
+                {user?.fullname}
+              </Text>
+            </Box>
           </Box>
           <Menu>
             <MenuButton
@@ -121,12 +124,19 @@ function SideBar() {
               variant="outline"
             />
             <MenuList>
-              <MenuItem icon={<InfoIcon />}>Infomation</MenuItem>
+              <ProfileModal user={user}>
+                <MenuItem icon={<InfoIcon />}>
+                  <Text>Infomation</Text>
+                </MenuItem>
+              </ProfileModal>
               <Divider />
-              <MenuItem icon={<ArrowForwardIcon />}>Log out</MenuItem>
+              <MenuItem icon={<ArrowForwardIcon />} onClick={logoutHandler}>
+                Log out
+              </MenuItem>
             </MenuList>
           </Menu>
         </Box>
+
         <IconButton
           variant="outline"
           size={"lg"}

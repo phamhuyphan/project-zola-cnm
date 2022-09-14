@@ -57,7 +57,7 @@ function SignIn({ setShow, isOpen }) {
       navigate("/chats");
     } catch (error) {
       toast({
-        title: "Sign in failed",
+        title: "Sign in failed " + error,
         status: "error",
         duration: 2500,
         isClosable: true,
