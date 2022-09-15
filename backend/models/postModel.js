@@ -3,7 +3,7 @@ const postSchema= mongoose.Schema(
   {
     content: { type: "string", trim: true },
 
-    imageUrl: {
+    pic: {
         type: String,
         default:
           "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
@@ -17,6 +17,6 @@ const postSchema= mongoose.Schema(
   { timestamps: true }
 );
 
-const Post = mongoose.model("Chat", postSchema);
+const Post = mongoose.model("Post", postSchema);
 
 module.exports = Post;

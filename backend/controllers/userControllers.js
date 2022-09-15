@@ -23,7 +23,7 @@ const allUsers = asyncHandler(async (req, res) => {
 //@route           POST /api/user/
 //@access          Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { username, fullname, email, password, pic } = req.body;
+  const {username, fullname ,email, password, pic } = req.body;
 
   if (!username || !email || !password || !fullname) {
     res.status(400);
@@ -49,7 +49,7 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(201).json({
       _id: user._id,
       username: user.username,
-      fullname: user.fullname,
+      fullname:user.fullname,
       email: user.email,
       //isAdmin: user.isAdmin,
       pic: user.pic,
@@ -74,6 +74,7 @@ const authUser = asyncHandler(async (req, res) => {
       _id: user._id,
       username: user.username,
       fullname: user.fullname,
+      fullname:user.fullname,
       email: user.email,
       //isAdmin: user.isAdmin,
       pic: user.pic,
