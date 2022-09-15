@@ -14,9 +14,7 @@ const ChatProvider = ({ children }) => {
     //fecth local storage
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     setUser(userInfo);
-    if (!userInfo) {
-      navigator("/");
-    }
+    if (!userInfo) navigator("/");
   }, [navigator]);
 
   return (

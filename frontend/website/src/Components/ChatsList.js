@@ -11,7 +11,7 @@ import { chatsData } from "../fakedata";
 import { ChatState } from "../providers/ChatProvider";
 
 function ChatList() {
-  const { setChats, chats, setSelectedChat, selectedChat } = ChatState();
+  const { setChats, chats, setSelectedChat, selectedChat, user } = ChatState();
   useEffect(() => {
     if (chatsData.length > 0) setChats(chatsData);
     console.log(chats);
@@ -22,6 +22,11 @@ function ChatList() {
     <VStack zIndex={1} mb={5}>
       {chats.map((chat) => (
         <Box
+          key={chat._id}
+          className="transition-opacity"
+          _hover={{
+            opacity: user?._id !== chat.users[1]._id ? "0.80" : "1",
+          }}
           onClick={() => setSelectedChat(chat)}
           cursor="pointer"
           bgColor={

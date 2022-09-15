@@ -45,7 +45,7 @@ function SideBar() {
   };
   return (
     <Box
-      className="scrollbar-thin scrollbar-thumb-blue-900  scrollbar-track-transparent "
+      className="scrollbar-thin  scrollbar-track-transparent scrollbar-thumb-slate-500"
       bgGradient={bg}
       h="full"
       position={"relative"}

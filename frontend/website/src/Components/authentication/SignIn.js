@@ -11,10 +11,12 @@ import {
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChatState } from "../../providers/ChatProvider";
 function SignIn({ setShow, isOpen }) {
   const navigator = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { user, setUser } = ChatState();
   let navigate = useNavigate();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
@@ -53,7 +55,9 @@ function SignIn({ setShow, isOpen }) {
       });
 
       localStorage.setItem("userInfo", JSON.stringify(data));
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
       setLoading(false);
+      setUser(userInfo);
       navigate("/chats");
     } catch (error) {
       toast({
