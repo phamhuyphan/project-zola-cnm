@@ -56,7 +56,7 @@ const fetchChats = asyncHandler(async (req, res) => {
   try {
     Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
       .populate("users", "-password")
-      .populate("groupAdmin", "-password")
+      .populate("chatAdmin", "-password")
       .populate("latestMessage")
       .sort({ updateAt: -1 })
       .then(async (results) => {
@@ -95,7 +95,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
     });
     const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
       .populate("users", "-password")
-      .populate("groupAdmin", "-password");
+      .populate("chatAdmin", "-password");
 
     res.status(200).json(fullGroupChat);
   } catch (error) {
@@ -113,7 +113,7 @@ const renameGroupChat = asyncHandler(async (req, res) => {
     { new: true }
   )
     .populate("users", "-password")
-    .populate("groupAdmin", "-password");
+    .populate("chatAdmin", "-password");
   if (!updatedChat) {
     res.status(404);
     throw new Error(`Chat not found`);

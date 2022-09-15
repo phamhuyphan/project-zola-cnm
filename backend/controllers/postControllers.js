@@ -3,7 +3,10 @@ const Post = require("../models/postModel")
 const Comment = require("../models/commentModel")
 
 const accessPost = asyncHandler(async (req, res) => {
-    res.json(Post.find())
+    var post = await Post.find()
+            .populate("likes", "-password")
+            .populate("sender", "-password");
+    res.json(post)
 })
 
 const createPost = asyncHandler(async (req, res) => {
@@ -54,10 +57,10 @@ const updatePost = asyncHandler(async (req, res) => {
 
 const likePost = asyncHandler(async (req, res) => {
 
-    const { postId, userId } = req.body;
-    const added = await Chat.findByIdAndUpdate(
-      chatId,
-      { $push: { likes: userId } },
+    const { postId } = req.body;
+    const added = await Post.findByIdAndUpdate(
+      postId,
+      { $addToSet: { likes: req.user } },
       { new: true }
     )
       .populate("likes", "-password")
