@@ -6,7 +6,7 @@ import SideBarClosed from "../Components/SideBarClosed";
 import { ChatState } from "../providers/ChatProvider";
 
 function ChatPage() {
-  const { closeSideBar, setCloseSideBar } = ChatState();
+  const { closeSideBar, user } = ChatState();
 
   return (
     <Container

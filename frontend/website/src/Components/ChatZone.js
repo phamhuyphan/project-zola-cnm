@@ -14,7 +14,7 @@ import { ChatState } from "../providers/ChatProvider";
 import MessageZone from "./MessageZone";
 
 function ChatZone() {
-  const { selectedChat, setSelectedChat } = ChatState();
+  const { selectedChat, setSelectedChat, user } = ChatState();
   const { colorMode, toggleColorMode } = useColorMode();
   const bgColor = useColorModeValue(
     "linear(to-b,#1E2B6F,#193F5F)",
@@ -24,9 +24,7 @@ function ChatZone() {
     <Box
       w={"full"}
       h="full"
-      bgImage={
-        "url(https://images.pexels.com/photos/1715092/pexels-photo-1715092.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)"
-      }
+      bgImage={`url(${user?.pic})`}
       bgRepeat="no-repeat"
       bgPosition={"center"}
       bgSize="cover"
