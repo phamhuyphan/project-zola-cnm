@@ -10,8 +10,6 @@ const accessPost = asyncHandler(async (req, res) => {
 })
 
 const createPost = asyncHandler(async (req, res) => {
-   
-
 
     var createPost = await Post.create({
         content: req.body.content,
