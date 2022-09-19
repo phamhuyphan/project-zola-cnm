@@ -86,4 +86,32 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { allUsers, registerUser, authUser };
+const addFriend = asyncHandler(async (req, res) => {
+
+  const { userId } = req.body;
+  const added = await User.findByIdAndUpdate(
+    req.user._id,
+    { $addToSet: { friends: userId } },
+    { new: true }
+  )
+
+  if (!added) {
+    res.status(404);
+    throw new Error(`Post not found`);
+  } else {
+    res.json({
+      _id: added._id,
+      username: added.username,
+      fullname: added.fullname,
+      fullname:added.fullname,
+      email: added.email,
+      friends: added.friends,
+      //isAdmin: user.isAdmin,
+      pic: added.pic,
+    });
+  }
+
+})
+
+
+module.exports = { allUsers, registerUser, authUser, addFriend };
