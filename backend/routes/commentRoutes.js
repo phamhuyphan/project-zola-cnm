@@ -12,6 +12,6 @@ const router = express.Router();
 
 router.route("/:postId").get(protect, getAllComments);
 router.route("/").post(protect, createComment);
-
+router.route("/").delete(protect, deleteComment);
 
 module.exports = router;
