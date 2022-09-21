@@ -3,12 +3,14 @@ const {
   registerUser,
   authUser,
   allUsers,
+  addFriend
 } = require("../controllers/userControllers");
 const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 router.route("/").get(protect,allUsers);
+router.route("/addfriend").put(protect,addFriend);
 router.route("/").post(registerUser);
 router.post("/login", authUser);
 
