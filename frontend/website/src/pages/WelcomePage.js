@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
 import gsap from "gsap";
 import SignIn from "../Components/authentication/SignIn";
-import {
-  Box,
-  Button,
-  Container,
-  ScaleFade,
-  Text,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Button, Container, Text, useDisclosure } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import SignUp from "../Components/authentication/SignUp";
 function WelcomePage() {

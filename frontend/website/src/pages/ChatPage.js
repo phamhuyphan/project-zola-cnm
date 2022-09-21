@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { Box, Container } from "@chakra-ui/react";
 import SideBar from "../Components/SideBar";
 import ChatZone from "../Components/ChatZone";
@@ -7,6 +7,7 @@ import { ChatState } from "../providers/ChatProvider";
 
 function ChatPage() {
   const { closeSideBar, user } = ChatState();
+  const [fetchAgain, setFetchAgain] = useState(false);
 
   return (
     <Container
@@ -19,7 +20,7 @@ function ChatPage() {
     >
       {!closeSideBar ? (
         <Box flex={{ lg: 0.33333, base: 1 }}>
-          <SideBar />
+          <SideBar fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
         </Box>
       ) : (
         <Box flex={{ lg: 0, base: 1 }}>

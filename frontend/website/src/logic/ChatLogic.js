@@ -16,7 +16,6 @@ export const getSender = (loggedUser, users) => {
  * @returns a sender information
  */
 export const getSenderInfo = (loggedUser, users) => {
-  console.log(users[0]._id === loggedUser._id ? users[1] : users[0]);
   return users[0]._id === loggedUser._id ? users[1] : users[0];
 };
 /**

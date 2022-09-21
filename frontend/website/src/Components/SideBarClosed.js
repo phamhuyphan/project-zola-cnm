@@ -22,10 +22,6 @@ import {
   DrawerOverlay,
   IconButton,
   Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Text,
   Tooltip,
   useColorMode,
@@ -47,7 +43,7 @@ function SideBarClosed() {
     "linear(to-b,#1E2B6F,#193F5F)",
     "linear(to-b,white,#B1AEC6)"
   );
-  const { closeSideBar, setCloseSideBar, user } = ChatState();
+  const { setCloseSideBar, user } = ChatState();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigator = useNavigate();

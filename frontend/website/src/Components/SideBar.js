@@ -27,7 +27,7 @@ import ChatList from "./ChatsList";
 import { ChatState } from "../providers/ChatProvider";
 import { useNavigate } from "react-router-dom";
 import ProfileModal from "./ProfileModal";
-function SideBar() {
+function SideBar({ fetchAgain, setfetchAgain }) {
   const bg = useColorModeValue(
     "linear(to-t,blue.900,purple.900)",
     "linear(to-b,#C39A9E,#808293)"
@@ -36,7 +36,7 @@ function SideBar() {
     "linear(to-b,#1E2B6F,#193F5F)",
     "linear(to-b,white,#B1AEC6)"
   );
-  const { closeSideBar, setCloseSideBar, user } = ChatState();
+  const { setCloseSideBar, user } = ChatState();
   const { colorMode, toggleColorMode } = useColorMode();
   const navigator = useNavigate();
   const logoutHandler = () => {
@@ -98,14 +98,21 @@ function SideBar() {
               <Text opacity={0.7} fontSize="xs">
                 @{user?.username}
               </Text>
-              <Text fontSize={"lg"} lineHeight={1}>
+              <Text
+                fontSize={"lg"}
+                lineHeight={1}
+                textOverflow="ellipsis"
+                w="125px"
+                noOfLines={1}
+              >
                 {user?.fullname}
               </Text>
             </Box>
           </Box>
           <Menu>
             <MenuButton
-              mx={3}
+              mx={2}
+              mt={1}
               as={IconButton}
               border="none"
               aria-label="Options"
@@ -151,7 +158,7 @@ function SideBar() {
           }}
         />
       </Box>
-      <ChatList />
+      <ChatList fetchAgain={fetchAgain} setFetchAgain={setfetchAgain} />
     </Box>
   );
 }
