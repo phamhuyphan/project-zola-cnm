@@ -61,7 +61,7 @@ function SignIn({ setShow, isOpen }) {
       navigate("/chats");
     } catch (error) {
       toast({
-        title: "Sign in failed " + error,
+        title: "Sign in failed! Your password or email address is invalid!  ",
         status: "error",
         duration: 2500,
         isClosable: true,

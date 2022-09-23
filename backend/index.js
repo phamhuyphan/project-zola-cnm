@@ -14,7 +14,6 @@ const messageRoutes = require("./routes/messageRoutes");
 const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 
-
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/user", userRoutes);
@@ -22,12 +21,50 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
+
 const PORT = 5000;
-app.listen(PORT, () => {
-  console.log("Server start at", PORT);
+const server = app.listen(
+  PORT,
+  console.log(`server listening on port ${PORT}`.yellow.bold)
+);
+const io = require("socket.io")(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: "http://localhost:3000",
+  },
 });
 
+io.on("connection", (socket) => {
+  console.log("connected to socket.io");
+  //create a new socket where frontend join  data
+  socket.on("setup", (userData) => {
+    console.log("user data:", userData);
+    socket.join(userData._id);
+    socket.emit("connected");
+  });
 
+  //user join a chat socket
+  socket.on("join chat", (room) => {
+    socket.join(room);
+    console.log("user joind room: " + room);
+  });
 
+  //tying indicator socket
+  socket.on("typing", (room) => socket.in(room).emit("typing"));
+  //stop tying i0ndicator socket
+  socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
+  socket.on("new message", (newMessageRecieved) => {
+    let chat = newMessageRecieved.chat;
+    if (!chat.users) return console.log("chat.users is empty");
+    chat.users.forEach((user) => {
+      if (user._id == newMessageRecieved.sender._id) return;
+      socket.in(user._id).emit("message recieved", newMessageRecieved);
+    });
+  });
 
+  socket.off("setup", () => {
+    console.log("USER DISCONNECTED");
+    socket.leave(userData._id);
+  });
+});

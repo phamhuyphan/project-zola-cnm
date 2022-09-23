@@ -22,10 +22,6 @@ import {
   DrawerOverlay,
   IconButton,
   Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Text,
   Tooltip,
   useColorMode,
@@ -40,14 +36,14 @@ import ProfileModal from "./ProfileModal";
 
 function SideBarClosed() {
   const bg = useColorModeValue(
-    "linear(to-t,blue.900,purple.900)",
-    "linear(to-b,#C39A9E,#808293)"
+    "linear(to-b,#C39A9E,#808293)",
+    "linear(to-t,blue.900,purple.900)"
   );
   const colorLoggedUser = useColorModeValue(
     "linear(to-b,#1E2B6F,#193F5F)",
     "linear(to-b,white,#B1AEC6)"
   );
-  const { closeSideBar, setCloseSideBar, user } = ChatState();
+  const { setCloseSideBar, user } = ChatState();
   const { colorMode, toggleColorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigator = useNavigate();
@@ -149,7 +145,7 @@ function SideBarClosed() {
                 <AvatarBadge
                   boxSize={5}
                   bg="green.500"
-                  borderColor={colorMode === "light" ? "darkblue" : "white"}
+                  borderColor={colorMode === "light" ? "white" : "darkblue"}
                 ></AvatarBadge>
               </Avatar>
             </Tooltip>
