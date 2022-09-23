@@ -6,8 +6,9 @@ import SideBarClosed from "../Components/SideBarClosed";
 import { ChatState } from "../providers/ChatProvider";
 
 function ChatPage() {
-  const { closeSideBar, user } = ChatState();
+  const { closeSideBar } = ChatState();
   const [fetchAgain, setFetchAgain] = useState(false);
+  const { selectedChat } = ChatState();
 
   return (
     <Container
@@ -18,18 +19,28 @@ function ChatPage() {
       p={0}
       className="transition-all "
     >
-      {!closeSideBar ? (
-        <Box flex={{ lg: 0.33333, base: 1 }}>
-          <SideBar fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
-        </Box>
-      ) : (
-        <Box flex={{ lg: 0, base: 1 }}>
-          <SideBarClosed />
-        </Box>
-      )}
+      <Box
+        display={{
+          base: !selectedChat ? "flex" : "none",
+          md: closeSideBar ? "none" : "flex",
+        }}
+        flex={{ base: "1", md: "0.3" }}
+      >
+        <SideBar fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+      </Box>
+      <Box
+        w={"fit-content"}
+        display={{ base: "none", md: closeSideBar ? "flex" : "none" }}
+        flex={{ base: "1", md: "0" }}
+      >
+        <SideBarClosed />
+      </Box>
 
-      <Box flex={1} display={{ lg: "initial", base: 0 }}>
-        <ChatZone />
+      <Box
+        display={{ base: !selectedChat ? "none" : "flex", md: "flex" }}
+        flex={{ base: closeSideBar ? "1" : "auto", md: "1" }}
+      >
+        <ChatZone fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
       </Box>
     </Container>
   );

@@ -12,7 +12,7 @@ import {
 import moment from "moment";
 import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
-import { getSender } from "../logic/ChatLogic";
+import { getSender, getSenderInfo } from "../logic/ChatLogic";
 
 function ChatList({ fetchAgain, setfetchAgain }) {
   const [loggedUser, setLoggedUser] = useState(null);
@@ -69,7 +69,7 @@ function ChatList({ fetchAgain, setfetchAgain }) {
           justifyContent="space-between"
           borderRadius={"full"}
           mt={3}
-          w={350}
+          w={"90%"}
           p={2}
           mx={3}
         >
@@ -80,12 +80,15 @@ function ChatList({ fetchAgain, setfetchAgain }) {
                 ? chat.chatName
                 : loggedUser._id && getSender(loggedUser, chat.users)
             }
+            src={getSenderInfo(user, chat.users).pic}
           >
-            <AvatarBadge
-              boxSize={5}
-              bg="green.500"
-              borderColor={"white"}
-            ></AvatarBadge>
+            {!chat.isGroupChat && (
+              <AvatarBadge
+                boxSize={5}
+                bg="green.500"
+                borderColor={"white"}
+              ></AvatarBadge>
+            )}
           </Avatar>
 
           <Box>

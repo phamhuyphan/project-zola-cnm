@@ -23,7 +23,7 @@ const allUsers = asyncHandler(async (req, res) => {
 //@route           POST /api/user/
 //@access          Public
 const registerUser = asyncHandler(async (req, res) => {
-  const {username, fullname ,email, password, pic } = req.body;
+  const { username, fullname, email, password, pic } = req.body;
 
   if (!username || !email || !password || !fullname) {
     res.status(400);
@@ -49,7 +49,7 @@ const registerUser = asyncHandler(async (req, res) => {
     res.status(201).json({
       _id: user._id,
       username: user.username,
-      fullname:user.fullname,
+      fullname: user.fullname,
       email: user.email,
       //isAdmin: user.isAdmin,
       pic: user.pic,
@@ -74,7 +74,6 @@ const authUser = asyncHandler(async (req, res) => {
       _id: user._id,
       username: user.username,
       fullname: user.fullname,
-      fullname:user.fullname,
       email: user.email,
       //isAdmin: user.isAdmin,
       pic: user.pic,
@@ -87,13 +86,12 @@ const authUser = asyncHandler(async (req, res) => {
 });
 
 const addFriend = asyncHandler(async (req, res) => {
-
   const { userId } = req.body;
   const added = await User.findByIdAndUpdate(
     req.user._id,
     { $addToSet: { friends: userId } },
     { new: true }
-  )
+  );
 
   if (!added) {
     res.status(404);
@@ -103,15 +101,12 @@ const addFriend = asyncHandler(async (req, res) => {
       _id: added._id,
       username: added.username,
       fullname: added.fullname,
-      fullname:added.fullname,
       email: added.email,
       friends: added.friends,
       //isAdmin: user.isAdmin,
       pic: added.pic,
     });
   }
-
-})
-
+});
 
 module.exports = { allUsers, registerUser, authUser, addFriend };
