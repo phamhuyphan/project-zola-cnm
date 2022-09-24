@@ -8,7 +8,6 @@ import {
   Avatar,
   AvatarBadge,
   Box,
-  Button,
   FormControl,
   IconButton,
   Input,
@@ -201,8 +200,13 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           justifyContent="center"
           alignItems="center"
         >
-          <Text fontSize="3xl" textColor={"whiteAlpha.900"}>
-            CHOOSE A CHAT TO GET START{" "}
+          <Text
+            mixBlendMode={"difference"}
+            fontSize="3xl"
+            textAlign={"center"}
+            textColor={"whiteAlpha.900"}
+          >
+            CHOOSE A CHAT TO GET START
           </Text>
         </Box>
       ) : (
@@ -258,6 +262,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       borderRadius="full"
                       display={{ base: "flex", md: "none" }}
                       icon={<ChevronLeftIcon />}
+                      textColor="black"
                       size="12px"
                       onClick={() => setSelectedChat("")}
                     />
@@ -336,16 +341,21 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   />
                   <IconButton
                     variant={"ghost"}
-                    bgGradient={
-                      colorMode === "light"
-                        ? "linear(to-b,#1E2B6F,#193F5F)"
-                        : "linear(to-b,#C39A9E,#808293)"
-                    }
                     className="transition-opacity"
                     borderRadius="full"
                     onClick={toggleColorMode}
+                    transform="unset"
                     _hover={{
+                      transform: "rotate(40deg)",
+
                       color: "black",
+                      bgGradient:
+                        colorMode === "light"
+                          ? "linear(to-b,#C39A9E,#808293)"
+                          : "linear(to-b,#1E2B6F,#193F5F)",
+                    }}
+                    _pressed={{
+                      transform: "rotate(360deg)",
                     }}
                     icon={
                       colorMode === "light" ? (
@@ -372,6 +382,9 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       w="fit-content"
                       border={"1px solid black"}
                       display="flex"
+                      pos="relative"
+                      bottom={-5}
+                      borderRadius={"full"}
                     >
                       <Lottie
                         width={40}
@@ -388,8 +401,16 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                           marginLeft: 0,
                         }}
                       />
-                      <Text textColor={"white"} mixBlendMode={"difference"}>
-                        someone is typing
+                      <Text
+                        mixBlendMode={"difference"}
+                        textColor="blackAlpha.900"
+                      >
+                        {selectedChat.isGroupChat
+                          ? getSender(user, selectedChat.users)
+                          : selectedChat.users[0]._id !== user._id
+                          ? selectedChat.users[1].fullname
+                          : selectedChat.users[0].fullname}{" "}
+                        is typing
                       </Text>
                     </Box>
                   ) : (
@@ -397,10 +418,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   )}
                   <InputGroup size="lg" marginY={4}>
                     <Input
-                      variant="filled"
+                      variant="outline"
                       rounded={"full"}
                       bg="white"
-                      filter="invert(1)"
+                      textColor={"black"}
                       placeholder="Type something..."
                       value={newMessage}
                       onChange={typingHandler}

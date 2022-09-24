@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Avatar,
   AvatarBadge,
   Box,
   Text,
-  useColorModeValue,
   useToast,
   VStack,
 } from "@chakra-ui/react";
@@ -40,6 +39,7 @@ function ChatList({ fetchAgain, setfetchAgain }) {
       });
     }
   };
+
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
@@ -52,7 +52,8 @@ function ChatList({ fetchAgain, setfetchAgain }) {
           key={chat._id}
           className="transition-opacity"
           _hover={{
-            opacity: loggedUser?._id !== chat.users[1]._id ? "0.80" : "1",
+            opacity: selectedChat?._id !== chat._id ? "0.80" : "1",
+            outline: "2px solid white",
           }}
           onClick={() => setSelectedChat(chat)}
           cursor="pointer"
@@ -69,7 +70,7 @@ function ChatList({ fetchAgain, setfetchAgain }) {
           justifyContent="space-between"
           borderRadius={"full"}
           mt={3}
-          w={"90%"}
+          w={"95%"}
           p={2}
           mx={3}
         >
@@ -85,13 +86,13 @@ function ChatList({ fetchAgain, setfetchAgain }) {
             {!chat.isGroupChat && (
               <AvatarBadge
                 boxSize={5}
-                bg="green.500"
+                bg={"green.500"}
                 borderColor={"white"}
               ></AvatarBadge>
             )}
           </Avatar>
 
-          <Box>
+          <Box flex="auto" px="2" maxW="400px" w="0.5">
             <Text fontWeight={"bold"} textColor={"black"}>
               {chat.isGroupChat
                 ? chat.chatName
@@ -99,7 +100,7 @@ function ChatList({ fetchAgain, setfetchAgain }) {
             </Text>
             <Text
               textColor={"black"}
-              w="180px"
+              w={{ base: "100%", md: "180px" }}
               textOverflow={"ellipsis"}
               overflow="hidden"
               whiteSpace={"nowrap"}
@@ -125,7 +126,8 @@ function ChatList({ fetchAgain, setfetchAgain }) {
             fontSize="12"
             bgGradient="linear(to-br,blue.900,blue.800)"
             textAlign={"right"}
-            w="80px"
+            w={{ base: "150px", md: "80px" }}
+            p={{ base: "5", md: "1" }}
           >
             {moment(chat.latestMessage?.createdAt).calendar()}
           </Text>

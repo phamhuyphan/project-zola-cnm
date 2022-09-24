@@ -1,6 +1,7 @@
 import { ViewIcon } from "@chakra-ui/icons";
 import {
   Avatar,
+  Box,
   IconButton,
   Modal,
   ModalBody,
@@ -27,12 +28,36 @@ function ProfileModal({ user, children }) {
       <Modal size="lg" isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader fontSize="40px" display="flex" justifyContent="center">
-            User Infomation
+          <ModalHeader
+            bg="white"
+            fontSize="40px"
+            display="flex"
+            justifyContent="center"
+            pos={"relative"}
+          >
+            <Box
+              bg={"black"}
+              w="full"
+              top="-10"
+              h="150px"
+              pos="absolute"
+              zIndex={0}
+            ></Box>
+            <Avatar
+              size="2xl"
+              name={user.fullname}
+              pos="relative"
+              zIndex={10}
+              src={user.pic}
+            />
           </ModalHeader>
           <ModalCloseButton />
-          <ModalBody display="flex" flexDir="row" justifyContent="space-around">
-            <Avatar size="2xl" name={user.fullname} src={user.pic} />
+          <ModalBody
+            display="flex"
+            flexDir="column"
+            alignItems={"center"}
+            justifyContent="space-around"
+          >
             <div>
               <Text>User Name: @{user.username}</Text>
               <Text>Name: {user.fullname}</Text>

@@ -36,6 +36,7 @@ const io = require("socket.io")(server, {
 
 io.on("connection", (socket) => {
   console.log("connected to socket.io");
+
   //create a new socket where frontend join  data
   socket.on("setup", (userData) => {
     console.log("user data:", userData);
@@ -51,7 +52,8 @@ io.on("connection", (socket) => {
 
   //tying indicator socket
   socket.on("typing", (room) => socket.in(room).emit("typing"));
-  //stop tying i0ndicator socket
+
+  //stop tying indicator socket
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
   socket.on("new message", (newMessageRecieved) => {
