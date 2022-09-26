@@ -15,9 +15,15 @@ import { getSender, getSenderInfo } from "../logic/ChatLogic";
 
 function ChatList({ fetchAgain, setfetchAgain }) {
   const [loggedUser, setLoggedUser] = useState(null);
-
-  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+  const { selectedChat, setSelectedChat, user, setUser, chats, setChats } =
+    ChatState();
   const toast = useToast();
+  useEffect(() => {
+    setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
+    setUser(loggedUser);
+    fetchChats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchAgain]);
   const fetchChats = async () => {
     try {
       const config = {
@@ -25,7 +31,6 @@ function ChatList({ fetchAgain, setfetchAgain }) {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      //get req
       const { data } = await axios.get(`/api/chat`, config);
       setChats(data);
     } catch (error) {
@@ -40,11 +45,6 @@ function ChatList({ fetchAgain, setfetchAgain }) {
     }
   };
 
-  useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
-    fetchChats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchAgain]);
   return (
     <VStack zIndex={1} mb={5}>
       {chats.map((chat) => (
@@ -79,7 +79,7 @@ function ChatList({ fetchAgain, setfetchAgain }) {
             name={
               chat.isGroupChat
                 ? chat.chatName
-                : loggedUser._id && getSender(loggedUser, chat.users)
+                : loggedUser?._id && getSender(loggedUser, chat.users)
             }
             src={getSenderInfo(user, chat.users).pic}
           >
@@ -114,7 +114,7 @@ function ChatList({ fetchAgain, setfetchAgain }) {
                 `@${chat.latestMessage?.sender.username}: ${chat.latestMessage?.content} `
               ) : (
                 `${
-                  getSender(loggedUser, chat.users) === user.name
+                  getSender(loggedUser, chat.users) === user.fullname
                     ? "You: " + chat.latestMessage?.content
                     : chat.latestMessage?.content
                 }`

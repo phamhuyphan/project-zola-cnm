@@ -56,7 +56,7 @@ function SideBarClosed() {
     notification,
     setNotification,
   } = ChatState();
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigator = useNavigate();
   const logoutHandler = () => {

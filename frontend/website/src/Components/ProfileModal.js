@@ -1,8 +1,6 @@
-import { ViewIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
-  IconButton,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -58,11 +56,13 @@ function ProfileModal({ user, children }) {
             alignItems={"center"}
             justifyContent="space-around"
           >
-            <div>
-              <Text>User Name: @{user.username}</Text>
-              <Text>Name: {user.fullname}</Text>
+            <Box display={"flex"} flexDir="column" alignItems="center">
+              <Text>@{user.username}</Text>
+              <Text fontSize={"xl"} fontWeight={"bold"}>
+                {user.fullname}
+              </Text>
               <Text>Email: {user.email}</Text>
-            </div>
+            </Box>
           </ModalBody>
 
           <ModalFooter></ModalFooter>

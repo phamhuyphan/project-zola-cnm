@@ -129,7 +129,7 @@ function GroupChatModal({ children }) {
         w={10}
         borderRadius="full"
       >
-        <i class="fa fa-users"></i>
+        <i className="fa fa-users"></i>
         <Text position="absolute" top="0" right="2">
           +
         </Text>

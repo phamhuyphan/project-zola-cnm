@@ -8,6 +8,7 @@ import {
   Avatar,
   AvatarBadge,
   Box,
+  Fade,
   FormControl,
   IconButton,
   Input,
@@ -17,6 +18,7 @@ import {
   Text,
   useColorMode,
   useColorModeValue,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -43,10 +45,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
-  const [hoverring, setHoverring] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const toast = useToast();
+  const { isOpen, onToggle } = useDisclosure();
+
   const { user, selectedChat, setSelectedChat, notification, setNotification } =
     ChatState();
   const fetchMessages = async () => {
@@ -131,6 +134,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     }, timerLength);
   };
+
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit("setup", user);
@@ -139,9 +143,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     });
     socket.on("typing", () => {
       setIsTyping(true);
+      onToggle();
     });
     socket.on("stop typing", () => {
       setIsTyping(false);
+      onToggle();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -152,7 +158,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat]);
 
-  console.log(notification);
   useEffect(() => {
     socket.on("message recieved", (newMessageRecieved) => {
       if (
@@ -290,10 +295,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       textColor={colorMode === "light" ? "black" : "white"}
                     >
                       {selectedChat.isGroupChat ? (
-                        <div
-                          onMouseEnter={() => setHoverring(true)}
-                          onMouseLeave={() => setHoverring(false)}
-                        >
+                        <div>
                           <UpdateGroupChatModal
                             fetchAgain={fetchAgain}
                             setFetchAgain={setFetchAgain}
@@ -378,41 +380,46 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   pos="absolute"
                 >
                   {isTyping ? (
-                    <Box
-                      w="fit-content"
-                      border={"1px solid black"}
-                      display="flex"
-                      pos="relative"
-                      bottom={-5}
-                      borderRadius={"full"}
-                    >
-                      <Lottie
-                        width={40}
-                        options={{
-                          loop: true,
-                          autoplay: true,
-                          animationData: animationData,
-                          rendererSettings: {
-                            preserveAspectRatio: "xMidYMid slice",
-                          },
-                        }}
-                        style={{
-                          marginBottom: 15,
-                          marginLeft: 0,
-                        }}
-                      />
-                      <Text
-                        mixBlendMode={"difference"}
-                        textColor="blackAlpha.900"
+                    <Fade in={onToggle}>
+                      <Box
+                        w="fit-content"
+                        border={"1px solid black"}
+                        display="flex"
+                        pos="relative"
+                        bottom={-5}
+                        bgColor={"blackAlpha.800"}
+                        borderRadius={"full"}
+                        p={1}
                       >
-                        {selectedChat.isGroupChat
-                          ? getSender(user, selectedChat.users)
-                          : selectedChat.users[0]._id !== user._id
-                          ? selectedChat.users[1].fullname
-                          : selectedChat.users[0].fullname}{" "}
-                        is typing
-                      </Text>
-                    </Box>
+                        <Lottie
+                          width={40}
+                          options={{
+                            loop: true,
+                            autoplay: true,
+                            animationData: animationData,
+                            rendererSettings: {
+                              preserveAspectRatio: "xMidYMid slice",
+                            },
+                          }}
+                          style={{
+                            marginBottom: 0,
+                            marginLeft: 0,
+                          }}
+                        />
+                        <Text
+                          mixBlendMode={"difference"}
+                          textColor="white"
+                          fontSize={12}
+                        >
+                          {selectedChat.isGroupChat
+                            ? getSender(user, selectedChat.users)
+                            : selectedChat.users[0]._id !== user._id
+                            ? selectedChat.users[1].fullname
+                            : selectedChat.users[0].fullname}{" "}
+                          is typing
+                        </Text>
+                      </Box>
+                    </Fade>
                   ) : (
                     <></>
                   )}
@@ -425,8 +432,14 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       placeholder="Type something..."
                       value={newMessage}
                       onChange={typingHandler}
+                      _focus={{
+                        opacity: 0.8,
+                      }}
                     />
-                    <InputRightElement width="4.5rem">
+                    <InputRightElement
+                      width="5.5rem"
+                      justifyContent={"space-around"}
+                    >
                       <Text
                         className={`shadow-md
                       ${
@@ -436,11 +449,19 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       }
                       rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
                       >
-                        <i
-                          class="fa fa-paper-plane"
-                          aria-hidden="true"
-                          onClick={sendMessage}
-                        ></i>
+                        <i class="fa fa-smile" aria-hidden="true"></i>
+                      </Text>
+                      <Text
+                        className={`shadow-md
+                      ${
+                        colorMode === "light"
+                          ? "text-darkblue bg-gradient-to-bl from-white to-[#B1AEC6]"
+                          : "text-white bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
+                      }
+                      rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
+                        onClick={sendMessage}
+                      >
+                        <i className="fa fa-paper-plane" aria-hidden="true"></i>
                       </Text>
                     </InputRightElement>
                   </InputGroup>

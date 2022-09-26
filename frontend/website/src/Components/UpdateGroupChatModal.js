@@ -152,7 +152,7 @@ function UpdateGroupChatModal({
       return;
     }
     //check if admin of the chat group is the logged user or not
-    if (selectedChat.groupAdmin._id !== user._id) {
+    if (selectedChat.chatAdmin._id !== user._id) {
       toast({
         title: "Only admins can add new members",
         description: "error",
@@ -224,6 +224,7 @@ function UpdateGroupChatModal({
                 <UserBadgeItem
                   key={u._id}
                   _user={u}
+                  isAdmin={selectedChat?.chatAdmin._id === u._id}
                   handleFunction={() => handleRemove(u)}
                 />
               ))}
