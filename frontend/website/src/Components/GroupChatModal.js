@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useState } from "react";
-import { ChatState } from "../../context/ChatProvider";
+import { ChatState } from "../providers/ChatProvider";
 import UserBadgeItem from "./UserBadgeItem";
 import UserListItem from "./UserListItem";
 
@@ -123,13 +123,13 @@ function GroupChatModal({ children }) {
   return (
     <>
       <Button
+        bg="transparent"
         onClick={onOpen}
         position="relative"
-        bg="white"
         w={10}
         borderRadius="full"
       >
-        <i class="fa fa-users"></i>
+        <i className="fa fa-users"></i>
         <Text position="absolute" top="0" right="2">
           +
         </Text>

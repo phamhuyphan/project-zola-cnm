@@ -22,6 +22,10 @@ import {
   DrawerOverlay,
   IconButton,
   Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
   Text,
   Tooltip,
   useColorMode,
@@ -31,6 +35,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { getSender } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
 import ProfileModal from "./ProfileModal";
 
@@ -43,8 +48,15 @@ function SideBarClosed() {
     "linear(to-b,#1E2B6F,#193F5F)",
     "linear(to-b,white,#B1AEC6)"
   );
-  const { setCloseSideBar, user } = ChatState();
-  const { colorMode, toggleColorMode } = useColorMode();
+  const {
+    setCloseSideBar,
+    user,
+    setSelectedChat,
+
+    notification,
+    setNotification,
+  } = ChatState();
+  const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigator = useNavigate();
   const logoutHandler = () => {
@@ -59,7 +71,6 @@ function SideBarClosed() {
       h="full"
       position={"relative"}
       w="fit-content"
-      overflow={"auto"}
       py={5}
       px={2}
     >
@@ -134,36 +145,63 @@ function SideBarClosed() {
         />
         <Box display="flex" w="fit-content" borderRadius="full">
           <Box position="relative">
-            <Tooltip hasArrow label={"@" + user?.username}>
-              <Avatar
-                id="bgChatZone"
-                name={user?.fullname}
-                src={user?.pic}
-                size="md"
-                outline={"white 2px solid "}
+            <Menu>
+              <MenuButton
+                position="relative"
+                borderRadius="full"
+                border="3px solid black"
+                _hover={{
+                  borderColor: "yellow.500",
+                }}
+                onClick={() => setCloseSideBar(false)}
+                mr={3}
               >
-                <AvatarBadge
-                  boxSize={5}
-                  bg="green.500"
-                  borderColor={colorMode === "light" ? "white" : "darkblue"}
-                ></AvatarBadge>
-              </Avatar>
-            </Tooltip>
-            <Text
-              bgColor={"red"}
-              position="absolute"
-              borderRadius={"full"}
-              textAlign="center"
-              verticalAlign={"middle"}
-              textColor={"white"}
-              fontSize={"small"}
-              top={0}
-              left={0}
-              w={5}
-              h={5}
-            >
-              12
-            </Text>
+                <Box borderRadius="full" id="bgChatZone">
+                  <Avatar size={"md"} name={user?.fullname} src={user?.pic}>
+                    <AvatarBadge
+                      boxSize={5}
+                      bg="green.500"
+                      borderColor={colorMode === "light" ? "white" : "darkblue"}
+                    ></AvatarBadge>
+                  </Avatar>
+                  {notification.length > 0 && (
+                    <Text
+                      position="absolute"
+                      bg="red"
+                      borderRadius="full"
+                      w="22px"
+                      fontSize="14px"
+                      h="22px"
+                      verticalAlign="middle"
+                      color="white"
+                      top="0px"
+                      right="0px"
+                    >
+                      {notification.length}
+                    </Text>
+                  )}
+                </Box>
+              </MenuButton>
+              <MenuList pl={2}>
+                {!notification.length && "No new messages"}
+                {notification.map((notify) => (
+                  <MenuItem
+                    key={notify._id}
+                    onClick={() => {
+                      setSelectedChat(notify.chat);
+                      setNotification(notify.filter((n) => n !== notify));
+                    }}
+                  >
+                    {notify.chat.isGroupChat
+                      ? `New Message(s) in ${notify.chat.chatName}`
+                      : `New Message(s) from ${getSender(
+                          user,
+                          notify.chat.users
+                        )}`}
+                  </MenuItem>
+                ))}
+              </MenuList>
+            </Menu>
           </Box>
         </Box>
       </Box>

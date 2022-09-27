@@ -2,7 +2,7 @@ import { CloseIcon } from "@chakra-ui/icons";
 import { Box } from "@chakra-ui/react";
 import React from "react";
 
-function UserBadgeItem({ _user, handleFunction }) {
+function UserBadgeItem({ _user, handleFunction, isAdmin }) {
   return (
     <Box
       px={2}
@@ -18,10 +18,13 @@ function UserBadgeItem({ _user, handleFunction }) {
       textColor="white"
       cursor="pointer"
       onClick={handleFunction}
-      bg={`red `}
+      opacity="0.7"
+      bg={`${isAdmin ? "yellow" : "red"}`}
+      transition="all 0.25s ease-in-out"
+      _hover={{ opacity: "1", textDecor: "line-through" }}
     >
       @{_user?.username}
-      <CloseIcon pl={1} />
+      {!isAdmin && <CloseIcon pl={1} />}
     </Box>
   );
 }

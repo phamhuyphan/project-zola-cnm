@@ -1,11 +1,9 @@
-import { Avatar, Box, Text, Tooltip, useToast, VStack } from "@chakra-ui/react";
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { Avatar, Box, Text, Tooltip } from "@chakra-ui/react";
+import React from "react";
 import {
   isLastMessage,
   isSameSender,
   isSameSenderMargin,
-  isSameSenderSendMessage,
   isSameUserMargin,
 } from "../logic/ChatLogic";
 import moment from "moment";
@@ -57,7 +55,7 @@ function MessageList({ messages }) {
                 display: "flex",
                 alignItems: "center",
                 padding: "5px 20px",
-                maxWidth: "100%",
+                maxWidth: "75%",
                 marginLeft: isSameSenderMargin(messages, m, i, user._id),
                 marginTop: isSameUserMargin(messages, m, i, user._id) ? 5 : 30,
               }}
