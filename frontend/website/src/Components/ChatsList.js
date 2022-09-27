@@ -28,7 +28,7 @@ function ChatList({ fetchAgain, setfetchAgain }) {
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${JSON.parse(localStorage.getItem("userInfo")).token}`,
         },
       };
       const { data } = await axios.get(`/api/chat`, config);
