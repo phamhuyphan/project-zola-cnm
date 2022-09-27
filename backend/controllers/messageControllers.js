@@ -56,4 +56,10 @@ const sendMessage = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { allMessages, sendMessage };
+
+const deleteMessage = asyncHandler(async (req, res) => {
+  const { messageId } = req.body
+  Message.findByIdAndUpdate(messageId,{content: "deleted"}).then((message) => {res.send(message)})
+})
+
+module.exports = { allMessages, sendMessage,deleteMessage };
