@@ -196,6 +196,20 @@ const deleteMe = asyncHandler(async (req, res) => {
   Message.deleteMany({chat:req.body.chatId}).then((data) => { res.send(data) })
 })
 
+const changAdmin = asyncHandler(async (req, res) => {
+  const findchat = await Chat.findById(req.body.chatId)
+  if(!findchat) {res.send("Not found group")} 
+  else{
+    console.log("dasdasdasdasadas");
+    const up= await Chat.findOneAndUpdate({_id: req.body.chatId,chatAdmin:req.user._id},{chatAdmin:req.body.userId})
+    if(up){
+      res.send(up)
+    }else{
+      res.send("er")
+    }
+  }
+})
+
 module.exports = {
   accessChat,
   fetchChats,
@@ -204,5 +218,6 @@ module.exports = {
   addToGroup,
   removeFromGroup,
   deleteGroup,
-  deleteMe
+  deleteMe,
+  changAdmin
 };
