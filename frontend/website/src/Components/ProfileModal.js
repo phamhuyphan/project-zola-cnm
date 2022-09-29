@@ -43,10 +43,10 @@ function ProfileModal({ user, children }) {
             ></Box>
             <Avatar
               size="2xl"
-              name={user.fullname}
+              name={user?.fullname}
               pos="relative"
               zIndex={10}
-              src={user.pic}
+              src={user?.pic}
             />
           </ModalHeader>
           <ModalCloseButton />
@@ -57,11 +57,11 @@ function ProfileModal({ user, children }) {
             justifyContent="space-around"
           >
             <Box display={"flex"} flexDir="column" alignItems="center">
-              <Text>@{user.username}</Text>
+              <Text>@{user?.username}</Text>
               <Text fontSize={"xl"} fontWeight={"bold"}>
-                {user.fullname}
+                {user?.fullname}
               </Text>
-              <Text>Email: {user.email}</Text>
+              <Text>Email: {user?.email}</Text>
             </Box>
           </ModalBody>
 

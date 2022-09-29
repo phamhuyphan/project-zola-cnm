@@ -30,10 +30,12 @@ import {
   HamburgerIcon,
   InfoIcon,
   MoonIcon,
+  SearchIcon,
   SunIcon,
   ViewIcon,
 } from "@chakra-ui/icons";
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import ChatList from "./ChatsList";
 import { ChatState } from "../providers/ChatProvider";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +44,7 @@ import UserListItem from "./UserListItem";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./GroupChatModal";
-function SideBar({ fetchAgain, setfetchAgain }) {
+function SideBar({ fetchAgain, setFetchAgain }) {
   const bg = useColorModeValue(
     "linear(to-b,#C39A9E,#808293)",
     "linear(to-t,blue.900,purple.900)"
@@ -69,10 +71,15 @@ function SideBar({ fetchAgain, setfetchAgain }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isHover, setHover] = useState(false);
   const toast = useToast();
+  const [isOn, setIsOn] = useState(false);
+
+  const toggleSwitch = () => setIsOn(!isOn);
+
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
     navigator("/");
   };
+
   const handleSearch = async () => {
     if (!search) {
       toast({
@@ -265,21 +272,17 @@ function SideBar({ fetchAgain, setfetchAgain }) {
                 px="3"
               >
                 {/**Add group chat */}
-                <Tooltip
-                  label="Create a group chat with"
-                  hasArrow
-                  placement="bottom-end"
-                >
-                  <GroupChatModal>
-                    <Button
-                      display="flex"
-                      fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-                      rightIcon={<AddIcon />}
-                    >
-                      New Group Chat
-                    </Button>
-                  </GroupChatModal>
-                </Tooltip>
+
+                <GroupChatModal>
+                  <Button
+                    display="flex"
+                    fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+                    rightIcon={<AddIcon fontSize={"25px"} />}
+                  >
+                    New Group Chat
+                  </Button>
+                </GroupChatModal>
+
                 {/**button serch */}
                 <Tooltip
                   label="Search users to chat with"
@@ -293,7 +296,7 @@ function SideBar({ fetchAgain, setfetchAgain }) {
                     mx={1}
                     w={{ base: "17px", md: "10px", lg: "17px" }}
                   >
-                    <i className="fa fa-search" aria-hidden="true"></i>
+                    <SearchIcon fontSize={"25px"} />
                   </Button>
                 </Tooltip>
 
@@ -335,33 +338,50 @@ function SideBar({ fetchAgain, setfetchAgain }) {
                 {/** Change theme (md) */}
                 <Box
                   position={"absolute"}
-                  top={0}
-                  left={-10}
+                  top={1}
+                  left={-14}
                   display={{ base: "inline-block", md: "none" }}
                 >
-                  <IconButton
-                    variant={"ghost"}
-                    className="transition-opacity"
-                    borderRadius="full"
-                    onClick={toggleColorMode}
-                    transform="unset"
-                    _hover={{
-                      transform: "rotate(40deg)",
+                  <div
+                    className={`${
+                      isOn ? "justify-end" : "justify-start"
+                    } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer `}
+                    onClick={toggleSwitch}
+                  >
+                    <motion.div
+                      className="handle w-[20px] flex justify-center items-center h-[20px]  rounded-full"
+                      layout
+                      transition={{
+                        type: "spring",
+                        stiffness: 700,
+                        damping: 30,
+                      }}
+                    >
+                      <IconButton
+                        variant={"ghost"}
+                        className="transition-opacity"
+                        borderRadius="full"
+                        onClick={toggleColorMode}
+                        transform="unset"
+                        _hover={{
+                          transform: "rotate(40deg)",
 
-                      color: "black",
-                      bgGradient:
-                        colorMode === "light"
-                          ? "linear(to-b,#C39A9E,#808293)"
-                          : "linear(to-b,#1E2B6F,#193F5F)",
-                    }}
-                    icon={
-                      colorMode === "light" ? (
-                        <MoonIcon textColor={"white"} />
-                      ) : (
-                        <SunIcon textColor={"yellow"} />
-                      )
-                    }
-                  />
+                          color: "black",
+                          bgGradient:
+                            colorMode === "light"
+                              ? "linear(to-b,#C39A9E,#808293)"
+                              : "linear(to-b,#1E2B6F,#193F5F)",
+                        }}
+                        icon={
+                          colorMode === "light" ? (
+                            <MoonIcon textColor={"white"} />
+                          ) : (
+                            <SunIcon textColor={"yellow"} />
+                          )
+                        }
+                      />
+                    </motion.div>
+                  </div>
                 </Box>
               </Box>
             </Box>
@@ -419,7 +439,7 @@ function SideBar({ fetchAgain, setfetchAgain }) {
             filter={!isHover && "grayscale(100%)"}
           ></Box>
         </Box>
-        <ChatList fetchAgain={fetchAgain} setFetchAgain={setfetchAgain} />
+        <ChatList fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
         <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
           <DrawerOverlay />
           <DrawerContent>

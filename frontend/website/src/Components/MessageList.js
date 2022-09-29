@@ -23,22 +23,23 @@ function MessageList({ messages }) {
             textColor={"blackAlpha.900"}
             alignItems="center"
             position={"relative"}
-            zIndex={-1}
+            zIndex={0}
           >
             {(isSameSender(messages, m, i, user._id) ||
               isLastMessage(messages, i, user._id)) && (
               <Tooltip
-                label={m.sender.name}
+                label={"@" + m.sender.username}
                 hasArrow
                 placeContent="bottom-start"
               >
                 <Avatar
                   size="md"
+                  showBorder={true}
                   cursor="pointer"
                   my="auto"
                   mr={2}
                   display={m.sender._id === user._id && "none"}
-                  name={m.sender.name}
+                  name={m.sender.username}
                   src={m.sender.pic}
                   marginTop={
                     isSameUserMargin(messages, m, i, user._id) ? 0 : 45
@@ -46,22 +47,31 @@ function MessageList({ messages }) {
                 />
               </Tooltip>
             )}
-            <span
-              style={{
-                backgroundColor: `${
-                  m.sender._id === user._id ? "#BEE3F8" : "white"
-                }`,
-                borderRadius: "10px",
-                display: "flex",
-                alignItems: "center",
-                padding: "5px 20px",
-                maxWidth: "75%",
-                marginLeft: isSameSenderMargin(messages, m, i, user._id),
-                marginTop: isSameUserMargin(messages, m, i, user._id) ? 5 : 30,
-              }}
+            <Tooltip
+              label={moment(m.createdAt).calendar()}
+              hasArrow
+              placeContent="bottom-start"
             >
-              {m.content}
-            </span>
+              <Text
+                className="shadow-lg"
+                style={{
+                  backgroundColor: `${
+                    m.sender._id === user._id ? "#BEE3F8" : "white"
+                  }`,
+                  borderRadius: "10px",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "5px 20px",
+                  maxWidth: "75%",
+                  marginLeft: isSameSenderMargin(messages, m, i, user._id),
+                  marginTop: isSameUserMargin(messages, m, i, user._id)
+                    ? 5
+                    : 30,
+                }}
+              >
+                {m.content}
+              </Text>
+            </Tooltip>
             {(isSameSender(messages, m, i, user._id) ||
               isLastMessage(messages, i, user._id)) && (
               <Box
