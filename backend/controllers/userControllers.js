@@ -109,4 +109,6 @@ const addFriend = asyncHandler(async (req, res) => {
   }
 });
 
+
+
 module.exports = { allUsers, registerUser, authUser, addFriend };
