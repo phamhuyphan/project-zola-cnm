@@ -93,7 +93,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   };
   const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage) {
-      setFetchAgain(!fetchAgain);
       if (user) socket.emit("stop typing", selectedChat._id);
 
       try {
@@ -115,6 +114,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         socket.emit("new message", data);
         console.log(data);
         setMessages([...messages, data]);
+        setFetchAgain(!fetchAgain);
       } catch (error) {
         toast({
           title: "Error Occured",
@@ -294,6 +294,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       <AvatarGroup size={"sm"} max={2} marginRight={3}>
                         {selectedChat.users.map((u) => (
                           <Avatar
+                            key={u._id}
                             size={"xs"}
                             name={selectedChat.chatName}
                             src={u.pic}
@@ -310,7 +311,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       >
                         <AvatarBadge
                           boxSize={5}
-                          bg={"green.500"}
+                          bg={
+                            getSenderInfo(user, selectedChat.users).statusOnline
+                              ? "green.500"
+                              : "red.500"
+                          }
                           borderColor={"white"}
                         ></AvatarBadge>
                       </Avatar>
@@ -328,7 +333,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                             fetchMessages={fetchMessages}
                           >
                             <Text _hover={{ textDecor: "underline" }}>
-                              {selectedChat.chatName}
+                              {selectedChat.users[0].fullname}
                             </Text>
                           </UpdateGroupChatModal>
                         </div>
@@ -341,9 +346,15 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                           </ProfileModal>
                         </>
                       )}
-                      {selectedChat.isGroupChat && (
+                      {selectedChat.isGroupChat ? (
                         <Text fontWeight={"normal"}>
                           {selectedChat.users.length} members
+                        </Text>
+                      ) : (
+                        <Text fontWeight={"normal"}>
+                          {getSenderInfo(user, selectedChat.users).statusOnline
+                            ? "online"
+                            : "offline"}
                         </Text>
                       )}
                     </Text>

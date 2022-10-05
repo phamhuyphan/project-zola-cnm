@@ -15,13 +15,9 @@ import axios from "axios";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
 
 function ChatList({ fetchAgain, setFetchAgain }) {
-  const [loggedUser, setLoggedUser] = useState(null);
-  const { selectedChat, setSelectedChat, user, setUser, chats, setChats } =
-    ChatState();
+  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
   useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
-    setUser(loggedUser);
     fetchChats();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchAgain]);
@@ -100,7 +96,12 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                 pl={1}
               >
                 {chat.users.map((u) => (
-                  <Avatar size={"md"} name={chat.chatName} src={u.pic} />
+                  <Avatar
+                    key={u._id}
+                    size={"md"}
+                    name={chat.chatName}
+                    src={u.pic}
+                  />
                 ))}
               </AvatarGroup>
             ) : (
@@ -114,7 +115,11 @@ function ChatList({ fetchAgain, setFetchAgain }) {
               >
                 <AvatarBadge
                   boxSize={5}
-                  bg={"green.500"}
+                  bg={
+                    getSenderInfo(user, chat.users).statusOnline
+                      ? "green.500"
+                      : "red.500"
+                  }
                   borderColor={"white"}
                 ></AvatarBadge>
               </Avatar>

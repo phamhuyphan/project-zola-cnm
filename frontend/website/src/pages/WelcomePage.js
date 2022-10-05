@@ -10,7 +10,24 @@ function WelcomePage() {
   const isPresent = useIsPresent();
   const navigator = useNavigate();
   useEffect(() => {
-    !isPresent && console.log("I've been removed!");
+    isPresent &&
+      gsap.fromTo(
+        "#square1",
+        { y: -200, x: 200 },
+        { y: 0, x: 0, duration: 1.25, zIndex: 1, rotation: 45 }
+      );
+    isPresent &&
+      gsap.fromTo(
+        "#square2",
+        { y: 200, x: 200 },
+        { y: 0, x: 0, duration: 1.5, zIndex: 2, rotation: -45 }
+      );
+    isPresent &&
+      gsap.fromTo(
+        "#picture_login",
+        { y: 0, x: 400, rotation: 0, zIndex: 3, scale: 1.5 },
+        { y: 0, x: 0, duration: 1.75, zIndex: 3, scale: 1.5 }
+      );
   }, [isPresent]);
   useEffect(() => {
     //fecth local storage
@@ -19,21 +36,6 @@ function WelcomePage() {
   }, [navigator]);
   const [show, setShow] = useState(false);
   //Animation
-  gsap.fromTo(
-    "#square1",
-    { y: -200, x: 200 },
-    { y: 0, x: 0, duration: 1.25, zIndex: 1, rotation: 45 }
-  );
-  gsap.fromTo(
-    "#square2",
-    { y: 200, x: 200 },
-    { y: 0, x: 0, duration: 1.5, zIndex: 2, rotation: -45 }
-  );
-  gsap.fromTo(
-    "#picture_login",
-    { y: 0, x: 400, rotation: 0, zIndex: 3, scale: 1.5 },
-    { y: 0, x: 0, duration: 1.75, zIndex: 3, scale: 1.5 }
-  );
 
   return (
     <div className="overflow-hidden relative max-w-full transition-transform bg-gradient-to-b from-dark-blue to-deep-blue h-[100vh]">

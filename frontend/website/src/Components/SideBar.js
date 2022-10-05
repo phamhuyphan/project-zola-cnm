@@ -207,7 +207,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                       <Avatar size={"md"} name={user?.fullname} src={user?.pic}>
                         <AvatarBadge
                           boxSize={5}
-                          bg={"green.500"}
+                          bg={user.statusOnline ? "green.500" : "red.500"}
                           borderColor={
                             colorMode === "light" ? "white" : "darkblue"
                           }
@@ -257,7 +257,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                     fontSize={"lg"}
                     lineHeight={1}
                     textOverflow="ellipsis"
-                    w="125px"
+                    w={{ lg: "125px", md: "fit-content" }}
                     noOfLines={1}
                   >
                     {user?.fullname}
