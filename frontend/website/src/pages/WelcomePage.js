@@ -1,13 +1,34 @@
 import React, { useEffect, useState } from "react";
 import gsap from "gsap";
 import SignIn from "../Components/authentication/SignIn";
-import { Box, Button, Container, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Text, useDisclosure } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import SignUp from "../Components/authentication/SignUp";
+import { motion, useIsPresent } from "framer-motion";
 function WelcomePage() {
   const { isOpen, onToggle } = useDisclosure();
-
+  const isPresent = useIsPresent();
   const navigator = useNavigate();
+  useEffect(() => {
+    isPresent &&
+      gsap.fromTo(
+        "#square1",
+        { y: -200, x: 200 },
+        { y: 0, x: 0, duration: 1.25, zIndex: 1, rotation: 45 }
+      );
+    isPresent &&
+      gsap.fromTo(
+        "#square2",
+        { y: 200, x: 200 },
+        { y: 0, x: 0, duration: 1.5, zIndex: 2, rotation: -45 }
+      );
+    isPresent &&
+      gsap.fromTo(
+        "#picture_login",
+        { y: 0, x: 400, rotation: 0, zIndex: 3, scale: 1.5 },
+        { y: 0, x: 0, duration: 1.75, zIndex: 3, scale: 1.5 }
+      );
+  }, [isPresent]);
   useEffect(() => {
     //fecth local storage
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -15,28 +36,9 @@ function WelcomePage() {
   }, [navigator]);
   const [show, setShow] = useState(false);
   //Animation
-  gsap.fromTo(
-    "#square1",
-    { y: -200, x: 200 },
-    { y: 0, x: 0, duration: 1.25, zIndex: 1, rotation: 45 }
-  );
-  gsap.fromTo(
-    "#square2",
-    { y: 200, x: 200 },
-    { y: 0, x: 0, duration: 1.5, zIndex: 2, rotation: -45 }
-  );
-  gsap.fromTo(
-    "#picture_login",
-    { y: 0, x: 400, rotation: 0, zIndex: 3, scale: 1.5 },
-    { y: 0, x: 0, duration: 1.75, zIndex: 3, scale: 1.5 }
-  );
+
   return (
-    <Container
-      maxW={"100vw"}
-      overflow="hidden"
-      position="relative"
-      className="transition-transform bg-gradient-to-b from-dark-blue to-deep-blue h-[100vh]"
-    >
+    <div className="overflow-hidden relative max-w-full transition-transform bg-gradient-to-b from-dark-blue to-deep-blue h-[100vh]">
       <Box
         id="login_form"
         position="relative"
@@ -155,7 +157,15 @@ function WelcomePage() {
       <Box id="picture_login"></Box>
       <Box id="square1"></Box>
       <Box id="square2"></Box>
-    </Container>
+
+      <motion.div
+        initial={{ scaleX: 1 }}
+        animate={{ scaleX: 0, transition: { duration: 0.5, ease: "circOut" } }}
+        exit={{ scaleX: 1, transition: { duration: 0.5, ease: "circIn" } }}
+        style={{ originX: isPresent ? 0 : 1 }}
+        className="fixed top-0 bottom-0 left-0 right-0 bg-indigo-700 z-40 overflow-hidden"
+      />
+    </div>
   );
 }
 

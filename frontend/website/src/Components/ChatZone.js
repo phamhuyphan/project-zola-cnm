@@ -7,8 +7,9 @@ import {
 import {
   Avatar,
   AvatarBadge,
+  AvatarGroup,
   Box,
-  Button,
+  Fade,
   FormControl,
   IconButton,
   Input,
@@ -18,6 +19,7 @@ import {
   Text,
   useColorMode,
   useColorModeValue,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
@@ -27,7 +29,7 @@ import React, { useEffect, useState } from "react";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
 import MessageList from "./MessageList";
-
+import { motion } from "framer-motion";
 import animationData from "../animations/52671-typing-animation-in-chat.json";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import ProfileModal from "./ProfileModal";
@@ -44,19 +46,25 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
-  const [hoverring, setHoverring] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const toast = useToast();
+  const { isOpen, onToggle } = useDisclosure();
+  const [isOn, setIsOn] = useState(false);
+  const toggleSwitch = () => setIsOn(!isOn);
+
   const { user, selectedChat, setSelectedChat, notification, setNotification } =
     ChatState();
   const fetchMessages = async () => {
     if (!selectedChat) return;
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
     try {
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
+        cancelToken: source.token,
       };
       setLoading(true);
       const { data } = await axios.get(
@@ -65,22 +73,28 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       );
       setMessages(data);
       setLoading(false);
-      socket.emit("join chat", selectedChat._id);
+      if (user) socket.emit("join chat", selectedChat._id);
     } catch (error) {
-      toast({
-        title: "Error Occured",
-        description: "Failed to send message",
-        status: "warning",
-        duration: 2500,
-        isClosable: true,
-        position: "bottom",
-      });
+      if (axios.isCancel(error)) console.log("successfully aborted");
+      else
+        toast({
+          title: "Error Occured",
+          description: "Failed to send message",
+          status: "warning",
+          duration: 2500,
+          isClosable: true,
+          position: "bottom",
+        });
     }
+    return () => {
+      // cancel the request before component unmounts
+      source.cancel();
+    };
   };
   const sendMessage = async (event) => {
     if (event.key === "Enter" && newMessage) {
-      setFetchAgain(!fetchAgain);
-      socket.emit("stop typing", selectedChat._id);
+      if (user) socket.emit("stop typing", selectedChat._id);
+
       try {
         const config = {
           headers: {
@@ -100,6 +114,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         socket.emit("new message", data);
         console.log(data);
         setMessages([...messages, data]);
+        setFetchAgain(!fetchAgain);
       } catch (error) {
         toast({
           title: "Error Occured",
@@ -132,18 +147,23 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     }, timerLength);
   };
+
   useEffect(() => {
     socket = io(ENDPOINT);
-    socket.emit("setup", user);
-    socket.on("connected", () => {
-      setSocketConnected(true);
-    });
-    socket.on("typing", () => {
-      setIsTyping(true);
-    });
-    socket.on("stop typing", () => {
-      setIsTyping(false);
-    });
+    if (user) {
+      socket.emit("setup", user);
+      socket.on("connected", () => {
+        setSocketConnected(true);
+      });
+      socket.on("typing", () => {
+        setIsTyping(true);
+        onToggle();
+      });
+      socket.on("stop typing", () => {
+        setIsTyping(false);
+        onToggle();
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -153,7 +173,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat]);
 
-  console.log(notification);
   useEffect(() => {
     socket.on("message recieved", (newMessageRecieved) => {
       if (
@@ -201,8 +220,13 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           justifyContent="center"
           alignItems="center"
         >
-          <Text fontSize="3xl" textColor={"whiteAlpha.900"}>
-            CHOOSE A CHAT TO GET START{" "}
+          <Text
+            mixBlendMode={"difference"}
+            fontSize="3xl"
+            textAlign={"center"}
+            textColor={"whiteAlpha.900"}
+          >
+            CHOOSE A CHAT TO GET START
           </Text>
         </Box>
       ) : (
@@ -213,7 +237,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
             position="relative"
             boxSize="full"
             backdropFilter="auto"
-            backdropBlur="600px"
+            backdropBlur="200px"
           >
             {loading ? (
               <Spinner size="xl" w={20} h={20} alignSelf="center" m="auto" />
@@ -236,11 +260,15 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     alignItems="center"
                     position="absolute"
                     top={5}
+                    zIndex={2}
                     left={10}
                     bgGradient={bgColor}
                     minW="300"
                     w="fit-content"
                     p={2}
+                    opacity="0.95"
+                    transition={"all 0.2s ease-in-out"}
+                    _hover={{ opacity: 1 }}
                     borderRadius="full"
                     textColor={
                       colorMode === "light"
@@ -258,44 +286,54 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       borderRadius="full"
                       display={{ base: "flex", md: "none" }}
                       icon={<ChevronLeftIcon />}
+                      textColor="black"
                       size="12px"
                       onClick={() => setSelectedChat("")}
                     />
-                    <Avatar
-                      name={
-                        selectedChat.isGroupChat
-                          ? selectedChat.chatName
-                          : getSender(user, selectedChat.users)
-                      }
-                      src={getSenderInfo(user, selectedChat.users).pic}
-                      mr={3}
-                    >
-                      {selectedChat.isGroupChat === false && (
+                    {selectedChat.isGroupChat ? (
+                      <AvatarGroup size={"sm"} max={2} marginRight={3}>
+                        {selectedChat.users.map((u) => (
+                          <Avatar
+                            key={u._id}
+                            size={"xs"}
+                            name={selectedChat.chatName}
+                            src={u.pic}
+                          />
+                        ))}
+                      </AvatarGroup>
+                    ) : (
+                      <Avatar
+                        showBorder={true}
+                        size={"md"}
+                        marginRight={3}
+                        name={user?._id && getSender(user, selectedChat.users)}
+                        src={getSenderInfo(user, selectedChat.users).pic}
+                      >
                         <AvatarBadge
                           boxSize={5}
-                          bg="green.500"
-                          borderColor={
-                            colorMode === "light" ? "white" : "darkblue"
+                          bg={
+                            getSenderInfo(user, selectedChat.users).statusOnline
+                              ? "green.500"
+                              : "red.500"
                           }
+                          borderColor={"white"}
                         ></AvatarBadge>
-                      )}
-                    </Avatar>
+                      </Avatar>
+                    )}
+
                     <Text
                       fontWeight={"bold"}
                       textColor={colorMode === "light" ? "black" : "white"}
                     >
                       {selectedChat.isGroupChat ? (
-                        <div
-                          onMouseEnter={() => setHoverring(true)}
-                          onMouseLeave={() => setHoverring(false)}
-                        >
+                        <div>
                           <UpdateGroupChatModal
                             fetchAgain={fetchAgain}
                             setFetchAgain={setFetchAgain}
                             fetchMessages={fetchMessages}
                           >
                             <Text _hover={{ textDecor: "underline" }}>
-                              {selectedChat.chatName}
+                              {selectedChat.users[0].fullname}
                             </Text>
                           </UpdateGroupChatModal>
                         </div>
@@ -308,16 +346,29 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                           </ProfileModal>
                         </>
                       )}
-                      {selectedChat.isGroupChat && (
+                      {selectedChat.isGroupChat ? (
                         <Text fontWeight={"normal"}>
                           {selectedChat.users.length} members
+                        </Text>
+                      ) : (
+                        <Text fontWeight={"normal"}>
+                          {getSenderInfo(user, selectedChat.users).statusOnline
+                            ? "online"
+                            : "offline"}
                         </Text>
                       )}
                     </Text>
                   </Box>
                 )}
-                {/** button change theme*/}
-                <Box position="absolute" top={7} right={10}>
+                {/** button group*/}
+                <Box
+                  position="absolute"
+                  top={7}
+                  right={10}
+                  zIndex={2}
+                  display="flex"
+                  alignItems={"center"}
+                >
                   <IconButton
                     variant={"ghost"}
                     className="transition-opacity"
@@ -334,27 +385,47 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       )
                     }
                   />
-                  <IconButton
-                    variant={"ghost"}
-                    bgGradient={
-                      colorMode === "light"
-                        ? "linear(to-b,#1E2B6F,#193F5F)"
-                        : "linear(to-b,#C39A9E,#808293)"
-                    }
-                    className="transition-opacity"
-                    borderRadius="full"
-                    onClick={toggleColorMode}
-                    _hover={{
-                      color: "black",
-                    }}
-                    icon={
-                      colorMode === "light" ? (
-                        <MoonIcon textColor={"white"} />
-                      ) : (
-                        <SunIcon textColor={"yellow"} />
-                      )
-                    }
-                  />
+                  <div
+                    className={`${
+                      isOn ? "justify-end" : "justify-start"
+                    } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer 
+                    `}
+                    onClick={toggleSwitch}
+                  >
+                    <motion.div
+                      className="handle w-[20px] flex justify-center items-center h-[20px]  rounded-full"
+                      layout
+                      transition={{
+                        type: "spring",
+                        stiffness: 700,
+                        damping: 20,
+                      }}
+                    >
+                      <IconButton
+                        variant={"ghost"}
+                        className="transition-opacity"
+                        borderRadius="full"
+                        onClick={toggleColorMode}
+                        transform="unset"
+                        _hover={{
+                          transform: "rotate(40deg)",
+
+                          color: "black",
+                          bgGradient:
+                            colorMode === "light"
+                              ? "linear(to-b,#C39A9E,#808293)"
+                              : "linear(to-b,#1E2B6F,#193F5F)",
+                        }}
+                        icon={
+                          colorMode === "light" ? (
+                            <MoonIcon textColor={"white"} />
+                          ) : (
+                            <SunIcon textColor={"yellow"} />
+                          )
+                        }
+                      />
+                    </motion.div>
+                  </div>
                 </Box>
 
                 <MessageList messages={messages} />
@@ -368,44 +439,66 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   pos="absolute"
                 >
                   {isTyping ? (
-                    <Box
-                      w="fit-content"
-                      border={"1px solid black"}
-                      display="flex"
-                    >
-                      <Lottie
-                        width={40}
-                        options={{
-                          loop: true,
-                          autoplay: true,
-                          animationData: animationData,
-                          rendererSettings: {
-                            preserveAspectRatio: "xMidYMid slice",
-                          },
-                        }}
-                        style={{
-                          marginBottom: 15,
-                          marginLeft: 0,
-                        }}
-                      />
-                      <Text textColor={"white"} mixBlendMode={"difference"}>
-                        someone is typing
-                      </Text>
-                    </Box>
+                    <Fade in={onToggle}>
+                      <Box
+                        w="fit-content"
+                        border={"1px solid black"}
+                        display="flex"
+                        pos="relative"
+                        bottom={-5}
+                        bgColor={"blackAlpha.800"}
+                        borderRadius={"full"}
+                        p={1}
+                      >
+                        <Lottie
+                          width={40}
+                          options={{
+                            loop: true,
+                            autoplay: true,
+                            animationData: animationData,
+                            rendererSettings: {
+                              preserveAspectRatio: "xMidYMid slice",
+                            },
+                          }}
+                          style={{
+                            marginBottom: 0,
+                            marginLeft: 0,
+                          }}
+                        />
+                        <Text
+                          mixBlendMode={"difference"}
+                          textColor="white"
+                          fontSize={12}
+                        >
+                          {selectedChat.isGroupChat
+                            ? getSender(user, selectedChat.users)
+                            : selectedChat.users[0]._id !== user._id
+                            ? selectedChat.users[1].fullname
+                            : selectedChat.users[0].fullname}{" "}
+                          is typing
+                        </Text>
+                      </Box>
+                    </Fade>
                   ) : (
                     <></>
                   )}
                   <InputGroup size="lg" marginY={4}>
                     <Input
-                      variant="filled"
+                      variant="outline"
                       rounded={"full"}
                       bg="white"
-                      filter="invert(1)"
+                      textColor={"black"}
                       placeholder="Type something..."
                       value={newMessage}
                       onChange={typingHandler}
+                      _focus={{
+                        opacity: 0.8,
+                      }}
                     />
-                    <InputRightElement width="4.5rem">
+                    <InputRightElement
+                      width="5.5rem"
+                      justifyContent={"space-around"}
+                    >
                       <Text
                         className={`shadow-md
                       ${
@@ -415,11 +508,19 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       }
                       rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
                       >
-                        <i
-                          class="fa fa-paper-plane"
-                          aria-hidden="true"
-                          onClick={sendMessage}
-                        ></i>
+                        <i className="fa fa-smile" aria-hidden="true"></i>
+                      </Text>
+                      <Text
+                        className={`shadow-md
+                      ${
+                        colorMode === "light"
+                          ? "text-darkblue bg-gradient-to-bl from-white to-[#B1AEC6]"
+                          : "text-white bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
+                      }
+                      rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
+                        onClick={sendMessage}
+                      >
+                        <i className="fa fa-paper-plane" aria-hidden="true"></i>
                       </Text>
                     </InputRightElement>
                   </InputGroup>

@@ -34,13 +34,31 @@ const io = require("socket.io")(server, {
   },
 });
 
+
+
+/////////////////////////////////////////
+const User = require("./models/userModel");
+/////////////////////////////////////////
+
+
 io.on("connection", (socket) => {
   console.log("connected to socket.io");
+  let user
   //create a new socket where frontend join  data
-  socket.on("setup", (userData) => {
+  socket.on("setup",async (userData) => {
+    user = userData._id;
+     //Thay doi status
+    const i = await User.findByIdAndUpdate(
+      userData._id,
+      { statusOnline:true },
+    )
+
     console.log("user data:", userData);
     socket.join(userData._id);
-    socket.emit("connected");
+    socket.emit("connected",socket.id);
+   
+    console.log("status",i);
+
   });
 
   //user join a chat socket
@@ -51,7 +69,8 @@ io.on("connection", (socket) => {
 
   //tying indicator socket
   socket.on("typing", (room) => socket.in(room).emit("typing"));
-  //stop tying i0ndicator socket
+
+  //stop tying indicator socket
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
   socket.on("new message", (newMessageRecieved) => {
@@ -63,8 +82,19 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.off("setup", () => {
+  socket.off("setup", async () => {
     console.log("USER DISCONNECTED");
     socket.leave(userData._id);
   });
+
+  socket.on("disconnect", async () => {
+
+    //Thay doi status
+    const i = await User.findByIdAndUpdate(
+      user,
+      { statusOnline: false },   
+    )
+    console.log("Loagout", i);
+  })
+
 });

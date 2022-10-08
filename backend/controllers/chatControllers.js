@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
+const Message = require("../models/messageModel");
 
 const accessChat = asyncHandler(async (req, res) => {
   const { userId } = req.body;
@@ -10,7 +11,7 @@ const accessChat = asyncHandler(async (req, res) => {
   }
 
   //last message
-  var isChat = await Chat.find({
+  let isChat = await Chat.find({
     isGroupChat: false,
     $and: [
       { users: { $elemMatch: { $eq: req.user._id } } },
@@ -28,7 +29,7 @@ const accessChat = asyncHandler(async (req, res) => {
   if (isChat.length > 0) {
     res.send(isChat[0]);
   } else {
-    var chatData = {
+    let chatData = {
       chatName: "sender",
       isGroupChat: false,
       users: [req.user._id, userId],
@@ -78,7 +79,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
     return res.status(400).send({ message: "Please fill all the field" });
   }
 
-  var users = JSON.parse(req.body.users);
+  let users = JSON.parse(req.body.users);
 
   if (users.length < 2) {
     return res.status(400).send("More than two users required");
@@ -156,6 +157,59 @@ const removeFromGroup = asyncHandler(async (req, res) => {
   }
 });
 
+const deleteGroup = asyncHandler(async (req, res) => {
+
+  const findchat = await Chat.findById(req.body.chatId)
+  if(!findchat) {res.send("Not found group")} 
+  else{
+
+    if(findchat.isGroupChat==true){
+      
+      await Chat.findOneAndDelete({_id: req.body.chatId, chatAdmin: req.user._id}).then((data) => {        
+        if(data)
+        {
+          Message.deleteMany({chat:req.body.chatId}).then((data) => {console.log(data);})
+          res.send(data)
+        }
+        else
+        res.send("You are not chat admin")
+      })
+      
+    }else{
+      
+      await Chat.findByIdAndDelete({_id: req.body.chatId}).then((data) => { 
+        if(data)
+        {
+          Message.deleteMany({chat:req.body.chatId}).then((data) => {console.log(data);})
+          res.send(data)
+        }
+        
+        else
+        res.send("error delete")
+      })
+    }
+
+  }
+})
+
+const deleteMe = asyncHandler(async (req, res) => {
+  Message.deleteMany({chat:req.body.chatId}).then((data) => { res.send(data) })
+})
+
+const changAdmin = asyncHandler(async (req, res) => {
+  const findchat = await Chat.findById(req.body.chatId)
+  if(!findchat) {res.send("Not found group")} 
+  else{
+    console.log("dasdasdasdasadas");
+    const up= await Chat.findOneAndUpdate({_id: req.body.chatId,chatAdmin:req.user._id},{chatAdmin:req.body.userId})
+    if(up){
+      res.send(up)
+    }else{
+      res.send("er")
+    }
+  }
+})
+
 module.exports = {
   accessChat,
   fetchChats,
@@ -163,4 +217,7 @@ module.exports = {
   renameGroupChat,
   addToGroup,
   removeFromGroup,
+  deleteGroup,
+  deleteMe,
+  changAdmin
 };

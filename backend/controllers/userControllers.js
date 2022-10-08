@@ -43,6 +43,7 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     pic,
+
   });
 
   if (user) {
@@ -108,5 +109,7 @@ const addFriend = asyncHandler(async (req, res) => {
     });
   }
 });
+
+
 
 module.exports = { allUsers, registerUser, authUser, addFriend };

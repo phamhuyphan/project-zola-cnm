@@ -11,7 +11,6 @@ import {
   DrawerHeader,
   DrawerOverlay,
   IconButton,
-  Image,
   Input,
   Menu,
   MenuButton,
@@ -28,15 +27,15 @@ import {
 import {
   AddIcon,
   ArrowForwardIcon,
-  ChevronDownIcon,
-  CloseIcon,
   HamburgerIcon,
   InfoIcon,
   MoonIcon,
+  SearchIcon,
   SunIcon,
   ViewIcon,
 } from "@chakra-ui/icons";
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import ChatList from "./ChatsList";
 import { ChatState } from "../providers/ChatProvider";
 import { useNavigate } from "react-router-dom";
@@ -44,8 +43,8 @@ import ProfileModal from "./ProfileModal";
 import UserListItem from "./UserListItem";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
-import { getSender } from "../logic/ChatLogic";
-function SideBar({ fetchAgain, setfetchAgain }) {
+import GroupChatModal from "./GroupChatModal";
+function SideBar({ fetchAgain, setFetchAgain }) {
   const bg = useColorModeValue(
     "linear(to-b,#C39A9E,#808293)",
     "linear(to-t,blue.900,purple.900)"
@@ -70,11 +69,17 @@ function SideBar({ fetchAgain, setfetchAgain }) {
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isHover, setHover] = useState(false);
   const toast = useToast();
+  const [isOn, setIsOn] = useState(false);
+
+  const toggleSwitch = () => setIsOn(!isOn);
+
   const logoutHandler = () => {
     localStorage.removeItem("userInfo");
     navigator("/");
   };
+
   const handleSearch = async () => {
     if (!search) {
       toast({
@@ -137,237 +142,363 @@ function SideBar({ fetchAgain, setfetchAgain }) {
   };
 
   return (
-    <Box
-      className="scrollbar-thin  scrollbar-track-transparent scrollbar-thumb-slate-500"
-      bgGradient={bg}
-      h="full"
-      position={"relative"}
-      minW={"fit-content"}
-      w="100%"
-      overflowY={"scroll"}
-    >
+    <>
       <Box
-        display="flex"
-        alignItems={"center"}
-        position={"sticky"}
-        top="0"
-        zIndex={10}
+        className="scrollbar-thin  scrollbar-track-blue-900 scrollbar-thumb-slate-500"
+        // bgGradient={bg}
+        h="100vh"
+        position={"relative"}
+        minW={"fit-content"}
+        w="full"
+        zIndex={1}
+        overflowX="hidden"
       >
+        {/**Sidebar navigation */}
         <Box
-          display="flex"
-          w="fit-content"
-          mx={"auto"}
-          mt="5"
-          p={2}
-          borderRadius="full"
-          bgGradient={colorLoggedUser}
-          boxShadow="xl"
-          justifyContent={"space-between"}
-          alignItems="center"
+          position={"sticky"}
+          top={0}
+          zIndex={10}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
         >
-          <Box display="flex">
-            <Menu>
-              <MenuButton
-                position="relative"
-                borderRadius="full"
-                border="3px solid black"
-                _hover={{
-                  borderColor: "yellow.500",
-                }}
-                mr={3}
-              >
-                <Box borderRadius="full" id="bgChatZone">
-                  <Avatar size={"md"} name={user?.fullname} src={user?.pic}>
-                    <AvatarBadge
-                      boxSize={5}
-                      bg="green.500"
-                      borderColor={colorMode === "light" ? "white" : "darkblue"}
-                    ></AvatarBadge>
-                  </Avatar>
-                  {notification.length > 0 && (
-                    <Text
-                      position="absolute"
-                      bg="red"
-                      borderRadius="full"
-                      w="22px"
-                      fontSize="14px"
-                      h="22px"
-                      verticalAlign="middle"
-                      color="white"
-                      top="0px"
-                      right="0px"
-                    >
-                      {notification.length}
-                    </Text>
-                  )}
-                </Box>
-              </MenuButton>
-              <MenuList pl={2}>
-                {!notification.length && "No new messages"}
-                {notification.map((notify) => (
-                  <MenuItem
-                    key={notify._id}
-                    onClick={() => {
-                      setSelectedChat(notify.chat);
-                      setNotification(notify.filter((n) => n !== notify));
-                    }}
-                  >
-                    {notify.chat.isGroupChat
-                      ? `New Message(s) in ${notify.chat.chatName}`
-                      : `New Message(s) from ${getSender(
-                          user,
-                          notify.chat.users
-                        )}`}
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
-            <Box textColor={useColorModeValue("black", "white")}>
-              <Text opacity={0.7} fontSize="xs">
-                @{user?.username}
-              </Text>
-              <Text
-                fontSize={"lg"}
-                lineHeight={1}
-                textOverflow="ellipsis"
-                w="125px"
-                noOfLines={1}
-              >
-                {user?.fullname}
-              </Text>
-            </Box>
-          </Box>
-          <Menu>
-            <MenuButton
-              mx={2}
-              mt={1}
-              as={IconButton}
-              border="none"
-              aria-label="Options"
-              _hover={{
-                bgColor: "transparent",
-              }}
-              _active={{
-                bgColor: "transparent",
-              }}
-              icon={
-                <ChevronDownIcon
-                  fontSize={25}
-                  textColor={colorMode === "light" ? "black" : "white"}
-                />
-              }
-              variant="outline"
-            />
-            <MenuList>
-              <ProfileModal user={user}>
-                <MenuItem icon={<InfoIcon />}>
-                  <Text>Infomation</Text>
-                </MenuItem>
-              </ProfileModal>
-              <Divider />
-              <MenuItem icon={<ArrowForwardIcon />} onClick={logoutHandler}>
-                Log out
-              </MenuItem>
-            </MenuList>
-          </Menu>
-          <Tooltip
-            label="Search users to chat with"
-            hasArrow
-            placement="bottom-end"
+          <Box
+            display="flex"
+            alignItems={"center"}
+            position={"sticky"}
+            p={{ base: 0, md: 3 }}
+            justifyContent={"center"}
+            top={0}
+            zIndex={10}
           >
-            <Button
-              bgColor="transparent"
+            {/**Avata user badge */}
+            <Box
+              display="flex"
+              w={{ base: "full", md: "fit-content" }}
+              mt={{ base: "0", md: "5" }}
+              p={2}
+              borderRadius={{ base: " 0 0 20px 20px ", md: "full" }}
+              bgGradient={{ base: "unset", md: colorLoggedUser }}
+              boxShadow="xl"
+              justifyContent="space-between"
+              alignItems="center"
               _hover={{
-                bgColor: "transparent",
+                py: { base: 20, md: 2 },
+                transitionProperty: "all",
+                transitionTimingFunction: " cubic-bezier(0.4, 0, 0.2, 1)",
+                transitionDuration: "150ms",
+                bgPosition: "top 40% right 0",
+                outline: { base: "1px solid white", md: "unset" },
+                borderTop: 0,
+                filter: "unset",
               }}
-              _active={{
-                bgColor: "transparent",
-              }}
-              onClick={onOpen}
-              color="white"
             >
-              <i className="fa fa-search" aria-hidden="true"></i>
-            </Button>
-          </Tooltip>
-        </Box>
-        <IconButton
-          display={{
-            base: "none",
-            md: "block",
-          }}
-          variant="outline"
-          size={"lg"}
-          onClick={() => setCloseSideBar(true)}
-          icon={<ViewIcon size="xl" color={"whiteAlpha.900"} />}
-          borderColor="transparent"
-          bgBlendMode={"overlay"}
-          borderRadius={"full"}
-          aria-label="View"
-          _hover={{
-            bgGradient: "linear(to-br,red.500, yellow.500)",
-          }}
-        />
-        <Box
-          position="absolute"
-          top={7}
-          right={10}
-          display={{ base: "block", md: "none" }}
-        >
-          <IconButton
-            variant={"ghost"}
-            bgGradient={
-              colorMode === "light"
-                ? "linear(to-b,#C39A9E,#808293)"
-                : "linear(to-b,#1E2B6F,#193F5F)"
-            }
-            className="transition-opacity"
-            borderRadius="full"
-            onClick={toggleColorMode}
-            _hover={{
-              color: "black",
-            }}
-            icon={
-              colorMode === "light" ? (
-                <MoonIcon textColor={"white"} />
-              ) : (
-                <SunIcon textColor={"yellow"} />
-              )
-            }
-          />
-        </Box>
-      </Box>
-      <ChatList fetchAgain={fetchAgain} setFetchAgain={setfetchAgain} />
-      <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
-        <DrawerOverlay />
-        <DrawerContent>
-          <DrawerHeader borderBottomWidth="1px">Search User</DrawerHeader>
-          <DrawerBody>
-            <Box display="flex" pb={2}>
-              <Input
-                placeholder="Search user by name or email to chat"
-                mr={2}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <Button onClick={handleSearch}>Go</Button>
+              <Box display="flex">
+                <Menu>
+                  <MenuButton
+                    position="relative"
+                    borderRadius="full"
+                    border="3px solid black"
+                    _hover={{
+                      borderColor: "yellow.500",
+                    }}
+                    mr={3}
+                  >
+                    <Box borderRadius="full" id="bgChatZone">
+                      <Avatar size={"md"} name={user?.fullname} src={user?.pic}>
+                        <AvatarBadge
+                          boxSize={5}
+                          bg={user.statusOnline ? "green.500" : "red.500"}
+                          borderColor={
+                            colorMode === "light" ? "white" : "darkblue"
+                          }
+                        ></AvatarBadge>
+                      </Avatar>
+                      {notification.length > 0 && (
+                        <Text
+                          position="absolute"
+                          bg="red"
+                          borderRadius="full"
+                          w="22px"
+                          fontSize="14px"
+                          h="22px"
+                          verticalAlign="middle"
+                          color="white"
+                          top="0px"
+                          right="0px"
+                        >
+                          {notification.length}
+                        </Text>
+                      )}
+                    </Box>
+                  </MenuButton>
+                  <MenuList pl={2}>
+                    {!notification.length && "No new messages"}
+                    {notification.map((notify) => (
+                      <MenuItem
+                        key={notify._id}
+                        onClick={() => {
+                          setSelectedChat(notify.chat);
+                          console.log(notify.chat);
+                          setNotification(notify.filter((n) => n !== notify));
+                        }}
+                      >
+                        {notify.chat.isGroupChat
+                          ? `New Message(s) in ${notify.chat.chatName}`
+                          : `New Message(s) from @${notify.sender.username}`}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
+                <Box textColor={useColorModeValue("blackAlpha.900", "white")}>
+                  <Text opacity={0.7} fontSize="xs">
+                    @{user?.username}
+                  </Text>
+                  <Text
+                    fontSize={"lg"}
+                    lineHeight={1}
+                    textOverflow="ellipsis"
+                    w={{ lg: "125px", md: "fit-content" }}
+                    noOfLines={1}
+                  >
+                    {user?.fullname}
+                  </Text>
+                </Box>
+              </Box>
+              <Box
+                pos={"relative"}
+                display="flex"
+                justifyContent={"center"}
+                alignItems="center"
+                px="3"
+              >
+                {/**Add group chat */}
+
+                <GroupChatModal>
+                  <Button
+                    display="flex"
+                    fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+                    rightIcon={<AddIcon fontSize={"25px"} />}
+                  >
+                    New Group Chat
+                  </Button>
+                </GroupChatModal>
+
+                {/**button serch */}
+                <Tooltip
+                  label="Search users to chat with"
+                  hasArrow
+                  placement="bottom-end"
+                >
+                  <Button
+                    borderRadius={"full"}
+                    bgColor="transparent"
+                    onClick={onOpen}
+                    mx={1}
+                    w={{ base: "17px", md: "10px", lg: "17px" }}
+                  >
+                    <SearchIcon fontSize={"25px"} />
+                  </Button>
+                </Tooltip>
+
+                {/**button menu */}
+                <Menu>
+                  <MenuButton
+                    borderRadius={"full"}
+                    w={{ base: "17px", md: "10px", lg: "17px" }}
+                    mx={1}
+                    mt={1}
+                    as={IconButton}
+                    position="relative"
+                    border="none"
+                    aria-label="Options"
+                    icon={
+                      <HamburgerIcon
+                        fontSize={25}
+                        textColor={colorMode === "light" ? "black" : "white"}
+                      />
+                    }
+                    variant="outline"
+                  />
+
+                  <MenuList>
+                    <ProfileModal user={user}>
+                      <MenuItem icon={<InfoIcon />}>
+                        <Text>Infomation</Text>
+                      </MenuItem>
+                    </ProfileModal>
+                    <Divider />
+                    <MenuItem
+                      icon={<ArrowForwardIcon />}
+                      onClick={logoutHandler}
+                    >
+                      Log out
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+                {/** Change theme (md) */}
+                <Box
+                  position={"absolute"}
+                  top={1}
+                  left={-14}
+                  display={{ base: "inline-block", md: "none" }}
+                >
+                  <div
+                    className={`${
+                      isOn ? "justify-end" : "justify-start"
+                    } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer `}
+                    onClick={toggleSwitch}
+                  >
+                    <motion.div
+                      className="handle w-[20px] flex justify-center items-center h-[20px]  rounded-full"
+                      layout
+                      transition={{
+                        type: "spring",
+                        stiffness: 700,
+                        damping: 30,
+                      }}
+                    >
+                      <IconButton
+                        variant={"ghost"}
+                        className="transition-opacity"
+                        borderRadius="full"
+                        onClick={toggleColorMode}
+                        transform="unset"
+                        _hover={{
+                          transform: "rotate(40deg)",
+
+                          color: "black",
+                          bgGradient:
+                            colorMode === "light"
+                              ? "linear(to-b,#C39A9E,#808293)"
+                              : "linear(to-b,#1E2B6F,#193F5F)",
+                        }}
+                        icon={
+                          colorMode === "light" ? (
+                            <MoonIcon textColor={"white"} />
+                          ) : (
+                            <SunIcon textColor={"yellow"} />
+                          )
+                        }
+                      />
+                    </motion.div>
+                  </div>
+                </Box>
+              </Box>
             </Box>
-            {loading ? (
-              <ChatLoading />
-            ) : (
-              searchResult?.map((user) => (
-                <UserListItem
-                  key={user._id}
-                  user={user}
-                  handleFunction={() => accessChat(user._id)}
+            {/**view button */}
+            <IconButton
+              display={{
+                base: "none",
+                md: "block",
+              }}
+              mt={5}
+              mx={2}
+              variant="outline"
+              size={"lg"}
+              onClick={() => setCloseSideBar(true)}
+              icon={<ViewIcon size="xl" color={"whiteAlpha.900"} />}
+              borderColor="transparent"
+              bgBlendMode={"overlay"}
+              borderRadius={"full"}
+              aria-label="View"
+            />
+          </Box>
+          {/** Background img*/}
+          <Box
+            pos={"absolute"}
+            top={0}
+            zIndex={5}
+            h={isHover ? "75px" : "70px"}
+            w={{ base: "full", md: "fit-content" }}
+            p={{ base: !isHover ? "10px" : "107px", md: "0" }}
+            borderRadius={{ base: " 0 0 20px 20px ", md: "full" }}
+            boxShadow="xl"
+            bgImage={{ base: `url('${user?.pic}')`, md: "none" }}
+            bgRepeat={"no-repeat"}
+            bgSize="cover"
+            bgPosition={isHover ? "top 40% right 0" : "center"}
+            className="transition-all"
+            filter={!isHover && "grayscale(100%)"}
+          ></Box>
+          {/** Background gradient*/}
+          <Box
+            pos={"absolute"}
+            top={0}
+            zIndex={6}
+            h={isHover ? "75px" : "70px"}
+            w={{ base: "full", md: "fit-content" }}
+            p={{ base: !isHover ? "10px" : "107px", md: "0" }}
+            borderRadius={{ base: " 0 0 20px 20px ", md: "full" }}
+            boxShadow="xl"
+            bgRepeat={"no-repeat"}
+            bgSize="cover"
+            bgPosition={isHover ? "top 40% right 0" : "center"}
+            className={`transition-all bg-gradient-to-b ${
+              colorMode === "dark" ? "from-[#00000d7d]" : "from-[#ffffff7d]"
+            }`}
+            filter={!isHover && "grayscale(100%)"}
+          ></Box>
+        </Box>
+        <ChatList fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
+        <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+          <DrawerOverlay />
+          <DrawerContent>
+            <DrawerHeader borderBottomWidth="1px">Search User</DrawerHeader>
+            <DrawerBody>
+              <Box display="flex" pb={2}>
+                <Input
+                  placeholder="Search user by name or email to chat with"
+                  mr={2}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                 />
-              ))
-            )}
-            {loadingChat && <Spinner ml="auto" display="flex" />}
-          </DrawerBody>
-        </DrawerContent>
-        <DrawerFooter></DrawerFooter>
-      </Drawer>
-    </Box>
+                <Button onClick={handleSearch}>Go</Button>
+              </Box>
+              {loading ? (
+                <ChatLoading />
+              ) : searchResult.length > 0 ? (
+                searchResult?.map((user) => (
+                  <UserListItem
+                    key={user._id}
+                    user={user}
+                    handleFunction={() => accessChat(user._id)}
+                  />
+                ))
+              ) : (
+                <Text className="font-bold">¯\_(ツ)_/¯</Text>
+              )}
+              {loadingChat && <Spinner ml="auto" display="flex" />}
+            </DrawerBody>
+          </DrawerContent>
+          <DrawerFooter></DrawerFooter>
+        </Drawer>
+      </Box>
+      <Box
+        className="scrollbar-thin  scrollbar-track-blue-900 scrollbar-thumb-slate-500"
+        bgGradient={bg}
+        h="100vh"
+        position={"absolute"}
+        minW={"fit-content"}
+        zIndex={0}
+        w="full"
+        overflowX="hidden"
+      ></Box>
+      <Box
+        className="scrollbar-thin  scrollbar-track-blue-900 scrollbar-thumb-slate-500"
+        bgImage={`url('${user?.pic}')`}
+        display={{ md: "inline-block", base: "none" }}
+        h="100vh"
+        position={"absolute"}
+        minW={"fit-content"}
+        zIndex={0}
+        opacity={0.3}
+        w="full"
+        overflowX="hidden"
+        bgRepeat={"no-repeat"}
+        bgSize="cover"
+        bgPos={"top 45% right 45%"}
+      ></Box>
+    </>
   );
 }
 

@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useState } from "react";
-import { ChatState } from "../../context/ChatProvider";
+import { ChatState } from "../providers/ChatProvider";
 import UserBadgeItem from "./UserBadgeItem";
 import UserListItem from "./UserListItem";
 
@@ -32,6 +32,8 @@ function GroupChatModal({ children }) {
 
   const { user, chats, setChats } = ChatState();
   const handlerSearch = async (query) => {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
     setSearch(query);
     if (!query) return;
     try {
@@ -40,6 +42,7 @@ function GroupChatModal({ children }) {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
+        cancelToken: source.token,
       };
 
       const { data } = await axios.get(`/api/user?search=${search}`, config);
@@ -47,15 +50,20 @@ function GroupChatModal({ children }) {
       setSearchResult(data);
       setLoading(false);
     } catch (error) {
-      toast({
-        title: "Error Occured",
-        description: "Failed to load search results",
-        status: "error",
-        duration: 2500,
-        isClosable: true,
-        position: "bottom-left",
-      });
+      if (axios.isCancel(error)) console.log("successfully aborted");
+      else
+        toast({
+          title: "Error Occured",
+          description: "Failed to load search results",
+          status: "error",
+          duration: 2500,
+          isClosable: true,
+          position: "bottom-left",
+        });
     }
+    return () => {
+      source.cancel();
+    };
   };
   const handlerSubmit = async () => {
     if (!groupChatName || !selectedUsers) {
@@ -123,13 +131,13 @@ function GroupChatModal({ children }) {
   return (
     <>
       <Button
+        bg="transparent"
         onClick={onOpen}
         position="relative"
-        bg="white"
         w={10}
         borderRadius="full"
       >
-        <i class="fa fa-users"></i>
+        <i className="fa fa-users"></i>
         <Text position="absolute" top="0" right="2">
           +
         </Text>

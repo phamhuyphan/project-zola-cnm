@@ -8,7 +8,8 @@ const messageSchema = mongoose.Schema(
     isRead:{ type: Boolean , default: false},
 
     content: { type: String, trim: true },
-   
+    
+    response: { type: mongoose.Schema.Types.ObjectId, ref: "Message" }
   },
   { timestamps: true }
 );

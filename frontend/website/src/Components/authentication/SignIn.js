@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Input,
-  Link,
   ScaleFade,
   Text,
   useToast,
@@ -13,10 +12,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChatState } from "../../providers/ChatProvider";
 function SignIn({ setShow, isOpen }) {
-  const navigator = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { user, setUser } = ChatState();
+  const { setUser } = ChatState();
   let navigate = useNavigate();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
