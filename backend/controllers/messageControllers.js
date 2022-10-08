@@ -8,10 +8,25 @@ const Chat = require("../models/chatModel");
 //@access          Protected
 
 const allMessages = asyncHandler(async (req, res) => {
+
+  let messagePage = 20; // số lượng messagemessage xuất hiện trên 1 page
+  let page = req.params.page || 1;
   try {
     const messages = await Message.find({ chat: req.params.chatId })
       .populate("sender", "username pic email")
       .populate("chat");
+      // .skip((messagePage * page) - messagePage) // Trong page đầu tiên sẽ bỏ qua giá trị là 0
+      // .limit(messagePage)
+      // .exec((err, message) => {
+      //   Message.countDocuments((err, count) => { // đếm để tính xem có bao nhiêu trang
+      //     if (err) return next(err);
+      //     res.render('product/index_product', {
+      //       message, // message trên một page
+      //       current: page, // page hiện tại
+      //       pages: Math.ceil(count / messagePage) // tổng số các page
+      //     });
+      //   });
+      // });
     res.json(messages);
   } catch (error) {
     res.status(400);
@@ -23,7 +38,7 @@ const allMessages = asyncHandler(async (req, res) => {
 //@route           POST /api/Message/
 //@access          Protected
 const sendMessage = asyncHandler(async (req, res) => {
-  const { content, chatId,response } = req.body;
+  const { content, chatId, response } = req.body;
 
   if (!content || !chatId) {
     console.log("Invalid data passed into request");
@@ -35,7 +50,7 @@ const sendMessage = asyncHandler(async (req, res) => {
     content: content,
     isRead: false,
     chat: chatId,
-    response:response,
+    response: response,
   };
 
   try {
@@ -60,7 +75,7 @@ const sendMessage = asyncHandler(async (req, res) => {
 
 const deleteMessage = asyncHandler(async (req, res) => {
   const { messageId } = req.body
-  Message.findByIdAndUpdate(messageId,{content: "deleted"}).then((message) => {res.send(message)})
+  Message.findByIdAndUpdate(messageId, { content: "deleted" }).then((message) => { res.send(message) })
 })
 
-module.exports = { allMessages, sendMessage,deleteMessage };
+module.exports = { allMessages, sendMessage, deleteMessage };
