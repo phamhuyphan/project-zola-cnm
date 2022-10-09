@@ -19,11 +19,25 @@ const allMessages = asyncHandler(async (req, res) => {
   }
 });
 
+const pageMessages = asyncHandler(async (req, res) => {
+  const limit = 20;
+  const skip = Message.find({chat: req.params.chatId}).length - 20;
+  try {
+    const messages = await Message.find({ chat: req.params.chatId }).limit(limit).skip(skip)
+      .populate("sender", "username pic email")
+      .populate("chat");
+    res.json(messages);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
 //@description     Create New Message
 //@route           POST /api/Message/
 //@access          Protected
 const sendMessage = asyncHandler(async (req, res) => {
-  const { content, chatId,response } = req.body;
+  const { content, chatId, response } = req.body;
 
   if (!content || !chatId) {
     console.log("Invalid data passed into request");
@@ -35,7 +49,7 @@ const sendMessage = asyncHandler(async (req, res) => {
     content: content,
     isRead: false,
     chat: chatId,
-    response:response,
+    response: response,
   };
 
   try {
@@ -60,7 +74,7 @@ const sendMessage = asyncHandler(async (req, res) => {
 
 const deleteMessage = asyncHandler(async (req, res) => {
   const { messageId } = req.body
-  Message.findByIdAndUpdate(messageId,{content: "deleted"}).then((message) => {res.send(message)})
+  Message.findByIdAndUpdate(messageId, { content: "deleted" }).then((message) => { res.send(message) })
 })
 
-module.exports = { allMessages, sendMessage,deleteMessage };
+module.exports = { allMessages, sendMessage, deleteMessage,pageMessages };
