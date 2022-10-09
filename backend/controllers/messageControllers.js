@@ -8,6 +8,18 @@ const Chat = require("../models/chatModel");
 //@access          Protected
 
 const allMessages = asyncHandler(async (req, res) => {
+  try {
+    const messages = await Message.find({ chat: req.params.chatId })
+      .populate("sender", "username pic email")
+      .populate("chat");
+    res.json(messages);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
+const pageMessages = asyncHandler(async (req, res) => {
   const limit = 20;
   const skip = Message.find({chat: req.params.chatId}).length - 20;
   try {
@@ -65,4 +77,4 @@ const deleteMessage = asyncHandler(async (req, res) => {
   Message.findByIdAndUpdate(messageId, { content: "deleted" }).then((message) => { res.send(message) })
 })
 
-module.exports = { allMessages, sendMessage, deleteMessage };
+module.exports = { allMessages, sendMessage, deleteMessage,pageMessages };
