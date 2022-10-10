@@ -33,6 +33,7 @@ import { motion } from "framer-motion";
 import animationData from "../animations/52671-typing-animation-in-chat.json";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import ProfileModal from "./ProfileModal";
+import { isFriend } from "../logic/UserLogic";
 const ENDPOINT = "http://localhost:5000";
 
 let socket, selectedChatCompare;
@@ -49,7 +50,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const toast = useToast();
-  const { isOpen, onToggle } = useDisclosure();
+  const { onToggle } = useDisclosure();
   const [isOn, setIsOn] = useState(false);
   const toggleSwitch = () => setIsOn(!isOn);
 
@@ -196,7 +197,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       h="full"
       bgImage={
         selectedChat
-          ? selectedChat.isGroupChat === true
+          ? selectedChat.isGroupChat
             ? selectedChat.chatAdmin.pic
             : `url(${getSenderInfo(user, selectedChat.users).pic})`
           : "initial"
@@ -215,7 +216,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           boxSize="full"
           backdropFilter="auto"
           backdropBlur="100px"
-          display={"flex"}
+          display="flex"
           width="100%"
           justifyContent="center"
           alignItems="center"
@@ -253,55 +254,53 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   scrollbarWidth: "none",
                 }}
               >
-                {selectedChat && (
-                  /**user badge */
-                  <Box
-                    display={"flex"}
-                    alignItems="center"
-                    position="absolute"
-                    top={5}
-                    zIndex={2}
-                    left={10}
-                    bgGradient={bgColor}
-                    minW="300"
-                    w="fit-content"
-                    p={2}
-                    opacity="0.95"
-                    transition={"all 0.2s ease-in-out"}
-                    _hover={{ opacity: 1 }}
+                {/**user badge */}
+                <Box
+                  display={"flex"}
+                  alignItems="center"
+                  position="absolute"
+                  top={5}
+                  zIndex={2}
+                  left={10}
+                  bgGradient={bgColor}
+                  minW="300"
+                  w="fit-content"
+                  p={2}
+                  opacity="0.95"
+                  transition={"all 0.2s ease-in-out"}
+                  _hover={{ opacity: 1 }}
+                  borderRadius="full"
+                  textColor={
+                    colorMode === "light" ? "whiteAlpha.900" : "blackAlpha.900"
+                  }
+                >
+                  <IconButton
+                    bg="white"
+                    ml={5}
+                    mr={2}
+                    my={2}
+                    w="30px"
+                    h="30px"
                     borderRadius="full"
-                    textColor={
-                      colorMode === "light"
-                        ? "whiteAlpha.900"
-                        : "blackAlpha.900"
-                    }
-                  >
-                    <IconButton
-                      bg="white"
-                      ml={5}
-                      mr={2}
-                      my={2}
-                      w="30px"
-                      h="30px"
-                      borderRadius="full"
-                      display={{ base: "flex", md: "none" }}
-                      icon={<ChevronLeftIcon />}
-                      textColor="black"
-                      size="12px"
-                      onClick={() => setSelectedChat("")}
-                    />
-                    {selectedChat.isGroupChat ? (
-                      <AvatarGroup size={"sm"} max={2} marginRight={3}>
-                        {selectedChat.users.map((u) => (
-                          <Avatar
-                            key={u._id}
-                            size={"xs"}
-                            name={selectedChat.chatName}
-                            src={u.pic}
-                          />
-                        ))}
-                      </AvatarGroup>
-                    ) : (
+                    display={{ base: "flex", md: "none" }}
+                    icon={<ChevronLeftIcon />}
+                    textColor="black"
+                    size="12px"
+                    onClick={() => setSelectedChat("")}
+                  />
+                  {selectedChat.isGroupChat ? (
+                    <AvatarGroup size={"sm"} max={2} marginRight={3}>
+                      {selectedChat.users.map((u) => (
+                        <Avatar
+                          key={u._id}
+                          size={"xs"}
+                          name={u.fullname}
+                          src={u.pic}
+                        />
+                      ))}
+                    </AvatarGroup>
+                  ) : (
+                    <>
                       <Avatar
                         showBorder={true}
                         size={"md"}
@@ -319,47 +318,48 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                           borderColor={"white"}
                         ></AvatarBadge>
                       </Avatar>
-                    )}
+                    </>
+                  )}
 
-                    <Text
-                      fontWeight={"bold"}
-                      textColor={colorMode === "light" ? "black" : "white"}
-                    >
-                      {selectedChat.isGroupChat ? (
-                        <div>
-                          <UpdateGroupChatModal
-                            fetchAgain={fetchAgain}
-                            setFetchAgain={setFetchAgain}
-                            fetchMessages={fetchMessages}
-                          >
-                            <Text _hover={{ textDecor: "underline" }}>
-                              {selectedChat.users[0].fullname}
-                            </Text>
-                          </UpdateGroupChatModal>
-                        </div>
-                      ) : (
-                        <>
-                          <ProfileModal
-                            user={getSenderInfo(user, selectedChat.users)}
-                          >
-                            {getSender(user, selectedChat.users)}
-                          </ProfileModal>
-                        </>
-                      )}
-                      {selectedChat.isGroupChat ? (
+                  <Text
+                    fontWeight={"bold"}
+                    textColor={colorMode === "light" ? "black" : "white"}
+                  >
+                    {selectedChat.isGroupChat ? (
+                      <div>
+                        <UpdateGroupChatModal
+                          fetchAgain={fetchAgain}
+                          setFetchAgain={setFetchAgain}
+                          fetchMessages={fetchMessages}
+                        >
+                          <Text _hover={{ textDecor: "underline" }}>
+                            {selectedChat.chatName}{" "}
+                          </Text>
+                        </UpdateGroupChatModal>
                         <Text fontWeight={"normal"}>
                           {selectedChat.users.length} members
                         </Text>
-                      ) : (
+                      </div>
+                    ) : (
+                      <>
+                        <ProfileModal
+                          user={getSenderInfo(user, selectedChat.users)}
+                        >
+                          {getSender(user, selectedChat.users)}
+                        </ProfileModal>
                         <Text fontWeight={"normal"}>
                           {getSenderInfo(user, selectedChat.users).statusOnline
                             ? "online"
-                            : "offline"}
+                            : "offline"}{" "}
+                          <span>
+                            {!isFriend(user, selectedChat.users[0]) &&
+                              " Stranger"}
+                          </span>
                         </Text>
-                      )}
-                    </Text>
-                  </Box>
-                )}
+                      </>
+                    )}
+                  </Text>
+                </Box>
                 {/** button group*/}
                 <Box
                   position="absolute"
@@ -427,9 +427,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     </motion.div>
                   </div>
                 </Box>
-
                 <MessageList messages={messages} />
-
                 <FormControl
                   onKeyDown={sendMessage}
                   isRequired

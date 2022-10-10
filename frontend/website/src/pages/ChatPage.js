@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Box } from "@chakra-ui/react";
 import SideBar from "../Components/SideBar";
 import ChatZone from "../Components/ChatZone";
@@ -7,7 +7,7 @@ import { ChatState } from "../providers/ChatProvider";
 import { motion, useIsPresent } from "framer-motion";
 
 function ChatPage() {
-  const { closeSideBar, selectedChat, user, setUser } = ChatState();
+  const { closeSideBar, selectedChat, user } = ChatState();
   const [fetchAgain, setFetchAgain] = useState(false);
   const isPresent = useIsPresent();
   return (

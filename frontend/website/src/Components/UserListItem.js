@@ -30,7 +30,7 @@ function UserListItem({ user, handleFunction }) {
       <Box>
         <Text>{user.username}</Text>
         <Text fontSize="xs">
-          <b>Email :</b>
+          <span className="font-bold">Email :</span>
           {user.email}
         </Text>
       </Box>
