@@ -9,7 +9,7 @@ function UserListItem({ user, handleFunction }) {
       bg="#E8E8E8"
       _hover={{
         background: "#38B2AC",
-        color: "white",
+        color: "whiteAlpha.900",
       }}
       w="100%"
       display="flex"
@@ -27,13 +27,13 @@ function UserListItem({ user, handleFunction }) {
         name={user.username}
         src={user.pic}
       />
-      <Box>
+      <>
         <Text>{user.username}</Text>
         <Text fontSize="xs">
           <span className="font-bold">Email :</span>
           {user.email}
         </Text>
-      </Box>
+      </>
     </Box>
   );
 }

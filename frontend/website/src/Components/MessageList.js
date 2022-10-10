@@ -1,5 +1,5 @@
-import { Avatar, Box, Text, Tooltip } from "@chakra-ui/react";
-import React from "react";
+import { Avatar, Box, IconButton, Text, Tooltip } from "@chakra-ui/react";
+import React, { useState } from "react";
 import {
   isLastMessage,
   isSameSender,
@@ -9,8 +9,11 @@ import {
 import moment from "moment";
 import { ChatState } from "../providers/ChatProvider";
 import ScrollableFeed from "react-scrollable-feed";
+import { DeleteIcon } from "@chakra-ui/icons";
 
 function MessageList({ messages }) {
+  const [isHover, setIsHover] = useState(false);
+
   const { user } = ChatState();
   return (
     <ScrollableFeed className="pb-32 pt-16 px-4 w-full scrollbar-thin scroll-smooth">
@@ -47,49 +50,47 @@ function MessageList({ messages }) {
                 />
               </Tooltip>
             )}
-            <Tooltip
-              label={moment(m.createdAt).calendar()}
-              hasArrow
-              placeContent="bottom-start"
+
+            <Box
+              className="shadow-lg"
+              display="flex"
+              flexDirection="column"
+              maxWidth="75%"
+              w={"fit-content"}
+              borderRadius="10px"
+              backgroundColor={`${
+                m.sender._id === user._id ? "#BEE3F8" : "whiteAlpha.900"
+              }`}
+              padding="10px"
+              marginLeft={isSameSenderMargin(messages, m, i, user._id)}
+              marginTop={
+                isSameUserMargin(messages, m, i, user._id) ? "auto" : 30
+              }
+              position={"relative"}
             >
-              <Text
-                className="shadow-lg"
-                style={{
-                  backgroundColor: `${
-                    m.sender._id === user._id ? "#BEE3F8" : "white"
-                  }`,
-                  borderRadius: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                  padding: "5px 20px",
-                  maxWidth: "75%",
-                  marginLeft: isSameSenderMargin(messages, m, i, user._id),
-                  marginTop: isSameUserMargin(messages, m, i, user._id)
-                    ? 5
-                    : 30,
-                }}
-              >
-                {m.content}
-              </Text>
-            </Tooltip>
-            {(isSameSender(messages, m, i, user._id) ||
-              isLastMessage(messages, i, user._id)) && (
-              <Box
-                position={"absolute"}
-                bottom={"-25px"}
-                right={m.sender._id === user._id ? "0" : "unset"}
-                left={m.sender._id === user._id ? "unset" : "10"}
-              >
+              <Text width={"fit-content"}>{m.content}</Text>
+              {(isSameSender(messages, m, i, user._id) ||
+                isLastMessage(messages, i, user._id)) && (
                 <Text
-                  fontSize={14}
-                  marginLeft={5}
-                  textColor={"whiteAlpha.900"}
-                  textShadow={"2px 2px #000"}
+                  width={"fit-content"}
+                  fontSize={9}
+                  marginLeft={0}
+                  textColor={"blackAlpha.900"}
                 >
                   {moment(m.createdAt).calendar()}
                 </Text>
-              </Box>
-            )}
+              )}
+              <IconButton
+                position="absolute"
+                top={0}
+                bottom={0}
+                m={"auto 0"}
+                borderRadius={"full"}
+                right={m.sender._id === user._id ? "unset" : -16}
+                left={m.sender._id === user._id ? -16 : "unset"}
+                icon={<DeleteIcon fontSize={15} textColor={"whiteAlpha.800"} />}
+              ></IconButton>
+            </Box>
           </Box>
         ))}
     </ScrollableFeed>

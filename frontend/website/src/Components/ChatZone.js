@@ -14,6 +14,7 @@ import {
   IconButton,
   Input,
   InputGroup,
+  InputLeftElement,
   InputRightElement,
   Spinner,
   Text,
@@ -22,6 +23,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
+import EmojiPicker, { Emoji, EmojiStyle, Theme } from "emoji-picker-react";
 import axios from "axios";
 import Lottie from "react-lottie";
 import io from "socket.io-client";
@@ -33,14 +35,15 @@ import { motion } from "framer-motion";
 import animationData from "../animations/52671-typing-animation-in-chat.json";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import ProfileModal from "./ProfileModal";
-import { isFriend } from "../logic/UserLogic";
+import moment from "moment";
+
 const ENDPOINT = "http://localhost:5000";
 
 let socket, selectedChatCompare;
 function ChatZone({ fetchAgain, setFetchAgain }) {
   const { colorMode, toggleColorMode } = useColorMode();
   const bgColor = useColorModeValue(
-    "linear(to-b,white,#B1AEC6)",
+    "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
   );
   const [messages, setMessages] = useState([]);
@@ -53,9 +56,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const { onToggle } = useDisclosure();
   const [isOn, setIsOn] = useState(false);
   const toggleSwitch = () => setIsOn(!isOn);
-
   const { user, selectedChat, setSelectedChat, notification, setNotification } =
     ChatState();
+  const [selectedEmoji, setSelectedEmoji] = useState("");
+  const [toggle, setToggle] = useState(true);
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -93,7 +97,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     };
   };
   const sendMessage = async (event) => {
-    if (event.key === "Enter" && newMessage) {
+    if ((event.key === "Enter" || event === "Send") && newMessage) {
       if (user) socket.emit("stop typing", selectedChat._id);
 
       try {
@@ -164,6 +168,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         setIsTyping(false);
         onToggle();
       });
+      socket.on("change", (user) => {
+        setFetchAgain(!fetchAgain);
+        console.log("feching again " + user.documentKeys._id);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -203,7 +211,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           : "initial"
       }
       bgColor={useColorModeValue(
-        "linear(to-b,white,#B1AEC6)",
+        "linear(to-b,whiteAlpha.900,#B1AEC6)",
         "linear(to-b,#1E2B6F,#193F5F)"
       )}
       bgRepeat="no-repeat"
@@ -275,17 +283,20 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   }
                 >
                   <IconButton
-                    bg="white"
-                    ml={5}
-                    mr={2}
+                    mx={1}
                     my={2}
-                    w="30px"
+                    bg="none"
+                    w="50px"
                     h="30px"
                     borderRadius="full"
                     display={{ base: "flex", md: "none" }}
-                    icon={<ChevronLeftIcon />}
-                    textColor="black"
-                    size="12px"
+                    icon={<ChevronLeftIcon fontSize={"lg"} />}
+                    size="20px"
+                    textColor={
+                      colorMode === "light"
+                        ? "blackAlpha.900"
+                        : "whiteAlpha.900"
+                    }
                     onClick={() => setSelectedChat("")}
                   />
                   {selectedChat.isGroupChat ? (
@@ -315,7 +326,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                               ? "green.500"
                               : "red.500"
                           }
-                          borderColor={"white"}
+                          borderColor={"whiteAlpha.900"}
                         ></AvatarBadge>
                       </Avatar>
                     </>
@@ -323,7 +334,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
 
                   <Text
                     fontWeight={"bold"}
-                    textColor={colorMode === "light" ? "black" : "white"}
+                    textColor={
+                      colorMode === "light" ? "black" : "whiteAlpha.900"
+                    }
+                    w="full"
+                    pr="5"
                   >
                     {selectedChat.isGroupChat ? (
                       <div>
@@ -347,14 +362,14 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         >
                           {getSender(user, selectedChat.users)}
                         </ProfileModal>
-                        <Text fontWeight={"normal"}>
+                        <Text fontWeight={"normal"} opacity={0.8}>
                           {getSenderInfo(user, selectedChat.users).statusOnline
                             ? "online"
-                            : "offline"}{" "}
-                          <span>
-                            {!isFriend(user, selectedChat.users[0]) &&
-                              " Stranger"}
-                          </span>
+                            : "Last online " +
+                              moment(
+                                getSenderInfo(user, selectedChat.users)
+                                  .updatedAt
+                              ).calendar()}
                         </Text>
                       </>
                     )}
@@ -379,7 +394,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     }}
                     icon={
                       colorMode === "dark" ? (
-                        <PhoneIcon textColor={"white"} />
+                        <PhoneIcon textColor={"whiteAlpha.900"} />
                       ) : (
                         <PhoneIcon textColor={"yellow"} />
                       )
@@ -418,7 +433,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         }}
                         icon={
                           colorMode === "light" ? (
-                            <MoonIcon textColor={"white"} />
+                            <MoonIcon textColor={"whiteAlpha.900"} />
                           ) : (
                             <SunIcon textColor={"yellow"} />
                           )
@@ -465,7 +480,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         />
                         <Text
                           mixBlendMode={"difference"}
-                          textColor="white"
+                          textColor="whiteAlpha.900"
                           fontSize={12}
                         >
                           {selectedChat.isGroupChat
@@ -480,11 +495,26 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   ) : (
                     <></>
                   )}
+                  <Box
+                    display={`${toggle ? "" : "none"}`}
+                    pos="absolute"
+                    bottom={"28"}
+                    right={5}
+                  >
+                    <EmojiPicker
+                      onEmojiClick={(emojiData, e) => {
+                        setSelectedEmoji(emojiData.unified);
+                        setNewMessage(newMessage + emojiData.emoji);
+                      }}
+                      autoFocusSearch={false}
+                      theme={Theme.AUTO}
+                    />
+                  </Box>
                   <InputGroup size="lg" marginY={4}>
                     <Input
                       variant="outline"
                       rounded={"full"}
-                      bg="white"
+                      bg="whiteAlpha.900"
                       textColor={"black"}
                       placeholder="Type something..."
                       value={newMessage}
@@ -501,22 +531,24 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         className={`shadow-md
                       ${
                         colorMode === "light"
-                          ? "text-darkblue bg-gradient-to-bl from-white to-[#B1AEC6]"
-                          : "text-white bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
+                          ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
+                          : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
                       }
                       rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
+                        onClick={() => setToggle(!toggle)}
                       >
                         <i className="fa fa-smile" aria-hidden="true"></i>
                       </Text>
+
                       <Text
                         className={`shadow-md
                       ${
                         colorMode === "light"
-                          ? "text-darkblue bg-gradient-to-bl from-white to-[#B1AEC6]"
-                          : "text-white bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
+                          ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
+                          : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
                       }
                       rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
-                        onClick={sendMessage}
+                        onClick={() => sendMessage("Send")}
                       >
                         <i className="fa fa-paper-plane" aria-hidden="true"></i>
                       </Text>

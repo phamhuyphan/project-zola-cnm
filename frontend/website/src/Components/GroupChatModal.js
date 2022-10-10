@@ -92,7 +92,7 @@ function GroupChatModal({ children }) {
         },
         config
       );
-      setChats(data, ...chats);
+      setChats([data, ...chats]);
       onClose();
       toast({
         title: `${groupChatName} was successfully created!`,

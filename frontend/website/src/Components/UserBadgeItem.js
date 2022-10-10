@@ -15,7 +15,7 @@ function UserBadgeItem({ _user, handleFunction, isAdmin }) {
       justifyItems="center"
       variant="solid"
       fontSize={12}
-      textColor="white"
+      textColor="whiteAlpha.900"
       cursor="pointer"
       onClick={handleFunction}
       opacity="0.7"

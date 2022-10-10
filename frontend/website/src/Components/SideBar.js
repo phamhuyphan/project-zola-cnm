@@ -42,15 +42,16 @@ import { useNavigate } from "react-router-dom";
 import ProfileModal from "./ProfileModal";
 import UserListItem from "./UserListItem";
 import axios from "axios";
-import ChatLoading from "./ChatLoading";
+import ChatLoading from "./loading/ChatLoading";
 import GroupChatModal from "./GroupChatModal";
+
 function SideBar({ fetchAgain, setFetchAgain }) {
   const bg = useColorModeValue(
     "linear(to-b,#C39A9E,#808293)",
     "linear(to-t,blue.900,purple.900)"
   );
   const colorLoggedUser = useColorModeValue(
-    "linear(to-b,white,#B1AEC6)",
+    "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
   );
   const {
@@ -76,6 +77,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
   const toggleSwitch = () => setIsOn(!isOn);
 
   const logoutHandler = () => {
+    setFetchAgain(!fetchAgain);
     localStorage.removeItem("userInfo");
     navigator("/");
   };
@@ -170,7 +172,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
             top={0}
             zIndex={10}
           >
-            {/**Avata user badge */}
+            {/**Avata user badge: colorLoggedUser, user,notification,colorMode,isOn */}
             <Box
               display="flex"
               w={{ base: "full", md: "fit-content" }}
@@ -187,7 +189,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                 transitionTimingFunction: " cubic-bezier(0.4, 0, 0.2, 1)",
                 transitionDuration: "150ms",
                 bgPosition: "top 40% right 0",
-                outline: { base: "1px solid white", md: "unset" },
+                outline: { base: "1px solid whiteAlpha.900", md: "unset" },
                 borderTop: 0,
                 filter: "unset",
               }}
@@ -204,15 +206,11 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                     mr={3}
                   >
                     <Box borderRadius="full" id="bgChatZone">
-                      <Avatar size={"md"} name={user?.fullname} src={user?.pic}>
-                        <AvatarBadge
-                          boxSize={5}
-                          bg={user.statusOnline ? "green.500" : "red.500"}
-                          borderColor={
-                            colorMode === "light" ? "white" : "darkblue"
-                          }
-                        ></AvatarBadge>
-                      </Avatar>
+                      <Avatar
+                        size={"md"}
+                        name={user?.fullname}
+                        src={user?.pic}
+                      ></Avatar>
                       {notification.length > 0 && (
                         <Text
                           position="absolute"
@@ -222,7 +220,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                           fontSize="14px"
                           h="22px"
                           verticalAlign="middle"
-                          color="white"
+                          color="whiteAlpha.900"
                           top="0px"
                           right="0px"
                         >
@@ -249,14 +247,17 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                     ))}
                   </MenuList>
                 </Menu>
-                <Box textColor={useColorModeValue("blackAlpha.900", "white")}>
+                <Box
+                  textColor={useColorModeValue(
+                    "blackAlpha.900",
+                    "whiteAlpha.900"
+                  )}
+                >
                   <Text opacity={0.7} fontSize="xs">
                     @{user?.username}
                   </Text>
                   <Text
                     fontSize={"lg"}
-                    lineHeight={1}
-                    textOverflow="ellipsis"
                     w={{ lg: "125px", md: "fit-content" }}
                     noOfLines={1}
                   >
@@ -314,7 +315,9 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                     icon={
                       <HamburgerIcon
                         fontSize={25}
-                        textColor={colorMode === "light" ? "black" : "white"}
+                        textColor={
+                          colorMode === "light" ? "black" : "whiteAlpha.900"
+                        }
                       />
                     }
                     variant="outline"
@@ -374,7 +377,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                         }}
                         icon={
                           colorMode === "light" ? (
-                            <MoonIcon textColor={"white"} />
+                            <MoonIcon textColor={"whiteAlpha.900"} />
                           ) : (
                             <SunIcon textColor={"yellow"} />
                           )

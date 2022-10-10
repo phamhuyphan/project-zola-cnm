@@ -129,7 +129,7 @@ function SignUp({ setShow, isOpen }) {
           value={username}
           placeholder="Enter your username"
           onChange={(e) => setUsername(e.target.value)}
-          bgColor={"white"}
+          bgColor={"whiteAlpha.900"}
           borderRadius="lg"
           w="400px"
           h={45}
@@ -143,7 +143,7 @@ function SignUp({ setShow, isOpen }) {
           value={fullname}
           placeholder="Enter your full name"
           onChange={(e) => setName(e.target.value)}
-          bgColor={"white"}
+          bgColor={"whiteAlpha.900"}
           borderRadius="lg"
           w="400px"
           h={45}
@@ -156,7 +156,7 @@ function SignUp({ setShow, isOpen }) {
           value={email}
           placeholder="Enter your Email"
           onChange={(e) => setEmail(e.target.value)}
-          bgColor={"white"}
+          bgColor={"whiteAlpha.900"}
           borderRadius="lg"
           w="400px"
           h={45}
@@ -169,7 +169,7 @@ function SignUp({ setShow, isOpen }) {
           placeholder="Enter your Password"
           onChange={(e) => setPassword(e.target.value)}
           value={password}
-          bgColor={"white"}
+          bgColor={"whiteAlpha.900"}
           borderRadius="lg"
           w="400px"
           h={45}
@@ -182,7 +182,7 @@ function SignUp({ setShow, isOpen }) {
           placeholder="confirm your Password"
           onChange={(e) => setConfirmPassword(e.target.value)}
           value={confirmpassword}
-          bgColor={"white"}
+          bgColor={"whiteAlpha.900"}
           borderRadius="lg"
           w="400px"
           h={45}
@@ -212,6 +212,7 @@ function SignUp({ setShow, isOpen }) {
           mb="5"
           onClick={submitHandler}
           isLoading={loading}
+          isDisabled={!email || !confirmpassword || !password || !username}
         >
           Sign Up
         </Button>

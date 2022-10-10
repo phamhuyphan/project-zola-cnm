@@ -27,7 +27,7 @@ function ProfileModal({ user, children }) {
         <ModalOverlay />
         <ModalContent>
           <ModalHeader
-            bg="white"
+            bg="whiteAlpha.900"
             fontSize="40px"
             display="flex"
             justifyContent="center"

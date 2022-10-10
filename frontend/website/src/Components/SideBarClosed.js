@@ -46,7 +46,7 @@ function SideBarClosed() {
   );
   const colorLoggedUser = useColorModeValue(
     "linear(to-b,#1E2B6F,#193F5F)",
-    "linear(to-b,white,#B1AEC6)"
+    "linear(to-b,whiteAlpha.900,#B1AEC6)"
   );
   const {
     setCloseSideBar,
@@ -161,7 +161,9 @@ function SideBarClosed() {
                     <AvatarBadge
                       boxSize={5}
                       bg="green.500"
-                      borderColor={colorMode === "light" ? "white" : "darkblue"}
+                      borderColor={
+                        colorMode === "light" ? "whiteAlpha.900" : "darkblue"
+                      }
                     ></AvatarBadge>
                   </Avatar>
                   {notification.length > 0 && (
@@ -173,7 +175,7 @@ function SideBarClosed() {
                       fontSize="14px"
                       h="22px"
                       verticalAlign="middle"
-                      color="white"
+                      color="whiteAlpha.900"
                       top="0px"
                       right="0px"
                     >

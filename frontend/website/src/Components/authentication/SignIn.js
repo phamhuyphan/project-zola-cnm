@@ -76,7 +76,7 @@ function SignIn({ setShow, isOpen }) {
           value={email}
           placeholder="Enter your Email"
           onChange={(e) => setEmail(e.target.value)}
-          bgColor={"white"}
+          bgColor={"whiteAlpha.900"}
           borderRadius="lg"
           w="400px"
           h={45}
@@ -89,7 +89,7 @@ function SignIn({ setShow, isOpen }) {
           placeholder="Enter your Password"
           onChange={(e) => setPassword(e.target.value)}
           value={password}
-          bgColor={"white"}
+          bgColor={"whiteAlpha.900"}
           borderRadius="lg"
           w="400px"
           h={45}
@@ -101,7 +101,7 @@ function SignIn({ setShow, isOpen }) {
       <Text
         transitionDuration={"150ms"}
         textAlign="right"
-        textColor={"white"}
+        textColor={"whiteAlpha.900"}
         _hover={{
           bgClip: "text",
           bgGradient: "linear(to-br,blue.300, pink.400)",
@@ -114,8 +114,7 @@ function SignIn({ setShow, isOpen }) {
           variant={"link"}
           colorScheme={"yellow"}
           fontWeight={"bold"}
-          transition="ease-in-out"
-          transitionDuration={150}
+          transition="all 0.25s ease-in-out"
           fontSize={32}
           _hover={{
             bgClip: "text",
@@ -124,6 +123,7 @@ function SignIn({ setShow, isOpen }) {
           mb="5"
           onClick={submitHandler}
           isLoading={loading}
+          isDisabled={!password || !email}
         >
           Sign In
         </Button>

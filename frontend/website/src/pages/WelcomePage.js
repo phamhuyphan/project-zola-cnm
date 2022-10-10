@@ -87,7 +87,7 @@ function WelcomePage() {
             fontSize={48}
             fontWeight="bold"
             textAlign={"center"}
-            textColor="white"
+            textColor="whiteAlpha.900"
             className="parallax"
             data-value="2"
           >
@@ -100,7 +100,7 @@ function WelcomePage() {
             fontSize={16}
             fontWeight="bold"
             textAlign="center"
-            textColor={"white"}
+            textColor={"whiteAlpha.900"}
             className="parallax"
             data-value="3"
           >
@@ -113,12 +113,12 @@ function WelcomePage() {
           <SignUp setShow={setShow} isOpen={!isOpen} />
         )}
         {!show ? (
-          <Text textColor={"white"}>
+          <Text textColor={"whiteAlpha.900"}>
             don't have an account?{" "}
             <span className="font-bold">
               <Button
                 variant="link"
-                colorScheme={"white"}
+                colorScheme={"whiteAlpha.900"}
                 _hover={{
                   bgClip: "text",
                   bgGradient: "linear(to-br,blue.300,red.300)",
@@ -133,12 +133,12 @@ function WelcomePage() {
             </span>
           </Text>
         ) : (
-          <Text textColor={"white"}>
+          <Text textColor={"whiteAlpha.900"}>
             already have an account?{" "}
             <span className="font-bold">
               <Button
                 variant="link"
-                colorScheme={"white"}
+                colorScheme={"whiteAlpha.900"}
                 _hover={{
                   bgClip: "text",
                   bgGradient: "linear(to-br,blue.300,red.300)",
