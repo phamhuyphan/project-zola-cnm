@@ -14,7 +14,6 @@ import {
   IconButton,
   Input,
   InputGroup,
-  InputLeftElement,
   InputRightElement,
   Spinner,
   Text,
@@ -23,7 +22,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import EmojiPicker, { Emoji, EmojiStyle, Theme } from "emoji-picker-react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 import axios from "axios";
 import Lottie from "react-lottie";
 import io from "socket.io-client";
@@ -59,7 +58,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const { user, selectedChat, setSelectedChat, notification, setNotification } =
     ChatState();
   const [selectedEmoji, setSelectedEmoji] = useState("");
-  const [toggle, setToggle] = useState(true);
+  const [toggle, setToggle] = useState(false);
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -507,7 +506,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         setNewMessage(newMessage + emojiData.emoji);
                       }}
                       autoFocusSearch={false}
-                      theme={Theme.AUTO}
+                      theme={colorMode ? Theme.DARK : Theme.LIGHT}
                     />
                   </Box>
                   <InputGroup size="lg" marginY={4}>
