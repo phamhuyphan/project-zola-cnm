@@ -22,7 +22,7 @@ app.use("/api/message", messageRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
 
-const PORT = 5000;
+const PORT = process.env.PORT;
 const server = app.listen(
   PORT,
   console.log(`server listening on port ${PORT}`.yellow.bold)
