@@ -15,6 +15,9 @@ const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 
 app.use(express.json());
+app.get("/", (req, res) => {
+  res.send("API is Running suc");
+});
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
@@ -34,31 +37,26 @@ const io = require("socket.io")(server, {
   },
 });
 
-
-
 /////////////////////////////////////////
 const User = require("./models/userModel");
 /////////////////////////////////////////
 
-
 io.on("connection", (socket) => {
   console.log("connected to socket.io");
-  let user
+  let user;
   //create a new socket where frontend join  data
-  socket.on("setup",async (userData) => {
+  socket.on("setup", async (userData) => {
     user = userData._id;
-     //Thay doi status
-    const i = await User.findByIdAndUpdate(
-      userData._id,
-      { statusOnline:true },
-    )
+    //Thay doi status
+    const i = await User.findByIdAndUpdate(userData._id, {
+      statusOnline: true,
+    });
 
     console.log("user data:", userData);
     socket.join(userData._id);
-    socket.emit("connected",socket.id);
-   
-    console.log("status",i);
+    socket.emit("connected", socket.id);
 
+    console.log("status", i);
   });
 
   //user join a chat socket
@@ -88,13 +86,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", async () => {
-
     //Thay doi status
-    const i = await User.findByIdAndUpdate(
-      user,
-      { statusOnline: false },   
-    )
+    const i = await User.findByIdAndUpdate(user, { statusOnline: false });
     console.log("Loagout", i);
-  })
-
+  });
 });

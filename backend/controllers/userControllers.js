@@ -8,11 +8,11 @@ const generateToken = require("../config/generateToken");
 const allUsers = asyncHandler(async (req, res) => {
   const keyword = req.query.search
     ? {
-      $or: [
-        { username: { $regex: req.query.search, $options: "i" } },
-        { email: { $regex: req.query.search, $options: "i" } },
-      ],
-    }
+        $or: [
+          { username: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      }
     : {};
   console.log(req.user);
   const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
@@ -43,7 +43,6 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     pic,
-
   });
 
   if (user) {
@@ -109,7 +108,28 @@ const addFriend = asyncHandler(async (req, res) => {
     });
   }
 });
+// sửa thông tin user(username, fullname)
+const reInfor = asyncHandler(async (req, res) => {
+  const { userId, username, fullname, pic } = req.body;
 
+  const updateInfo = await User.findByIdAndUpdate(
+    userId,
+    {
+      username,
+      fullname,
+      pic,
+    },
+    {
+      new: true,
+    }
+  );
 
+  if (!updateInfo) {
+    res.status(400);
+    throw new Error("User not foundddd");
+  } else {
+    res.json(updateInfo);
+  }
+});
 
-module.exports = { allUsers, registerUser, authUser, addFriend };
+module.exports = { allUsers, registerUser, authUser, addFriend, reInfor };
