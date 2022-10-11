@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const generateToken = require("../config/generateToken");
+const QRCode = require("qrcode")
 
 //@description     Get or Search all users
 //@route           GET /api/user?search=
@@ -110,6 +111,28 @@ const addFriend = asyncHandler(async (req, res) => {
   }
 });
 
+const generateQRCode = asyncHandler(async (req, res) => {
+  // Creating the data
+  let data = req.params.userId;
+
+  // Converting the data into String format
+  let stringdata = JSON.stringify(data)
+
+  // Print the QR code to terminal
+  QRCode.toString(stringdata, { type: 'terminal' },
+    (err, QRcode) => {
+      if (err) return console.log(err)
+    })
+
+  // Converting the data into base64
+  QRCode.toDataURL(stringdata, (err, code) => {
+    if (err) return console.log(err) 
+    res.json(code)
+    // Printing the code
+    console.log(code)
+  })
+});
 
 
-module.exports = { allUsers, registerUser, authUser, addFriend };
+
+module.exports = { allUsers, registerUser, authUser, addFriend, generateQRCode };
