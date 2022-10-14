@@ -4,7 +4,7 @@ const {
   authUser,
   allUsers,
   addFriend,
-  generateQRCode
+  generateQRCode,getUserByEmail
 } = require("../controllers/userControllers");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -14,6 +14,7 @@ router.route("/").get(protect,allUsers);
 router.route("/addfriend").put(protect,addFriend);
 router.route("/").post(registerUser);
 router.post("/login", authUser);
+router.post("/:email", getUserByEmail);
 router.post("/:userId/qrcode",generateQRCode);
 
 module.exports = router;

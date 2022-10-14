@@ -12,14 +12,20 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^0.27.2",
-    "framer-motion": "^6.5.1",
+    "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
+    "crypto-js": "^4.1.1",
+    "firebase": "^9.11.0",
+    "framer-motion": "^4.1.17",
     "gsap": "^3.11.1",
     "moment": "^2.29.4",
+    "nodemailer": "^6.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-google-button": "^0.7.2",
     "react-lottie": "^1.2.3",
     "react-router-dom": "^6.3.0",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "^4.0.2",
     "react-scrollable-feed": "^1.3.1",
     "socket.io": "^4.5.2",
     "socket.io-client": "^4.5.2",
@@ -50,6 +56,7 @@
     ]
   },
   "devDependencies": {
+    "react-app-rewired": "^2.2.1",
     "tailwind-scrollbar": "^2.0.1",
     "tailwindcss": "^3.1.8"
   }

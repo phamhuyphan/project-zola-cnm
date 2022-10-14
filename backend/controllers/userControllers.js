@@ -87,6 +87,19 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
+//@description    get user by Email
+//@route           get /api/user/:email
+//@access          Public
+const getUserByEmail =  asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (user) {
+   res.json((user.email));
+  }  if (!user) {
+    res.json("a");
+  }
+});
+
 const addFriend = asyncHandler(async (req, res) => {
   const { userId } = req.body;
   const added = await User.findByIdAndUpdate(
@@ -112,7 +125,7 @@ const addFriend = asyncHandler(async (req, res) => {
 });
 
 const generateQRCode = asyncHandler(async (req, res) => {
-  // Creating the data
+
   let data = req.params.userId;
 
   // Converting the data into String format
@@ -123,10 +136,9 @@ const generateQRCode = asyncHandler(async (req, res) => {
     (err, QRcode) => {
       if (err) return console.log(err)
     })
-
   // Converting the data into base64
   QRCode.toDataURL(stringdata, (err, code) => {
-    if (err) return console.log(err) 
+    if (err) return console.log(err)
     res.json(code)
     // Printing the code
     console.log(code)
@@ -135,4 +147,4 @@ const generateQRCode = asyncHandler(async (req, res) => {
 
 
 
-module.exports = { allUsers, registerUser, authUser, addFriend, generateQRCode };
+module.exports = { getUserByEmail, allUsers, registerUser, authUser, addFriend, generateQRCode };

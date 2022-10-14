@@ -9,6 +9,9 @@ import {
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+//import { mailer } from './Mailler';
+
+//const bcrypt = require('bcrypt');
 function SignUp({ setShow, isOpen }) {
   const [fullname, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -110,6 +113,9 @@ function SignUp({ setShow, isOpen }) {
 
       localStorage.setItem("userInfo", JSON.stringify(data));
       setLoading(false);
+      // bcrypt.hash(data.email, parseInt(process.env.BCRYPT_SALT_ROUND)).then((hashedEmail) => {
+      //   mailer.sendMail(data.email, "Verify Email", `<a href="${process.env.APP_URL}/verify?email=${data.email}&token=${hashedEmail}"> Verify </a>`)
+      // });
       navigate("/chats");
     } catch (error) {
       toast({
