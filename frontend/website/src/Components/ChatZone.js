@@ -6,7 +6,6 @@ import {
 } from "@chakra-ui/icons";
 import {
   Avatar,
-  AvatarBadge,
   AvatarGroup,
   Box,
   Fade,
@@ -57,7 +56,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const toggleSwitch = () => setIsOn(!isOn);
   const { user, selectedChat, setSelectedChat, notification, setNotification } =
     ChatState();
-  const [selectedEmoji, setSelectedEmoji] = useState("");
+
   const [toggle, setToggle] = useState(false);
   const fetchMessages = async () => {
     if (!selectedChat) return;
@@ -167,10 +166,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         setIsTyping(false);
         onToggle();
       });
-      socket.on("change", (user) => {
-        setFetchAgain(!fetchAgain);
-        console.log("feching again " + user.documentKeys._id);
-      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -197,7 +192,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     });
   });
-
+  console.log("chatZone is rendered");
   return (
     <Box
       w="full"
@@ -317,28 +312,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         marginRight={3}
                         name={user?._id && getSender(user, selectedChat.users)}
                         src={getSenderInfo(user, selectedChat.users).pic}
-                      >
-                        <AvatarBadge
-                          boxSize={5}
-                          bg={
-                            getSenderInfo(user, selectedChat.users).statusOnline
-                              ? "green.500"
-                              : "red.500"
-                          }
-                          borderColor={"whiteAlpha.900"}
-                        ></AvatarBadge>
-                      </Avatar>
+                      ></Avatar>
                     </>
                   )}
 
-                  <Text
-                    fontWeight={"bold"}
-                    textColor={
-                      colorMode === "light" ? "black" : "whiteAlpha.900"
-                    }
-                    w="full"
-                    pr="5"
-                  >
+                  <Box w="full" pr="5">
                     {selectedChat.isGroupChat ? (
                       <div>
                         <UpdateGroupChatModal
@@ -346,11 +324,22 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                           setFetchAgain={setFetchAgain}
                           fetchMessages={fetchMessages}
                         >
-                          <Text _hover={{ textDecor: "underline" }}>
+                          <Text
+                            textColor={
+                              colorMode === "light" ? "black" : "whiteAlpha.900"
+                            }
+                            fontWeight={"bold"}
+                            _hover={{ textDecor: "underline" }}
+                          >
                             {selectedChat.chatName}{" "}
                           </Text>
                         </UpdateGroupChatModal>
-                        <Text fontWeight={"normal"}>
+                        <Text
+                          textColor={
+                            colorMode === "light" ? "black" : "whiteAlpha.900"
+                          }
+                          fontWeight={"normal"}
+                        >
                           {selectedChat.users.length} members
                         </Text>
                       </div>
@@ -359,9 +348,23 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         <ProfileModal
                           user={getSenderInfo(user, selectedChat.users)}
                         >
-                          {getSender(user, selectedChat.users)}
+                          <Text
+                            textColor={
+                              colorMode === "light" ? "black" : "whiteAlpha.900"
+                            }
+                            fontWeight={"bold"}
+                            _hover={{ textDecor: "underline" }}
+                          >
+                            {getSender(user, selectedChat.users)}
+                          </Text>
                         </ProfileModal>
-                        <Text fontWeight={"normal"} opacity={0.8}>
+                        <Text
+                          textColor={
+                            colorMode === "light" ? "black" : "whiteAlpha.900"
+                          }
+                          fontWeight={"normal"}
+                          opacity={0.8}
+                        >
                           {getSenderInfo(user, selectedChat.users).statusOnline
                             ? "online"
                             : "Last online " +
@@ -372,7 +375,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         </Text>
                       </>
                     )}
-                  </Text>
+                  </Box>
                 </Box>
                 {/** button group*/}
                 <Box
@@ -441,7 +444,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     </motion.div>
                   </div>
                 </Box>
-                <MessageList messages={messages} />
+                <MessageList messages={messages} setMessages={setMessages} />
                 <FormControl
                   onKeyDown={sendMessage}
                   isRequired
@@ -502,7 +505,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   >
                     <EmojiPicker
                       onEmojiClick={(emojiData, e) => {
-                        setSelectedEmoji(emojiData.unified);
                         setNewMessage(newMessage + emojiData.emoji);
                       }}
                       autoFocusSearch={false}
@@ -523,9 +525,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       }}
                     />
                     <InputRightElement
-                      width="5.5rem"
+                      width="15.5rem"
                       justifyContent={"space-around"}
                     >
+                      <Input size="sm" type="file"></Input>
                       <Text
                         className={`shadow-md
                       ${

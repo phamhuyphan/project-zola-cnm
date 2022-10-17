@@ -3,6 +3,7 @@ import { Box } from "@chakra-ui/react";
 import React from "react";
 
 function UserBadgeItem({ _user, handleFunction, isAdmin }) {
+  console.log("UserBadgeItem is rendered");
   return (
     <Box
       px={2}

@@ -46,7 +46,8 @@ code {
   height: 100%;
   right: 0;
   background-repeat: no-repeat;
-  bottom: -100px;
+  top: 25%;
+  bottom: 0;
   z-index: 2;
   background-image: url(./asset/woman.png);
   scale: 1.4;

@@ -86,8 +86,4 @@ io.on("connection", (socket) => {
     //Thay doi status
     await User.findByIdAndUpdate(user, { statusOnline: false });
   });
-
-  User.watch().on("change", (user) => {
-    socket.emit("change", user);
-  });
 });

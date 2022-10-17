@@ -2,13 +2,18 @@ import {
   Box,
   Button,
   Input,
+  InputGroup,
+  InputLeftElement,
   ScaleFade,
+  Text,
   useToast,
   VStack,
 } from "@chakra-ui/react";
+
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AtSignIcon, EmailIcon } from "@chakra-ui/icons";
 function SignUp({ setShow, isOpen }) {
   const [fullname, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -123,73 +128,97 @@ function SignUp({ setShow, isOpen }) {
   };
   return (
     <ScaleFade initialScale={0.9} in={!isOpen}>
-      <VStack marginY={"2.5rem"} zIndex={10} spacing={5} align="stretch">
-        <Input
-          type={"name"}
-          value={username}
-          placeholder="Enter your username"
-          onChange={(e) => setUsername(e.target.value)}
-          bgColor={"whiteAlpha.900"}
-          borderRadius="lg"
-          w="400px"
-          h={45}
-          marginBottom={"1.25rem"}
-          padding="3"
-          mb={0}
-          textColor={"gray.500"}
-        />
-        <Input
-          type={"name"}
-          value={fullname}
-          placeholder="Enter your full name"
-          onChange={(e) => setName(e.target.value)}
-          bgColor={"whiteAlpha.900"}
-          borderRadius="lg"
-          w="400px"
-          h={45}
-          marginBottom={"1.25rem"}
-          padding="3"
-          textColor={"gray.500"}
-        />
-        <Input
-          type={"email"}
-          value={email}
-          placeholder="Enter your Email"
-          onChange={(e) => setEmail(e.target.value)}
-          bgColor={"whiteAlpha.900"}
-          borderRadius="lg"
-          w="400px"
-          h={45}
-          marginBottom={"1.25rem"}
-          padding="3"
-          textColor={"gray.500"}
-        />
-        <Input
-          type={"password"}
-          placeholder="Enter your Password"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-          bgColor={"whiteAlpha.900"}
-          borderRadius="lg"
-          w="400px"
-          h={45}
-          marginBottom={"1.25rem"}
-          padding="3"
-          textColor={"gray.500"}
-        />
-        <Input
-          type={"password"}
-          placeholder="confirm your Password"
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          value={confirmpassword}
-          bgColor={"whiteAlpha.900"}
-          borderRadius="lg"
-          w="400px"
-          h={45}
-          marginBottom={"1.25rem"}
-          padding="3"
-          textColor={"gray.500"}
-        />
+      <VStack marginY={"1.5rem"} zIndex={10} spacing={5} align="stretch">
+        <InputGroup size="md" mb={0} h={45}>
+          <InputLeftElement
+            display={"flex"}
+            justifyContent="center"
+            alignItems={"center"}
+          >
+            <AtSignIcon color={"blackAlpha.900"} />
+          </InputLeftElement>
+          <Input
+            type={"name"}
+            value={username}
+            placeholder="Enter your username"
+            onChange={(e) => setUsername(e.target.value)}
+            bgColor={"whiteAlpha.900"}
+            borderRadius="lg"
+            textColor={username ? "blackAlpha.800" : "gray.500"}
+          />
+        </InputGroup>
+        <InputGroup size="md" mb={0} h={45}>
+          <InputLeftElement
+            display={"flex"}
+            justifyContent="center"
+            alignItems={"center"}
+          >
+            <Text fontWeight={"bold"}>n</Text>
+          </InputLeftElement>
+          <Input
+            type={"name"}
+            value={fullname}
+            placeholder="Enter your full name"
+            onChange={(e) => setName(e.target.value)}
+            bgColor={"whiteAlpha.900"}
+            borderRadius="lg"
+            textColor={fullname ? "blackAlpha.800" : "gray.500"}
+          />
+        </InputGroup>
+        <InputGroup size="md" mb={0} h={45}>
+          <InputLeftElement
+            display={"flex"}
+            justifyContent="center"
+            alignItems={"center"}
+          >
+            <EmailIcon color={"blackAlpha.900"} />
+          </InputLeftElement>
+          <Input
+            type={"email"}
+            value={email}
+            placeholder="Enter your Email"
+            onChange={(e) => setEmail(e.target.value)}
+            bgColor={"whiteAlpha.900"}
+            borderRadius="lg"
+            textColor={email ? "blackAlpha.800" : "gray.500"}
+          />
+        </InputGroup>
+        <InputGroup size="md" mb={0} h={45}>
+          <InputLeftElement
+            display={"flex"}
+            justifyContent="center"
+            alignItems={"center"}
+          >
+            <i class="fas fa-key" aria-hidden="true"></i>
+          </InputLeftElement>
+          <Input
+            type={"password"}
+            placeholder="Enter your Password"
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            bgColor={"whiteAlpha.900"}
+            borderRadius="lg"
+            textColor={password ? "blackAlpha.800" : "gray.500"}
+          />
+        </InputGroup>
+        <InputGroup size="md" mb={0} h={45}>
+          <InputLeftElement
+            display={"flex"}
+            justifyContent="center"
+            alignItems={"center"}
+          >
+            <i class="fas fa-key" aria-hidden="true"></i>
+          </InputLeftElement>
+          <Input
+            type={"password"}
+            placeholder="Confirm your Password"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={confirmpassword}
+            bgColor={"whiteAlpha.900"}
+            borderRadius="lg"
+            textColor={password ? "blackAlpha.800" : "gray.500"}
+          />
+        </InputGroup>
         <Input
           type="file"
           accept="image/*"

@@ -1,7 +1,24 @@
 import { DeleteIcon } from "@chakra-ui/icons";
-import { Avatar, Box, IconButton, Text, Tooltip } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Button,
+  IconButton,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  Tooltip,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
+import axios from "axios";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import {
   isLastMessage,
   isSameSender,
@@ -10,9 +27,78 @@ import {
 } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
 
-function MessageItem({ messages, m, i }) {
+function MessageItem({ messages, setMessages, m, i }) {
   const [isHover, setIsHover] = useState(false);
-  const { user } = ChatState();
+  const toast = useToast();
+  const { user, selectedChat } = ChatState();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const fetchMessages = async () => {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+        cancelToken: source.token,
+      };
+      const { data } = await axios.get(
+        `/api/message/${selectedChat._id}`,
+        config
+      );
+      setMessages(data);
+    } catch (error) {
+      if (axios.isCancel(error)) console.log("successfully aborted");
+      else
+        toast({
+          title: "Error Occured",
+          description: "Failed to send message",
+          status: "warning",
+          duration: 2500,
+          isClosable: true,
+          position: "bottom",
+        });
+    }
+    return () => {
+      // cancel the request before component unmounts
+      source.cancel();
+    };
+  };
+
+  async function handleDelete(messageId) {
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      await axios
+        .put(
+          "/api/message/delete",
+          {
+            messageId: messageId,
+          },
+          config
+        )
+        .then((res) => {
+          console.log(user);
+          console.log(res.data);
+        });
+      fetchMessages();
+    } catch (e) {
+      toast({
+        title: "Error Occured",
+        description: "Failed to delete the message",
+        status: "warning",
+        duration: 2500,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  }
+  console.log("MessageItem is rendered");
   return (
     <>
       <Box
@@ -63,7 +149,13 @@ function MessageItem({ messages, m, i }) {
           marginTop={isSameUserMargin(messages, m, i, user._id) ? "auto" : 30}
           position={"relative"}
         >
-          <Text width={"fit-content"}>{m.content}</Text>
+          <Text
+            width={"fit-content"}
+            color={m.content === "deleted" && "gray.600"}
+            fontStyle={m.content === "deleted" && "italic"}
+          >
+            {m.content}
+          </Text>
           {(isSameSender(messages, m, i, user._id) ||
             isLastMessage(messages, i, user._id)) && (
             <Text
@@ -76,20 +168,73 @@ function MessageItem({ messages, m, i }) {
             </Text>
           )}
           <IconButton
-            display={isHover ? "" : "none"}
+            display={
+              isHover && m.sender._id === user._id && m.content !== "deleted"
+                ? ""
+                : "none"
+            }
             position="absolute"
             top={0}
             bottom={0}
             m={"auto 0"}
+            onClick={onOpen}
             borderRadius={"full"}
             right={m.sender._id === user._id ? "unset" : -16}
             left={m.sender._id === user._id ? -16 : "unset"}
             icon={<DeleteIcon fontSize={15} />}
           ></IconButton>
+
+          <IconButton
+            display={
+              isHover && m.sender._id === user._id && m.content !== "deleted"
+                ? ""
+                : "none"
+            }
+            position="absolute"
+            top={0}
+            bottom={0}
+            m={"auto 0"}
+            onClick={onOpen}
+            borderRadius={"full"}
+            right={m.sender._id === user._id ? "unset" : -10}
+            left={m.sender._id === user._id ? -10 : "unset"}
+            icon={<DeleteIcon fontSize={15} />}
+          ></IconButton>
+
+          <Modal isOpen={isOpen} onClose={onClose} size="sm" isCentered="true">
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Delete Message</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                <Text>Are you sure you want to delete this message?</Text>
+                <Text color={"gray"} fontStyle="italic">
+                  You cannot undo the action
+                </Text>
+              </ModalBody>
+
+              <ModalFooter>
+                <Button colorScheme="blue" mr={3} onClick={onClose}>
+                  Cancel
+                </Button>
+
+                <Button
+                  variant="solid"
+                  colorScheme={"red"}
+                  onClick={() => {
+                    handleDelete(m._id);
+                    onClose();
+                  }}
+                >
+                  Delete
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </Box>
       </Box>
     </>
   );
 }
 
-export default MessageItem;
+export default memo(MessageItem);
