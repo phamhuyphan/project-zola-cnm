@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Box, Text } from "@chakra-ui/react";
-import axios from "axios";
 import React, { useEffect } from "react";
 import { ChatState } from "../providers/ChatProvider";
 import { MessageState } from "../providers/MessagesProvider";
@@ -9,7 +9,12 @@ function ResponseMessage({ setResponseMessageID }) {
   const { selectedChat, user } = ChatState();
 
   useEffect(() => {
+    setResponseMessageID(responseMessage);
+  }, [responseMessage]);
+
+  useEffect(() => {
     setResponseMessage(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat]);
 
   return (

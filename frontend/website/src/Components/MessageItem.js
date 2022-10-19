@@ -28,11 +28,11 @@ import {
 import { ChatState } from "../providers/ChatProvider";
 import { MessageState } from "../providers/MessagesProvider";
 
-function MessageItem({ messages, setMessages, m, i, setResponseMessageID }) {
+function MessageItem({ messages, setMessages, m, i }) {
   const [isHover, setIsHover] = useState(false);
   const toast = useToast();
   const { user, selectedChat } = ChatState();
-  const { setResponseMessage, responseMessage } = MessageState();
+  const { setResponseMessage } = MessageState();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const fetchMessages = async () => {
@@ -101,7 +101,6 @@ function MessageItem({ messages, setMessages, m, i, setResponseMessageID }) {
       });
     }
   }
-  console.log("MessageItem is rendered: " + responseMessage?.content);
   return (
     <>
       <Box
@@ -152,12 +151,26 @@ function MessageItem({ messages, setMessages, m, i, setResponseMessageID }) {
           marginTop={isSameUserMargin(messages, m, i, user._id) ? "auto" : 30}
           position={"relative"}
         >
-          {m?.response?.content && (
-            <Box bg="blackAlpha.500" p={1} rounded="sm">
-              <Text color="whiteAlpha.800">
-                {m?.response?.sender.username}:
+          {m?.response && (
+            <Box pos="relative">
+              <Text
+                fontSize={"xs"}
+                color="blackAlpha.800"
+                pos="relative"
+                top={0}
+                left={0}
+              >
+                @{m?.response?.sender.username}
               </Text>
-              <Text color="whiteAlpha.800">{m?.response?.content}</Text>
+              <Box bg="blackAlpha.500" p={1} pt={4} rounded="sm" display="flex">
+                <Text
+                  color="whiteAlpha.800"
+                  className="truncate"
+                  maxW={"150px"}
+                >
+                  {m?.response?.content}
+                </Text>
+              </Box>
             </Box>
           )}
           <Text

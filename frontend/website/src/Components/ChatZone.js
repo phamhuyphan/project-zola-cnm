@@ -181,6 +181,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   }, [selectedChat]);
 
   useEffect(() => {
+    console.log("recieved");
     socket.on("message recieved", (newMessageRecieved) => {
       if (
         !selectedChatCompare ||
@@ -449,11 +450,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   </div>
                 </Box>
                 <MessagesProvider>
-                  <MessageList
-                    messages={messages}
-                    setMessages={setMessages}
-                    setResponseMessageID={setResponseMessageID}
-                  />
+                  <MessageList messages={messages} setMessages={setMessages} />
                   <FormControl
                     onKeyDown={sendMessage}
                     isRequired
