@@ -24,6 +24,22 @@ const allMessages = asyncHandler(async (req, res) => {
   }
 });
 
+const pageMessages = asyncHandler(async (req, res) => {
+  const limit = 20;
+  const skip = Message.find({ chat: req.params.chatId }).length - 20;
+  try {
+    const messages = await Message.find({ chat: req.params.chatId })
+      .limit(limit)
+      .skip(skip)
+      .populate("sender", "username pic email")
+      .populate("chat");
+    res.json(messages);
+  } catch (error) {
+    res.status(400);
+    throw new Error(error.message);
+  }
+});
+
 //@description     Create New Message
 //@route           POST /api/Message/
 //@access          Protected
@@ -72,4 +88,4 @@ const deleteMessage = asyncHandler(async (req, res) => {
   );
 });
 
-module.exports = { allMessages, sendMessage, deleteMessage };
+module.exports = { allMessages, sendMessage, deleteMessage, pageMessages };
