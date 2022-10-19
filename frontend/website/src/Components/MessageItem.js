@@ -1,4 +1,4 @@
-import { DeleteIcon } from "@chakra-ui/icons";
+import { ChatIcon, DeleteIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -18,7 +18,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import moment from "moment";
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
   isLastMessage,
   isSameSender,
@@ -26,12 +26,15 @@ import {
   isSameUserMargin,
 } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
+import { MessageState } from "../providers/MessagesProvider";
 
-function MessageItem({ messages, setMessages, m, i }) {
+function MessageItem({ messages, setMessages, m, i, setResponseMessageID }) {
   const [isHover, setIsHover] = useState(false);
   const toast = useToast();
   const { user, selectedChat } = ChatState();
+  const { setResponseMessage, responseMessage } = MessageState();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const fetchMessages = async () => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -98,7 +101,7 @@ function MessageItem({ messages, setMessages, m, i }) {
       });
     }
   }
-  console.log("MessageItem is rendered");
+  console.log("MessageItem is rendered: " + responseMessage?.content);
   return (
     <>
       <Box
@@ -149,6 +152,14 @@ function MessageItem({ messages, setMessages, m, i }) {
           marginTop={isSameUserMargin(messages, m, i, user._id) ? "auto" : 30}
           position={"relative"}
         >
+          {m?.response?.content && (
+            <Box bg="blackAlpha.500" p={1} rounded="sm">
+              <Text color="whiteAlpha.800">
+                {m?.response?.sender.username}:
+              </Text>
+              <Text color="whiteAlpha.800">{m?.response?.content}</Text>
+            </Box>
+          )}
           <Text
             width={"fit-content"}
             color={m.content === "deleted" && "gray.600"}
@@ -167,40 +178,32 @@ function MessageItem({ messages, setMessages, m, i }) {
               {moment(m.createdAt).calendar()}
             </Text>
           )}
-          <IconButton
-            display={
-              isHover && m.sender._id === user._id && m.content !== "deleted"
-                ? ""
-                : "none"
-            }
+          <Box
+            display={isHover && m.content !== "deleted" ? "flex" : "none"}
             position="absolute"
+            w="100px"
+            justifyContent={"space-between"}
+            alignItems={"center"}
             top={0}
             bottom={0}
             m={"auto 0"}
-            onClick={onOpen}
-            borderRadius={"full"}
-            right={m.sender._id === user._id ? "unset" : -16}
-            left={m.sender._id === user._id ? -16 : "unset"}
-            icon={<DeleteIcon fontSize={15} />}
-          ></IconButton>
-
-          <IconButton
-            display={
-              isHover && m.sender._id === user._id && m.content !== "deleted"
-                ? ""
-                : "none"
-            }
-            position="absolute"
-            top={0}
-            bottom={0}
-            m={"auto 0"}
-            onClick={onOpen}
-            borderRadius={"full"}
-            right={m.sender._id === user._id ? "unset" : -10}
-            left={m.sender._id === user._id ? -10 : "unset"}
-            icon={<DeleteIcon fontSize={15} />}
-          ></IconButton>
-
+            right={m.sender._id === user._id ? "unset" : -32}
+            left={m.sender._id === user._id ? -32 : "unset"}
+          >
+            <IconButton
+              borderRadius={"full"}
+              onClick={() => {
+                setResponseMessage(m);
+              }}
+              icon={<ChatIcon fontSize={15} />}
+            ></IconButton>
+            <IconButton
+              display={m.sender._id === user._id ? "inline" : "none"}
+              onClick={onOpen}
+              borderRadius={"full"}
+              icon={<DeleteIcon fontSize={15} />}
+            ></IconButton>
+          </Box>
           <Modal isOpen={isOpen} onClose={onClose} size="sm" isCentered="true">
             <ModalOverlay />
             <ModalContent>

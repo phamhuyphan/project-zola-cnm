@@ -3,7 +3,7 @@ import ScrollableFeed from "react-scrollable-feed";
 
 import MessageItem from "./MessageItem";
 
-function MessageList({ messages, setMessages }) {
+function MessageList({ messages, setMessages, setResponseMessageID }) {
   console.log("MessageList is rendered");
   return (
     <ScrollableFeed className="pb-32 pt-16 px-4 w-full scrollbar-thin scroll-smooth">
@@ -15,6 +15,7 @@ function MessageList({ messages, setMessages }) {
             messages={messages}
             m={m}
             i={i}
+            setResponseMessageID={setResponseMessageID}
           />
         ))}
     </ScrollableFeed>

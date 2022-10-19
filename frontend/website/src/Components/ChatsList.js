@@ -163,4 +163,4 @@ function ChatList({ fetchAgain, setFetchAgain }) {
   );
 }
 
-export default memo(ChatList);
+export default ChatList;
