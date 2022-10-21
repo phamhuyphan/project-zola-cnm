@@ -3,7 +3,7 @@ const Post = require("../models/postModel")
 const Comment = require("../models/commentModel")
 
 const accessPost = asyncHandler(async (req, res) => {
-    var post = await Post.find()
+    let post = await Post.find()
             .populate("likes", "-password")
             .populate("sender", "-password");
     res.json(post)
@@ -11,7 +11,7 @@ const accessPost = asyncHandler(async (req, res) => {
 
 const createPost = asyncHandler(async (req, res) => {
 
-    var createPost = await Post.create({
+    let createPost = await Post.create({
         content: req.body.content,
         pic:req.body.pic,
         sender:req.user,
@@ -28,7 +28,7 @@ const createPost = asyncHandler(async (req, res) => {
 
 const deletePost = asyncHandler(async (req, res) => {
     const { postId } = req.body;
-    var deletePost = await Post.deleteOne({_id:postId})
+    let deletePost = await Post.deleteOne({_id:postId})
     if(deletePost){
         res.send("delete "+postId)
     }else{
@@ -40,7 +40,7 @@ const deletePost = asyncHandler(async (req, res) => {
 
 const updatePost = asyncHandler(async (req, res) => {
     const { postId } = req.body;
-    var update = Post.findByIdAndUpdate(postId,{
+    let update = Post.findByIdAndUpdate(postId,{
         content: req.body.content,
         pic:req.body.pic
     })

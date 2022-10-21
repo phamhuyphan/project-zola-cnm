@@ -9,7 +9,7 @@ const { validate } = require("../models/userModel");
 
 const getAllComments = asyncHandler(async (req, res) => {
     await Comment.find({ post: req.params.postId }).populate('sender', '-password').populate('post').then(data => {
-        var result = data
+        let result = data
         res.json(result)
     }).catch(error => {
         res.status(400).send(error.message || error);
@@ -24,7 +24,7 @@ const createComment = asyncHandler(async (req, res) => {
         content: req.body.content,
         post: req.body.postId
     }).populate('sender', '-password').populate('post').then(data => {
-        var result = data
+        let result = data
         res.json(result)
     }).catch(error => {
         res.status(400).send(error.message || error)
@@ -33,19 +33,18 @@ const createComment = asyncHandler(async (req, res) => {
 })
 
 const updateComment = asyncHandler(async (req, res) => {
-    const { commentId } = req.body;
-    var updateComment = await Comment.findByIdAndUpdate(
-        commentId,
-        {
-            content: req.body.content
-        }
-    );
-    if (!updateComment) {
-        res.status(404);
-        throw new Error(`Comment not found`);
-    } else {
-        res.json(updateComment);
-    }
+    const { commentId } = req.params.commentId;
+    const content = req.body.content;
+    Post.findById(req.params.postId).lean()
+        .then(() => {
+            return Comment.findByIdAndUpdate(req.params.commentId, {
+                content,
+            }, { new: true }).lean();
+        }).then((updatecomment) => {
+            res.json(updatecomment);
+        }).catch(error => {
+            res.send(error)
+        })
 
 })
 
@@ -101,10 +100,10 @@ const feedbackComment = asyncHandler(async (req, res) => {
 })
 
 module.exports = {
-        getAllComments,
-        createComment,
-        deleteComment,
-        updateComment,
-        feedbackComment,
-        feedbackNewComment
-    }
+    getAllComments,
+    createComment,
+    deleteComment,
+    updateComment,
+    feedbackComment,
+    feedbackNewComment
+}

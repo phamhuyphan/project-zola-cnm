@@ -1,7 +1,6 @@
 import { AnimatePresence } from "framer-motion";
 import React, { lazy, Suspense } from "react";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
