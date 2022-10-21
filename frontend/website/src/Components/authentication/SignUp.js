@@ -176,76 +176,6 @@ function SignUp({ setShow }) {
     }).catch(err => console.log(err))
   }
   return (
-<<<<<<< HEAD
-    <ScaleFade initialScale={0.9} in={!isOpening}>
-      <VStack marginY={"2.5rem"} zIndex={10} spacing={5} align="stretch">
-        <Input
-          type={"name"}
-          value={username}
-          placeholder="Enter your username"
-          onChange={(e) => setUsername(e.target.value)}
-          bgColor={"white"}
-          borderRadius="lg"
-          w="400px"
-          h={45}
-          marginBottom={"1.25rem"}
-          padding="3"
-          mb={0}
-          textColor={"gray.500"}
-        />
-        <Input
-          type={"name"}
-          value={fullname}
-          placeholder="Enter your full name"
-          onChange={(e) => setName(e.target.value)}
-          bgColor={"white"}
-          borderRadius="lg"
-          w="400px"
-          h={45}
-          marginBottom={"1.25rem"}
-          padding="3"
-          textColor={"gray.500"}
-        />
-        <Input
-          type={"email"}
-          value={email}
-          placeholder="Enter your Email"
-          onChange={(e) => setEmail(e.target.value)}
-          bgColor={"white"}
-          borderRadius="lg"
-          w="400px"
-          h={45}
-          marginBottom={"1.25rem"}
-          padding="3"
-          textColor={"gray.500"}
-        />
-        <Input
-          type={"password"}
-          placeholder="Enter your Password"
-          onChange={(e) => setPassword(e.target.value)}
-          value={password}
-          bgColor={"white"}
-          borderRadius="lg"
-          w="400px"
-          h={45}
-          marginBottom={"1.25rem"}
-          padding="3"
-          textColor={"gray.500"}
-        />
-        <Input
-          type={"password"}
-          placeholder="confirm your Password"
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          value={confirmpassword}
-          bgColor={"white"}
-          borderRadius="lg"
-          w="400px"
-          h={45}
-          marginBottom={"1.25rem"}
-          padding="3"
-          textColor={"gray.500"}
-        />
-=======
     <ScaleFade initialScale={0.9} in={!isOpen}>
       <VStack marginY={"1.5rem"} zIndex={10} spacing={5} align="stretch">
         <InputGroup size="md" mb={0} h={45}>
@@ -338,7 +268,6 @@ function SignUp({ setShow }) {
             textColor={password ? "blackAlpha.800" : "gray.500"}
           />
         </InputGroup>
->>>>>>> d805fa263d71a112f39841c9fa10cbf074789326
         <Input
           type="file"
           accept="image/*"
