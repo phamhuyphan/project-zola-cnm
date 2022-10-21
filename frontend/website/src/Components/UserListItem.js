@@ -2,6 +2,7 @@ import { Avatar, Box, Text } from "@chakra-ui/react";
 import React from "react";
 
 function UserListItem({ user, handleFunction }) {
+  console.log("UserListIem is rendered");
   return (
     <Box
       onClick={handleFunction}
@@ -9,7 +10,7 @@ function UserListItem({ user, handleFunction }) {
       bg="#E8E8E8"
       _hover={{
         background: "#38B2AC",
-        color: "white",
+        color: "whiteAlpha.900",
       }}
       w="100%"
       display="flex"
@@ -29,10 +30,14 @@ function UserListItem({ user, handleFunction }) {
       />
       <Box>
         <Text>{user.username}</Text>
-        <Text fontSize="xs">
-          <b>Email :</b>
-          {user.email}
-        </Text>
+        <Box>
+          <Text fontSize="xs" className="font-bold">
+            Email :
+          </Text>
+          <Text fontSize="xs" className="truncate">
+            {user.email}
+          </Text>
+        </Box>
       </Box>
     </Box>
   );

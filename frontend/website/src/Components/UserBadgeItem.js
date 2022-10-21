@@ -3,6 +3,7 @@ import { Box } from "@chakra-ui/react";
 import React from "react";
 
 function UserBadgeItem({ _user, handleFunction, isAdmin }) {
+  console.log("UserBadgeItem is rendered");
   return (
     <Box
       px={2}
@@ -15,7 +16,7 @@ function UserBadgeItem({ _user, handleFunction, isAdmin }) {
       justifyItems="center"
       variant="solid"
       fontSize={12}
-      textColor="white"
+      textColor="whiteAlpha.900"
       cursor="pointer"
       onClick={handleFunction}
       opacity="0.7"

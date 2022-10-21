@@ -1,18 +1,14 @@
 import {
   ArrowForwardIcon,
-  ChevronDownIcon,
   HamburgerIcon,
   InfoIcon,
   Search2Icon,
-  ViewIcon,
   ViewOffIcon,
 } from "@chakra-ui/icons";
 import {
   Avatar,
-  AvatarBadge,
   Box,
   Button,
-  Divider,
   Drawer,
   DrawerBody,
   DrawerCloseButton,
@@ -27,7 +23,6 @@ import {
   MenuItem,
   MenuList,
   Text,
-  Tooltip,
   useColorMode,
   useColorModeValue,
   useDisclosure,
@@ -46,7 +41,7 @@ function SideBarClosed() {
   );
   const colorLoggedUser = useColorModeValue(
     "linear(to-b,#1E2B6F,#193F5F)",
-    "linear(to-b,white,#B1AEC6)"
+    "linear(to-b,whiteAlpha.900,#B1AEC6)"
   );
   const {
     setCloseSideBar,
@@ -56,7 +51,6 @@ function SideBarClosed() {
     notification,
     setNotification,
   } = ChatState();
-  const { colorMode } = useColorMode();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigator = useNavigate();
   const logoutHandler = () => {
@@ -64,7 +58,7 @@ function SideBarClosed() {
     navigator("/");
   };
   const btnRef = React.useRef();
-
+  console.log("SideBarClosed is rendered");
   return (
     <Box
       bgGradient={bg}
@@ -157,13 +151,11 @@ function SideBarClosed() {
                 mr={3}
               >
                 <Box borderRadius="full" id="bgChatZone">
-                  <Avatar size={"md"} name={user?.fullname} src={user?.pic}>
-                    <AvatarBadge
-                      boxSize={5}
-                      bg="green.500"
-                      borderColor={colorMode === "light" ? "white" : "darkblue"}
-                    ></AvatarBadge>
-                  </Avatar>
+                  <Avatar
+                    size={"md"}
+                    name={user?.fullname}
+                    src={user?.pic}
+                  ></Avatar>
                   {notification.length > 0 && (
                     <Text
                       position="absolute"
@@ -173,7 +165,7 @@ function SideBarClosed() {
                       fontSize="14px"
                       h="22px"
                       verticalAlign="middle"
-                      color="white"
+                      color="whiteAlpha.900"
                       top="0px"
                       right="0px"
                     >

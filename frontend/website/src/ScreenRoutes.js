@@ -1,21 +1,24 @@
 import { AnimatePresence } from "framer-motion";
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import {
   Routes,
   Route,
   useLocation,
 } from "react-router-dom";
-import ChatPage from "./pages/ChatPage";
-import WelcomePage from "./pages/WelcomePage";
+import LoadingPage from "./Components/loading/LoadingPage";
+const ChatPage = lazy(() => import("./pages/ChatPage"));
+const WelcomePage = lazy(() => import("./pages/WelcomePage"));
 
 function ScreenRoutes() {
   const location = useLocation();
   return (
     <AnimatePresence mode="wait" initial={false}>
-      <Routes location={location} key={location.pathname}>
-        <Route exact path="/chats" element={<ChatPage />} />
-        <Route exact path="/" element={<WelcomePage />} />
-      </Routes>
+      <Suspense fallback={<LoadingPage />}>
+        <Routes location={location} key={location.pathname}>
+          <Route exact path="/chats" element={<ChatPage />} />
+          <Route exact path="/" element={<WelcomePage />} />
+        </Routes>
+      </Suspense>
     </AnimatePresence>
   );
 }

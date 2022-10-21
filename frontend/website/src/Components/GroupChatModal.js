@@ -15,7 +15,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { ChatState } from "../providers/ChatProvider";
 import UserBadgeItem from "./UserBadgeItem";
 import UserListItem from "./UserListItem";
@@ -92,7 +92,7 @@ function GroupChatModal({ children }) {
         },
         config
       );
-      setChats(data, ...chats);
+      setChats([data, ...chats]);
       onClose();
       toast({
         title: `${groupChatName} was successfully created!`,
@@ -128,6 +128,7 @@ function GroupChatModal({ children }) {
   const handleRemove = (userToRemove) => {
     setSelectedUsers(selectedUsers.filter((u) => u._id !== userToRemove._id));
   };
+  console.log("GroupChatModal is rendered");
   return (
     <>
       <Button
@@ -203,4 +204,4 @@ function GroupChatModal({ children }) {
     </>
   );
 }
-export default GroupChatModal;
+export default memo(GroupChatModal);

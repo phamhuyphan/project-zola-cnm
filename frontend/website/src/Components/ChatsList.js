@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import React, { memo, useEffect } from "react";
 import {
   Avatar,
-  AvatarBadge,
   AvatarGroup,
   Box,
   Text,
@@ -37,7 +36,8 @@ function ChatList({ fetchAgain, setFetchAgain }) {
       if (user) setChats(data);
     } catch (error) {
       if (axios.isCancel(error)) console.log("successfully aborted");
-      else
+      else {
+        console.log(error);
         toast({
           title: "Error Occured",
           description: "Failed to load chats",
@@ -46,13 +46,14 @@ function ChatList({ fetchAgain, setFetchAgain }) {
           isClosable: true,
           position: "bottom-left",
         });
+      }
     }
     return () => {
       // cancel the request before component unmounts
       source.cancel();
     };
   };
-
+  console.log("chatList is rendered");
   return (
     <VStack zIndex={1} mb={5}>
       {user &&
@@ -112,21 +113,15 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                 size={"md"}
                 name={user?._id && getSender(user, chat.users)}
                 src={getSenderInfo(user, chat.users).pic}
-              >
-                <AvatarBadge
-                  boxSize={5}
-                  bg={
-                    getSenderInfo(user, chat.users).statusOnline
-                      ? "green.500"
-                      : "red.500"
-                  }
-                  borderColor={"white"}
-                ></AvatarBadge>
-              </Avatar>
+              ></Avatar>
             )}
 
             <Box flex="1" px="2" maxW="400px" w="0.5">
-              <Text fontWeight={"bold"} textColor={"black"}>
+              <Text
+                fontWeight={"bold"}
+                textColor={"black"}
+                className="truncate"
+              >
                 {chat.isGroupChat ? chat.chatName : getSender(user, chat.users)}
               </Text>
               <Text
@@ -157,7 +152,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
               fontSize="12"
               bgGradient="linear(to-br,blue.900,blue.800)"
               textAlign={"right"}
-              w={{ base: "175px", md: "80px" }}
+              w={{ base: "200px", md: "100px" }}
               p={{ base: "5", md: "1" }}
             >
               {moment(chat.latestMessage?.createdAt).calendar()}

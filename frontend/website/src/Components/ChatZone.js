@@ -6,7 +6,6 @@ import {
 } from "@chakra-ui/icons";
 import {
   Avatar,
-  AvatarBadge,
   AvatarGroup,
   Box,
   Fade,
@@ -22,6 +21,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 import axios from "axios";
 import Lottie from "react-lottie";
 import io from "socket.io-client";
@@ -33,28 +33,34 @@ import { motion } from "framer-motion";
 import animationData from "../animations/52671-typing-animation-in-chat.json";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import ProfileModal from "./ProfileModal";
+import moment from "moment";
+import MessagesProvider from "../providers/MessagesProvider";
+import ResponseMessage from "./ResponseMessage";
+
 const ENDPOINT = "http://localhost:5000";
 
 let socket, selectedChatCompare;
 function ChatZone({ fetchAgain, setFetchAgain }) {
   const { colorMode, toggleColorMode } = useColorMode();
   const bgColor = useColorModeValue(
-    "linear(to-b,white,#B1AEC6)",
+    "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
   );
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [responseMessageID, setResponseMessageID] = useState(null);
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const toast = useToast();
-  const { isOpen, onToggle } = useDisclosure();
+  const { onToggle } = useDisclosure();
   const [isOn, setIsOn] = useState(false);
   const toggleSwitch = () => setIsOn(!isOn);
-
   const { user, selectedChat, setSelectedChat, notification, setNotification } =
     ChatState();
+
+  const [toggle, setToggle] = useState(false);
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -92,7 +98,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     };
   };
   const sendMessage = async (event) => {
-    if (event.key === "Enter" && newMessage) {
+    if ((event.key === "Enter" || event === "Send") && newMessage) {
       if (user) socket.emit("stop typing", selectedChat._id);
 
       try {
@@ -108,6 +114,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           {
             content: newMessage,
             chatId: selectedChat._id,
+            response: responseMessageID,
           },
           config
         );
@@ -174,6 +181,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   }, [selectedChat]);
 
   useEffect(() => {
+    console.log("recieved");
     socket.on("message recieved", (newMessageRecieved) => {
       if (
         !selectedChatCompare ||
@@ -189,20 +197,20 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     });
   });
-
+  console.log("chatZone is rendered");
   return (
     <Box
       w="full"
       h="full"
       bgImage={
         selectedChat
-          ? selectedChat.isGroupChat === true
+          ? selectedChat.isGroupChat
             ? selectedChat.chatAdmin.pic
             : `url(${getSenderInfo(user, selectedChat.users).pic})`
           : "initial"
       }
       bgColor={useColorModeValue(
-        "linear(to-b,white,#B1AEC6)",
+        "linear(to-b,whiteAlpha.900,#B1AEC6)",
         "linear(to-b,#1E2B6F,#193F5F)"
       )}
       bgRepeat="no-repeat"
@@ -215,7 +223,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           boxSize="full"
           backdropFilter="auto"
           backdropBlur="100px"
-          display={"flex"}
+          display="flex"
           width="100%"
           justifyContent="center"
           alignItems="center"
@@ -253,113 +261,127 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   scrollbarWidth: "none",
                 }}
               >
-                {selectedChat && (
-                  /**user badge */
-                  <Box
-                    display={"flex"}
-                    alignItems="center"
-                    position="absolute"
-                    top={5}
-                    zIndex={2}
-                    left={10}
-                    bgGradient={bgColor}
-                    minW="300"
-                    w="fit-content"
-                    p={2}
-                    opacity="0.95"
-                    transition={"all 0.2s ease-in-out"}
-                    _hover={{ opacity: 1 }}
+                {/**user badge */}
+                <Box
+                  display={"flex"}
+                  alignItems="center"
+                  position="absolute"
+                  top={5}
+                  zIndex={2}
+                  left={10}
+                  bgGradient={bgColor}
+                  minW="300"
+                  w="fit-content"
+                  p={2}
+                  opacity="0.95"
+                  transition={"all 0.2s ease-in-out"}
+                  _hover={{ opacity: 1 }}
+                  borderRadius="full"
+                  textColor={
+                    colorMode === "light" ? "whiteAlpha.900" : "blackAlpha.900"
+                  }
+                >
+                  <IconButton
+                    mx={1}
+                    my={2}
+                    bg="none"
+                    w="50px"
+                    h="30px"
                     borderRadius="full"
+                    display={{ base: "flex", md: "none" }}
+                    icon={<ChevronLeftIcon fontSize={"lg"} />}
+                    size="20px"
                     textColor={
                       colorMode === "light"
-                        ? "whiteAlpha.900"
-                        : "blackAlpha.900"
+                        ? "blackAlpha.900"
+                        : "whiteAlpha.900"
                     }
-                  >
-                    <IconButton
-                      bg="white"
-                      ml={5}
-                      mr={2}
-                      my={2}
-                      w="30px"
-                      h="30px"
-                      borderRadius="full"
-                      display={{ base: "flex", md: "none" }}
-                      icon={<ChevronLeftIcon />}
-                      textColor="black"
-                      size="12px"
-                      onClick={() => setSelectedChat("")}
-                    />
-                    {selectedChat.isGroupChat ? (
-                      <AvatarGroup size={"sm"} max={2} marginRight={3}>
-                        {selectedChat.users.map((u) => (
-                          <Avatar
-                            key={u._id}
-                            size={"xs"}
-                            name={selectedChat.chatName}
-                            src={u.pic}
-                          />
-                        ))}
-                      </AvatarGroup>
-                    ) : (
+                    onClick={() => setSelectedChat("")}
+                  />
+                  {selectedChat.isGroupChat ? (
+                    <AvatarGroup size={"sm"} max={2} marginRight={3}>
+                      {selectedChat.users.map((u) => (
+                        <Avatar
+                          key={u._id}
+                          size={"xs"}
+                          name={u.fullname}
+                          src={u.pic}
+                        />
+                      ))}
+                    </AvatarGroup>
+                  ) : (
+                    <>
                       <Avatar
                         showBorder={true}
                         size={"md"}
                         marginRight={3}
                         name={user?._id && getSender(user, selectedChat.users)}
                         src={getSenderInfo(user, selectedChat.users).pic}
-                      >
-                        <AvatarBadge
-                          boxSize={5}
-                          bg={
-                            getSenderInfo(user, selectedChat.users).statusOnline
-                              ? "green.500"
-                              : "red.500"
-                          }
-                          borderColor={"white"}
-                        ></AvatarBadge>
-                      </Avatar>
-                    )}
+                      ></Avatar>
+                    </>
+                  )}
 
-                    <Text
-                      fontWeight={"bold"}
-                      textColor={colorMode === "light" ? "black" : "white"}
-                    >
-                      {selectedChat.isGroupChat ? (
-                        <div>
-                          <UpdateGroupChatModal
-                            fetchAgain={fetchAgain}
-                            setFetchAgain={setFetchAgain}
-                            fetchMessages={fetchMessages}
+                  <Box w="full" pr="5">
+                    {selectedChat.isGroupChat ? (
+                      <div>
+                        <UpdateGroupChatModal
+                          fetchAgain={fetchAgain}
+                          setFetchAgain={setFetchAgain}
+                          fetchMessages={fetchMessages}
+                        >
+                          <Text
+                            textColor={
+                              colorMode === "light" ? "black" : "whiteAlpha.900"
+                            }
+                            fontWeight={"bold"}
+                            _hover={{ textDecor: "underline" }}
                           >
-                            <Text _hover={{ textDecor: "underline" }}>
-                              {selectedChat.users[0].fullname}
-                            </Text>
-                          </UpdateGroupChatModal>
-                        </div>
-                      ) : (
-                        <>
-                          <ProfileModal
-                            user={getSenderInfo(user, selectedChat.users)}
-                          >
-                            {getSender(user, selectedChat.users)}
-                          </ProfileModal>
-                        </>
-                      )}
-                      {selectedChat.isGroupChat ? (
-                        <Text fontWeight={"normal"}>
+                            {selectedChat.chatName}{" "}
+                          </Text>
+                        </UpdateGroupChatModal>
+                        <Text
+                          textColor={
+                            colorMode === "light" ? "black" : "whiteAlpha.900"
+                          }
+                          fontWeight={"normal"}
+                        >
                           {selectedChat.users.length} members
                         </Text>
-                      ) : (
-                        <Text fontWeight={"normal"}>
+                      </div>
+                    ) : (
+                      <>
+                        <ProfileModal
+                          user={getSenderInfo(user, selectedChat.users)}
+                        >
+                          <Text
+                            textColor={
+                              colorMode === "light" ? "black" : "whiteAlpha.900"
+                            }
+                            fontWeight={"bold"}
+                            _hover={{ textDecor: "underline" }}
+                          >
+                            {getSender(user, selectedChat.users)}
+                          </Text>
+                        </ProfileModal>
+                        <Text
+                          textColor={
+                            colorMode === "light" ? "black" : "whiteAlpha.900"
+                          }
+                          fontWeight={"normal"}
+                          opacity={0.8}
+                        >
                           {getSenderInfo(user, selectedChat.users).statusOnline
                             ? "online"
-                            : "offline"}
+                            : "Last online " +
+                              moment(
+                                getSenderInfo(user, selectedChat.users)
+                                  .updatedAt
+                              ).calendar()}
                         </Text>
-                      )}
-                    </Text>
+                      </>
+                    )}
                   </Box>
-                )}
+                </Box>
                 {/** button group*/}
                 <Box
                   position="absolute"
@@ -379,7 +401,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     }}
                     icon={
                       colorMode === "dark" ? (
-                        <PhoneIcon textColor={"white"} />
+                        <PhoneIcon textColor={"whiteAlpha.900"} />
                       ) : (
                         <PhoneIcon textColor={"yellow"} />
                       )
@@ -418,7 +440,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         }}
                         icon={
                           colorMode === "light" ? (
-                            <MoonIcon textColor={"white"} />
+                            <MoonIcon textColor={"whiteAlpha.900"} />
                           ) : (
                             <SunIcon textColor={"yellow"} />
                           )
@@ -427,104 +449,126 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     </motion.div>
                   </div>
                 </Box>
-
-                <MessageList messages={messages} />
-
-                <FormControl
-                  onKeyDown={sendMessage}
-                  isRequired
-                  bottom={0}
-                  left={0}
-                  p={5}
-                  pos="absolute"
-                >
-                  {isTyping ? (
-                    <Fade in={onToggle}>
-                      <Box
-                        w="fit-content"
-                        border={"1px solid black"}
-                        display="flex"
-                        pos="relative"
-                        bottom={-5}
-                        bgColor={"blackAlpha.800"}
-                        borderRadius={"full"}
-                        p={1}
-                      >
-                        <Lottie
-                          width={40}
-                          options={{
-                            loop: true,
-                            autoplay: true,
-                            animationData: animationData,
-                            rendererSettings: {
-                              preserveAspectRatio: "xMidYMid slice",
-                            },
-                          }}
-                          style={{
-                            marginBottom: 0,
-                            marginLeft: 0,
-                          }}
-                        />
-                        <Text
-                          mixBlendMode={"difference"}
-                          textColor="white"
-                          fontSize={12}
+                <MessagesProvider>
+                  <MessageList messages={messages} setMessages={setMessages} />
+                  <FormControl
+                    onKeyDown={sendMessage}
+                    isRequired
+                    bottom={0}
+                    left={0}
+                    p={5}
+                    pos="absolute"
+                  >
+                    {isTyping && (
+                      <Fade in={onToggle}>
+                        <Box
+                          w="fit-content"
+                          border={"1px solid black"}
+                          display="flex"
+                          pos="relative"
+                          bottom={-5}
+                          bgColor={"blackAlpha.800"}
+                          borderRadius={"full"}
+                          p={1}
                         >
-                          {selectedChat.isGroupChat
-                            ? getSender(user, selectedChat.users)
-                            : selectedChat.users[0]._id !== user._id
-                            ? selectedChat.users[1].fullname
-                            : selectedChat.users[0].fullname}{" "}
-                          is typing
-                        </Text>
-                      </Box>
-                    </Fade>
-                  ) : (
-                    <></>
-                  )}
-                  <InputGroup size="lg" marginY={4}>
-                    <Input
-                      variant="outline"
-                      rounded={"full"}
-                      bg="white"
-                      textColor={"black"}
-                      placeholder="Type something..."
-                      value={newMessage}
-                      onChange={typingHandler}
-                      _focus={{
-                        opacity: 0.8,
-                      }}
-                    />
-                    <InputRightElement
-                      width="5.5rem"
-                      justifyContent={"space-around"}
+                          <Lottie
+                            width={40}
+                            options={{
+                              loop: true,
+                              autoplay: true,
+                              animationData: animationData,
+                              rendererSettings: {
+                                preserveAspectRatio: "xMidYMid slice",
+                              },
+                            }}
+                            style={{
+                              marginBottom: 0,
+                              marginLeft: 0,
+                            }}
+                          />
+                          <Text
+                            mixBlendMode={"difference"}
+                            textColor="whiteAlpha.900"
+                            fontSize={12}
+                          >
+                            {selectedChat.isGroupChat
+                              ? getSender(user, selectedChat.users)
+                              : selectedChat.users[0]._id !== user._id
+                              ? selectedChat.users[1].fullname
+                              : selectedChat.users[0].fullname}{" "}
+                            is typing
+                          </Text>
+                        </Box>
+                      </Fade>
+                    )}
+                    <Box
+                      display={`${toggle ? "" : "none"}`}
+                      pos="absolute"
+                      bottom={"28"}
+                      right={5}
                     >
-                      <Text
-                        className={`shadow-md
+                      <EmojiPicker
+                        onEmojiClick={(emojiData, e) => {
+                          setNewMessage(newMessage + emojiData.emoji);
+                        }}
+                        autoFocusSearch={false}
+                        theme={colorMode ? Theme.DARK : Theme.LIGHT}
+                      />
+                    </Box>
+
+                    <InputGroup size="lg" marginY={4}>
+                      <ResponseMessage
+                        setResponseMessageID={setResponseMessageID}
+                      />
+                      <Input
+                        variant="outline"
+                        rounded={"full"}
+                        bg="whiteAlpha.900"
+                        textColor={"black"}
+                        placeholder="Type something..."
+                        value={newMessage}
+                        onChange={typingHandler}
+                        _focus={{
+                          opacity: 0.8,
+                        }}
+                      />
+                      <InputRightElement
+                        width="15.5rem"
+                        justifyContent={"space-around"}
+                      >
+                        <Input size="sm" type="file"></Input>
+                        <Text
+                          className={`shadow-md
                       ${
                         colorMode === "light"
-                          ? "text-darkblue bg-gradient-to-bl from-white to-[#B1AEC6]"
-                          : "text-white bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
+                          ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
+                          : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
                       }
                       rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
-                      >
-                        <i className="fa fa-smile" aria-hidden="true"></i>
-                      </Text>
-                      <Text
-                        className={`shadow-md
+                          onClick={() => setToggle(!toggle)}
+                        >
+                          <i className="fa fa-smile" aria-hidden="true"></i>
+                        </Text>
+
+                        <Text
+                          className={`shadow-md
                       ${
                         colorMode === "light"
-                          ? "text-darkblue bg-gradient-to-bl from-white to-[#B1AEC6]"
-                          : "text-white bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
+                          ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
+                          : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
                       }
                       rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
-                        onClick={sendMessage}
-                      >
-                        <i className="fa fa-paper-plane" aria-hidden="true"></i>
-                      </Text>
-                    </InputRightElement>
-                  </InputGroup>
-                </FormControl>
+                          onClick={() => sendMessage("Send")}
+                        >
+                          <i
+                            className="fa fa-paper-plane"
+                            aria-hidden="true"
+                          ></i>
+                        </Text>
+                      </InputRightElement>
+                    </InputGroup>
+                  </FormControl>
+                </MessagesProvider>
               </Box>
             )}
           </Box>

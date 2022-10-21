@@ -11,14 +11,19 @@ import {
   ModalOverlay,
   ScaleFade,
   useDisclosure,
+  InputGroup,
+  InputLeftElement,
+  Text,
   useToast,
   VStack,
 } from "@chakra-ui/react";
+
 import axios from "axios";
 import OtpInput from 'react-otp-input';
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-function SignUp({ setShow, isOpening }) {
+import { AtSignIcon, EmailIcon } from "@chakra-ui/icons";
+function SignUp({ setShow }) {
   const [fullname, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -171,6 +176,7 @@ function SignUp({ setShow, isOpening }) {
     }).catch(err => console.log(err))
   }
   return (
+<<<<<<< HEAD
     <ScaleFade initialScale={0.9} in={!isOpening}>
       <VStack marginY={"2.5rem"} zIndex={10} spacing={5} align="stretch">
         <Input
@@ -239,6 +245,100 @@ function SignUp({ setShow, isOpening }) {
           padding="3"
           textColor={"gray.500"}
         />
+=======
+    <ScaleFade initialScale={0.9} in={!isOpen}>
+      <VStack marginY={"1.5rem"} zIndex={10} spacing={5} align="stretch">
+        <InputGroup size="md" mb={0} h={45}>
+          <InputLeftElement
+            display={"flex"}
+            justifyContent="center"
+            alignItems={"center"}
+          >
+            <AtSignIcon color={"blackAlpha.900"} />
+          </InputLeftElement>
+          <Input
+            type={"name"}
+            value={username}
+            placeholder="Enter your username"
+            onChange={(e) => setUsername(e.target.value)}
+            bgColor={"whiteAlpha.900"}
+            borderRadius="lg"
+            textColor={username ? "blackAlpha.800" : "gray.500"}
+          />
+        </InputGroup>
+        <InputGroup size="md" mb={0} h={45}>
+          <InputLeftElement
+            display={"flex"}
+            justifyContent="center"
+            alignItems={"center"}
+          >
+            <Text fontWeight={"bold"}>n</Text>
+          </InputLeftElement>
+          <Input
+            type={"name"}
+            value={fullname}
+            placeholder="Enter your full name"
+            onChange={(e) => setName(e.target.value)}
+            bgColor={"whiteAlpha.900"}
+            borderRadius="lg"
+            textColor={fullname ? "blackAlpha.800" : "gray.500"}
+          />
+        </InputGroup>
+        <InputGroup size="md" mb={0} h={45}>
+          <InputLeftElement
+            display={"flex"}
+            justifyContent="center"
+            alignItems={"center"}
+          >
+            <EmailIcon color={"blackAlpha.900"} />
+          </InputLeftElement>
+          <Input
+            type={"email"}
+            value={email}
+            placeholder="Enter your Email"
+            onChange={(e) => setEmail(e.target.value)}
+            bgColor={"whiteAlpha.900"}
+            borderRadius="lg"
+            textColor={email ? "blackAlpha.800" : "gray.500"}
+          />
+        </InputGroup>
+        <InputGroup size="md" mb={0} h={45}>
+          <InputLeftElement
+            display={"flex"}
+            justifyContent="center"
+            alignItems={"center"}
+          >
+            <i class="fas fa-key" aria-hidden="true"></i>
+          </InputLeftElement>
+          <Input
+            type={"password"}
+            placeholder="Enter your Password"
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            bgColor={"whiteAlpha.900"}
+            borderRadius="lg"
+            textColor={password ? "blackAlpha.800" : "gray.500"}
+          />
+        </InputGroup>
+        <InputGroup size="md" mb={0} h={45}>
+          <InputLeftElement
+            display={"flex"}
+            justifyContent="center"
+            alignItems={"center"}
+          >
+            <i class="fas fa-key" aria-hidden="true"></i>
+          </InputLeftElement>
+          <Input
+            type={"password"}
+            placeholder="Confirm your Password"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            value={confirmpassword}
+            bgColor={"whiteAlpha.900"}
+            borderRadius="lg"
+            textColor={password ? "blackAlpha.800" : "gray.500"}
+          />
+        </InputGroup>
+>>>>>>> d805fa263d71a112f39841c9fa10cbf074789326
         <Input
           type="file"
           accept="image/*"
@@ -263,6 +363,7 @@ function SignUp({ setShow, isOpening }) {
             onOpen
           }
           isLoading={loading}
+          isDisabled={!email || !confirmpassword || !password || !username}
         >
           Sign Up
         </Button>

@@ -259,16 +259,16 @@ const registerUser = asyncHandler(async (req, res) => {
 const sendEmail = asyncHandler(async (req, res) => {
   const { userId, otp } = req.body;
 
-   await UserOTPVerification.findOne({ userId: userId }).then(data => {
+  await UserOTPVerification.findOne({ userId: userId }).then(data => {
     console.log(data);
     const otpdata = data.otp;
 
-      console.log(typeof otpdata);
-      console.log(typeof otp);
+    console.log(typeof otpdata);
+    console.log(typeof otp);
     if (otp == otpdata) {
-      User.findByIdAndUpdate(userId, { verify: true }).then(data=>{
-       res.json("Verify Success");
-      }).catch(err => {console.log(err);})
+      User.findByIdAndUpdate(userId, { verify: true }).then(data => {
+        res.json("Verify Success");
+      }).catch(err => { console.log(err); })
       console.log("true");
     } else {
       console.log("False");
@@ -284,12 +284,33 @@ const getOTPById = asyncHandler(async (req, res) => {
   }).catch(err => console.log(err))
 
 });
+// sửa thông tin user(username, fullname)
+const update = asyncHandler(async (req, res) => {
+  const { _id, username, fullname, pic } = req.body;
 
+  const updateInfo = await User.findByIdAndUpdate(
+    _id,
+    {
+      username,
+      fullname,
+      pic,
+    },
+    {
+      new: true,
+    }
+  );
+  if (!updateInfo) {
+    res.status(400);
+    throw new Error("User not found");
+  } else {
+    res.json(updateInfo);
+  }
+});
 
 module.exports = {
   getUserByEmail,
   allUsers,
   registerUser,
   sendEmail,
-  authUser, addFriend, generateQRCode, getOTPById,getUserById
-}
+  authUser, addFriend, generateQRCode, getOTPById, getUserById,update
+};

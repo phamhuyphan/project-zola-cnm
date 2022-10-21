@@ -1,11 +1,11 @@
 import {
   Avatar,
-  AvatarBadge,
   Box,
   Button,
   Divider,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
@@ -42,15 +42,16 @@ import { useNavigate } from "react-router-dom";
 import ProfileModal from "./ProfileModal";
 import UserListItem from "./UserListItem";
 import axios from "axios";
-import ChatLoading from "./ChatLoading";
+import ChatLoading from "./loading/ChatLoading";
 import GroupChatModal from "./GroupChatModal";
+
 function SideBar({ fetchAgain, setFetchAgain }) {
   const bg = useColorModeValue(
     "linear(to-b,#C39A9E,#808293)",
     "linear(to-t,blue.900,purple.900)"
   );
   const colorLoggedUser = useColorModeValue(
-    "linear(to-b,white,#B1AEC6)",
+    "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
   );
   const {
@@ -69,13 +70,14 @@ function SideBar({ fetchAgain, setFetchAgain }) {
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isHover, setHover] = useState(false);
+
   const toast = useToast();
   const [isOn, setIsOn] = useState(false);
 
   const toggleSwitch = () => setIsOn(!isOn);
 
   const logoutHandler = () => {
+    setFetchAgain(!fetchAgain);
     localStorage.removeItem("userInfo");
     navigator("/");
   };
@@ -140,7 +142,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
       });
     }
   };
-
+  console.log("SideBar is rendered");
   return (
     <>
       <Box
@@ -154,13 +156,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
         overflowX="hidden"
       >
         {/**Sidebar navigation */}
-        <Box
-          position={"sticky"}
-          top={0}
-          zIndex={10}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-        >
+        <Box position={"sticky"} top={0} zIndex={10}>
           <Box
             display="flex"
             alignItems={"center"}
@@ -170,7 +166,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
             top={0}
             zIndex={10}
           >
-            {/**Avata user badge */}
+            {/**Avata user badge: colorLoggedUser, user,notification,colorMode,isOn */}
             <Box
               display="flex"
               w={{ base: "full", md: "fit-content" }}
@@ -181,16 +177,6 @@ function SideBar({ fetchAgain, setFetchAgain }) {
               boxShadow="xl"
               justifyContent="space-between"
               alignItems="center"
-              _hover={{
-                py: { base: 20, md: 2 },
-                transitionProperty: "all",
-                transitionTimingFunction: " cubic-bezier(0.4, 0, 0.2, 1)",
-                transitionDuration: "150ms",
-                bgPosition: "top 40% right 0",
-                outline: { base: "1px solid white", md: "unset" },
-                borderTop: 0,
-                filter: "unset",
-              }}
             >
               <Box display="flex">
                 <Menu>
@@ -204,15 +190,11 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                     mr={3}
                   >
                     <Box borderRadius="full" id="bgChatZone">
-                      <Avatar size={"md"} name={user?.fullname} src={user?.pic}>
-                        <AvatarBadge
-                          boxSize={5}
-                          bg={user.statusOnline ? "green.500" : "red.500"}
-                          borderColor={
-                            colorMode === "light" ? "white" : "darkblue"
-                          }
-                        ></AvatarBadge>
-                      </Avatar>
+                      <Avatar
+                        size={"md"}
+                        name={user?.fullname}
+                        src={user?.pic}
+                      ></Avatar>
                       {notification.length > 0 && (
                         <Text
                           position="absolute"
@@ -222,7 +204,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                           fontSize="14px"
                           h="22px"
                           verticalAlign="middle"
-                          color="white"
+                          color="whiteAlpha.900"
                           top="0px"
                           right="0px"
                         >
@@ -249,14 +231,17 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                     ))}
                   </MenuList>
                 </Menu>
-                <Box textColor={useColorModeValue("blackAlpha.900", "white")}>
+                <Box
+                  textColor={useColorModeValue(
+                    "blackAlpha.900",
+                    "whiteAlpha.900"
+                  )}
+                >
                   <Text opacity={0.7} fontSize="xs">
                     @{user?.username}
                   </Text>
                   <Text
                     fontSize={"lg"}
-                    lineHeight={1}
-                    textOverflow="ellipsis"
                     w={{ lg: "125px", md: "fit-content" }}
                     noOfLines={1}
                   >
@@ -314,7 +299,9 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                     icon={
                       <HamburgerIcon
                         fontSize={25}
-                        textColor={colorMode === "light" ? "black" : "white"}
+                        textColor={
+                          colorMode === "light" ? "black" : "whiteAlpha.900"
+                        }
                       />
                     }
                     variant="outline"
@@ -374,7 +361,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
                         }}
                         icon={
                           colorMode === "light" ? (
-                            <MoonIcon textColor={"white"} />
+                            <MoonIcon textColor={"whiteAlpha.900"} />
                           ) : (
                             <SunIcon textColor={"yellow"} />
                           )
@@ -408,41 +395,47 @@ function SideBar({ fetchAgain, setFetchAgain }) {
             pos={"absolute"}
             top={0}
             zIndex={5}
-            h={isHover ? "75px" : "70px"}
+            h={"75px"}
             w={{ base: "full", md: "fit-content" }}
-            p={{ base: !isHover ? "10px" : "107px", md: "0" }}
+            p={{ base: "10px", md: "0" }}
             borderRadius={{ base: " 0 0 20px 20px ", md: "full" }}
             boxShadow="xl"
             bgImage={{ base: `url('${user?.pic}')`, md: "none" }}
             bgRepeat={"no-repeat"}
             bgSize="cover"
-            bgPosition={isHover ? "top 40% right 0" : "center"}
+            bgPosition={"center"}
             className="transition-all"
-            filter={!isHover && "grayscale(100%)"}
+            filter={"grayscale(100%)"}
           ></Box>
           {/** Background gradient*/}
           <Box
             pos={"absolute"}
             top={0}
             zIndex={6}
-            h={isHover ? "75px" : "70px"}
+            h={"75px"}
             w={{ base: "full", md: "fit-content" }}
-            p={{ base: !isHover ? "10px" : "107px", md: "0" }}
+            p={{ base: "10px", md: "0" }}
             borderRadius={{ base: " 0 0 20px 20px ", md: "full" }}
             boxShadow="xl"
             bgRepeat={"no-repeat"}
             bgSize="cover"
-            bgPosition={isHover ? "top 40% right 0" : "center"}
+            bgPosition={"center"}
             className={`transition-all bg-gradient-to-b ${
               colorMode === "dark" ? "from-[#00000d7d]" : "from-[#ffffff7d]"
             }`}
-            filter={!isHover && "grayscale(100%)"}
+            filter={"grayscale(100%)"}
           ></Box>
         </Box>
         <ChatList fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
-        <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+        <Drawer
+          placement="left"
+          onClose={onClose}
+          isOpen={isOpen}
+          size={{ base: "full", md: "sm" }}
+        >
           <DrawerOverlay />
           <DrawerContent>
+            <DrawerCloseButton display={{ base: "inline-block", md: "none" }} />
             <DrawerHeader borderBottomWidth="1px">Search User</DrawerHeader>
             <DrawerBody>
               <Box display="flex" pb={2}>
@@ -493,6 +486,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
         zIndex={0}
         opacity={0.3}
         w="full"
+        filter={"grayscale(80%)"}
         overflowX="hidden"
         bgRepeat={"no-repeat"}
         bgSize="cover"
