@@ -110,7 +110,7 @@ function WelcomePage() {
         {!show ? (
           <SignIn setShow={setShow} isOpen={!isOpen} />
         ) : (
-          <SignUp setShow={setShow} isOpen={!isOpen} />
+          <SignUp setShow={setShow} isOpening={!isOpen} />
         )}
         {!show ? (
           <Text textColor={"white"}>

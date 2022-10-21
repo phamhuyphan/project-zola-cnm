@@ -62,7 +62,8 @@ function SignIn({ setShow, isOpen }) {
           fullname: user.displayName,
           authProvider: "google",
           email: user.email,
-          pic: user.photoURL
+          pic: user.photoURL,
+          verify: true
         });
       }
 
@@ -88,7 +89,8 @@ function SignIn({ setShow, isOpen }) {
             fullname: user.displayName,
             email: user.email,
             password: user.uid,
-            pic: user.photoURL
+            pic: user.photoURL,
+            verify: true
           },
           config
         );
@@ -156,22 +158,43 @@ function SignIn({ setShow, isOpen }) {
         { email, password },
         config
       );
-      toast({
-        title: "Sign in successfully",
-        status: "success",
-        duration: 2500,
-        isClosable: true,
-        position: "bottom",
-      });
+      const verify = await axios.post(
+        "/api/user/:email",
+        {
+          email: email
+        },
+        config
+      )
+      if (verify.data.verify === true) {
+        toast({
+          title: "Sign in successfully",
+          status: "success",
+          duration: 2500,
+          isClosable: true,
+          position: "bottom",
+        });
+        localStorage.setItem("userInfo", JSON.stringify(data));
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        setLoading(false);
+        setUser(userInfo);
+        navigate("/chats");
+      }
+      if (verify.data.verify === false) {
+        setLoading(false);
+        toast({
+          title: "Account is not verify",
+          status: "error",
+          duration: 2500,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
 
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-      setLoading(false);
-      setUser(userInfo);
-      navigate("/chats");
+
+
     } catch (error) {
       toast({
-        title: "Sign in failed! Your password or email address is invalid!  ",
+        title: "Sign in failed!Email isn't verify. Your password or email address is invalid!  ",
         status: "error",
         duration: 2500,
         isClosable: true,

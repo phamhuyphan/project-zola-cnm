@@ -2,17 +2,23 @@ import {
   Box,
   Button,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   ScaleFade,
+  useDisclosure,
   useToast,
   VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
+import OtpInput from 'react-otp-input';
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-//import { mailer } from './Mailler';
-
-//const bcrypt = require('bcrypt');
-function SignUp({ setShow, isOpen }) {
+function SignUp({ setShow, isOpening }) {
   const [fullname, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,9 +28,10 @@ function SignUp({ setShow, isOpen }) {
 
   const [loading, setLoading] = useState(false);
   const toast = useToast();
-
+  const [OTP, setOTP] = useState({ otp: '' });
+  function handleChange(otp) { setOTP({ otp: otp }) }
   let navigate = useNavigate();
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
   function postDetails(pics) {
     setLoading(true);
     if (pic === undefined) {
@@ -103,20 +110,22 @@ function SignUp({ setShow, isOpen }) {
         { username, fullname, email, password, pic },
         config
       );
-      toast({
-        title: "Sign up successfully",
-        status: "success",
-        duration: 2500,
-        isClosable: true,
-        position: "bottom",
-      });
+      if (data.verify === false) {
+        toast({
+          title: "Please account verification",
+          status: "success",
+          duration: 2500,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
 
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      setLoading(false);
-      // bcrypt.hash(data.email, parseInt(process.env.BCRYPT_SALT_ROUND)).then((hashedEmail) => {
-      //   mailer.sendMail(data.email, "Verify Email", `<a href="${process.env.APP_URL}/verify?email=${data.email}&token=${hashedEmail}"> Verify </a>`)
-      // });
-      navigate("/chats");
+      if (data.verify === true) {
+        localStorage.setItem("userInfo", JSON.stringify(data));
+        setLoading(false);
+        navigate("/chats");
+      }
+
     } catch (error) {
       toast({
         title: "Sign up failed " + error,
@@ -127,8 +136,30 @@ function SignUp({ setShow, isOpen }) {
       });
     }
   };
+
+  const submitOTP = async () => {
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+
+    await axios.post(
+      "/api/user/:email",
+      {
+        email: email
+      },
+      config
+    ).then(data => {
+      axios.post(
+        "/api/user/verify",
+        { userId: data.data._id, otp: OTP.otp }
+      )
+    }).catch(err => console.log(err))
+
+  }
   return (
-    <ScaleFade initialScale={0.9} in={!isOpen}>
+    <ScaleFade initialScale={0.9} in={!isOpening}>
       <VStack marginY={"2.5rem"} zIndex={10} spacing={5} align="stretch">
         <Input
           type={"name"}
@@ -216,12 +247,35 @@ function SignUp({ setShow, isOpen }) {
             bgGradient: "linear(to-br,red.600,yellow.600)",
           }}
           mb="5"
-          onClick={submitHandler}
+          onClick={
+            onOpen
+          }
           isLoading={loading}
         >
           Sign Up
         </Button>
       </Box>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Verify your email</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <OtpInput
+              value={OTP.otp}
+              onChange={handleChange}
+              numInputs={4}
+              separator={<span>-</span>}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant='ghost' onClick={submitOTP}>Confirm</Button>
+            <Button onClick={submitHandler} >Send code</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
     </ScaleFade>
   );
 }

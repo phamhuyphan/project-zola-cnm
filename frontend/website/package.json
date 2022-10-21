@@ -14,21 +14,30 @@
     "axios": "^0.27.2",
     "bcrypt": "^5.1.0",
     "bcryptjs": "^2.4.3",
+    "browserify-fs": "^1.0.0",
+    "browserify-zlib": "^0.2.0",
     "crypto-js": "^4.1.1",
+    "dgram": "^1.0.1",
+    "dotenv": "^16.0.3",
     "firebase": "^9.11.0",
     "framer-motion": "^4.1.17",
     "gsap": "^3.11.1",
     "moment": "^2.29.4",
-    "nodemailer": "^6.7.2",
+    "net-browserify": "^0.2.4",
+    "nodemailer": "^6.8.0",
+    "path-browserify": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-google-button": "^0.7.2",
     "react-lottie": "^1.2.3",
+    "react-otp-input": "^2.4.0",
+    "react-otp-ui": "^1.0.6",
     "react-router-dom": "^6.3.0",
-    "react-scripts": "^4.0.2",
+    "react-scripts": "^5.0.0",
     "react-scrollable-feed": "^1.3.1",
     "socket.io": "^4.5.2",
     "socket.io-client": "^4.5.2",
+    "tls-browserify": "^0.2.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -56,8 +65,17 @@
     ]
   },
   "devDependencies": {
+    "assert": "^2.0.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
+    "process": "^0.11.10",
     "react-app-rewired": "^2.2.1",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
     "tailwind-scrollbar": "^2.0.1",
-    "tailwindcss": "^3.1.8"
+    "tailwindcss": "^3.1.8",
+    "url": "^0.11.0"
   }
 }
