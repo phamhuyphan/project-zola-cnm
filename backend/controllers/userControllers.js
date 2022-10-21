@@ -110,6 +110,20 @@ const getUserByEmail = asyncHandler(async (req, res) => {
   }
 });
 
+const getUserById = asyncHandler(async (req, res) => {
+  const id = req.body;
+  const user = await User.findOne(id);
+  if (user) {
+    res.json((user));
+  }
+  if (!user) {
+    res.json("No search user");
+  }
+});
+
+
+
+
 const addFriend = asyncHandler(async (req, res) => {
   const { userId } = req.body;
   const added = await User.findByIdAndUpdate(
@@ -277,5 +291,5 @@ module.exports = {
   allUsers,
   registerUser,
   sendEmail,
-  authUser, addFriend, generateQRCode, getOTPById
+  authUser, addFriend, generateQRCode, getOTPById,getUserById
 }

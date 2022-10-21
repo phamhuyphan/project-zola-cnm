@@ -7,7 +7,7 @@ const {
   generateQRCode,
   getUserByEmail,
   sendEmail,
-  getOTPById
+  getOTPById,getUserById
 } = require("../controllers/userControllers");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -20,6 +20,7 @@ router.route("/verify").post(sendEmail);
 router.route("/verify/:id").post(getOTPById);
 router.post("/login", authUser);
 router.post("/:email", getUserByEmail);
+router.post("/:id", getUserById);
 router.post("/:userId/qrcode", generateQRCode);
 
 module.exports = router;

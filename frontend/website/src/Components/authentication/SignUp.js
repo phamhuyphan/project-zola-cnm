@@ -112,7 +112,7 @@ function SignUp({ setShow, isOpening }) {
       );
       if (data.verify === false) {
         toast({
-          title: "Please account verification",
+          title: "Account not verify. Please account verification",
           status: "success",
           duration: 2500,
           isClosable: true,
@@ -154,9 +154,21 @@ function SignUp({ setShow, isOpening }) {
       axios.post(
         "/api/user/verify",
         { userId: data.data._id, otp: OTP.otp }
-      )
-    }).catch(err => console.log(err))
+      ).then(data1 => {
+        console.log(data)
+        localStorage.setItem("userInfo", JSON.stringify(data));
+        setLoading(false);
+        navigate("/chats");
+      }).catch(err => console.log(err))
 
+      toast({
+        title: "Verification successfully",
+        status: "success",
+        duration: 2500,
+        isClosable: true,
+        position: "bottom",
+      });
+    }).catch(err => console.log(err))
   }
   return (
     <ScaleFade initialScale={0.9} in={!isOpening}>
