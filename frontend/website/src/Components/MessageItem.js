@@ -12,7 +12,7 @@ import { ChatState } from "../providers/ChatProvider";
 
 function MessageItem({ messages, m, i }) {
   const [isHover, setIsHover] = useState(false);
-  const { user } = ChatState();
+  const { user, setResponse } = ChatState();
   return (
     <>
       <Box
@@ -63,6 +63,29 @@ function MessageItem({ messages, m, i }) {
           marginTop={isSameUserMargin(messages, m, i, user._id) ? "auto" : 30}
           position={"relative"}
         >
+          {m?.response && (
+            <Box pos="relative">
+              <Text
+                fontSize={"xs"}
+                color="blackAlpha.800"
+                pos="relative"
+                top={0}
+                left={0}
+              >
+                @{m?.response?.sender.username}
+              </Text>
+              <Box bg="blackAlpha.500" p={1} pt={4} rounded="sm" display="flex">
+                <Text
+                  color="whiteAlpha.800"
+                  className="truncate"
+                  maxW={"150px"}
+                >
+                  {m?.response?.content}
+                </Text>
+              </Box>
+            </Box>
+          )}
+
           <Text width={"fit-content"}>{m.content}</Text>
           {(isSameSender(messages, m, i, user._id) ||
             isLastMessage(messages, i, user._id)) && (
@@ -84,7 +107,15 @@ function MessageItem({ messages, m, i }) {
             borderRadius={"full"}
             right={m.sender._id === user._id ? "unset" : -16}
             left={m.sender._id === user._id ? -16 : "unset"}
-            icon={<DeleteIcon fontSize={15} />}
+            icon={
+              <DeleteIcon
+                fontSize={15}
+                onClick={() => {
+                  setResponse(m);
+                  console.log(m);
+                }}
+              />
+            }
           ></IconButton>
         </Box>
       </Box>

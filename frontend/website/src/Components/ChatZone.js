@@ -45,6 +45,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
   );
+
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
@@ -55,8 +56,15 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const { onToggle } = useDisclosure();
   const [isOn, setIsOn] = useState(false);
   const toggleSwitch = () => setIsOn(!isOn);
-  const { user, selectedChat, setSelectedChat, notification, setNotification } =
-    ChatState();
+  const {
+    user,
+    selectedChat,
+    setSelectedChat,
+    notification,
+    setNotification,
+    response,
+    setResponse,
+  } = ChatState();
   const [selectedEmoji, setSelectedEmoji] = useState("");
   const [toggle, setToggle] = useState(false);
   const fetchMessages = async () => {
@@ -98,7 +106,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const sendMessage = async (event) => {
     if ((event.key === "Enter" || event === "Send") && newMessage) {
       if (user) socket.emit("stop typing", selectedChat._id);
-
       try {
         const config = {
           headers: {
@@ -112,11 +119,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           {
             content: newMessage,
             chatId: selectedChat._id,
+            response: response._id,
           },
           config
         );
         socket.emit("new message", data);
-        console.log(data);
+        setResponse(null);
         setMessages([...messages, data]);
         setFetchAgain(!fetchAgain);
       } catch (error) {
@@ -179,8 +187,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     fetchMessages();
     selectedChatCompare = selectedChat;
 
-
-    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat]);
 
@@ -299,10 +305,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         ? "blackAlpha.900"
                         : "whiteAlpha.900"
                     }
-                    onClick={() =>{
+                    onClick={() => {
                       selectedChat
-              ? socket.emit("outchat",selectedChat._id):console.log("out out out");  
-                       setSelectedChat("")}}
+                        ? socket.emit("outchat", selectedChat._id)
+                        : console.log("out out out");
+                      setSelectedChat("");
+                    }}
                   />
                   {selectedChat.isGroupChat ? (
                     <AvatarGroup size={"sm"} max={2} marginRight={3}>
@@ -516,6 +524,29 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     />
                   </Box>
                   <InputGroup size="lg" marginY={4}>
+                    {response && (
+                      <Box
+                        pos="absolute"
+                        bg="gray.500"
+                        zIndex={10}
+                        top={-10}
+                        right={10}
+                        p={2}
+                        borderTopRadius={"xl"}
+                      >
+                        <Box color={"white.500"} display="flex">
+                          <Text fontWeight={"bold"}>
+                            {(response?.sender._id !== user._id
+                              ? "@" + response?.sender.username
+                              : "You") + ": "}
+                          </Text>
+                          <Text className="truncate" maxW={"200px"} mx={1}>
+                            {response?.content}
+                          </Text>
+                        </Box>
+                      </Box>
+                    )}
+
                     <Input
                       variant="outline"
                       rounded={"full"}

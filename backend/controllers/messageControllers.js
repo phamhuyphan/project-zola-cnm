@@ -9,9 +9,14 @@ const Chat = require("../models/chatModel");
 
 const allMessages = asyncHandler(async (req, res) => {
   try {
-    const messages = await Message.find({ chat: req.params.chatId })
+    let messages = await Message.find({ chat: req.params.chatId })
       .populate("sender", "username pic email")
-      .populate("chat");
+      .populate("chat")
+      .populate("response");
+    messages = await User.populate(messages, {
+      path: "response.sender",
+      select: "username pic email fullname ",
+    });
     res.json(messages);
   } catch (error) {
     res.status(400);
@@ -23,7 +28,7 @@ const allMessages = asyncHandler(async (req, res) => {
 //@route           POST /api/Message/
 //@access          Protected
 const sendMessage = asyncHandler(async (req, res) => {
-  const { content, chatId,response } = req.body;
+  const { content, chatId, response } = req.body;
 
   if (!content || !chatId) {
     console.log("Invalid data passed into request");
@@ -35,7 +40,7 @@ const sendMessage = asyncHandler(async (req, res) => {
     content: content,
     isRead: false,
     chat: chatId,
-    response:response,
+    response: response,
   };
 
   try {
@@ -57,10 +62,13 @@ const sendMessage = asyncHandler(async (req, res) => {
   }
 });
 
-
 const deleteMessage = asyncHandler(async (req, res) => {
-  const { messageId } = req.body
-  Message.findByIdAndUpdate(messageId,{content: "deleted"}).then((message) => {res.send(message)})
-})
+  const { messageId } = req.body;
+  Message.findByIdAndUpdate(messageId, { content: "deleted" }).then(
+    (message) => {
+      res.send(message);
+    }
+  );
+});
 
-module.exports = { allMessages, sendMessage,deleteMessage };
+module.exports = { allMessages, sendMessage, deleteMessage };

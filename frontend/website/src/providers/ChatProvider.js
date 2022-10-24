@@ -9,7 +9,7 @@ const ChatProvider = ({ children }) => {
   const [chats, setChats] = useState([]);
   const [closeSideBar, setCloseSideBar] = useState(false);
   const [notification, setNotification] = useState([]);
-
+  const [response, setResponse] = useState(null);
   const navigator = useNavigate();
   useEffect(() => {
     //fecth local storage
@@ -31,6 +31,8 @@ const ChatProvider = ({ children }) => {
         setCloseSideBar,
         user,
         setUser,
+        response,
+        setResponse,
       }}
     >
       {children}
