@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Avatar,
   AvatarBadge,
@@ -13,6 +13,7 @@ import moment from "moment";
 import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
+import io from "socket.io-client";
 
 function ChatList({ fetchAgain, setFetchAgain }) {
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
@@ -67,7 +68,11 @@ function ChatList({ fetchAgain, setFetchAgain }) {
               border: "2px solid white",
               p: "6px",
             }}
-            onClick={() => setSelectedChat(chat)}
+            onClick={() => {      
+              selectedChat
+              ? io("http://localhost:5000").emit("outchat",selectedChat._id):console.log("out out out");  
+                              setSelectedChat(chat)    
+                            }}
             cursor="pointer"
             bgColor={
               selectedChat
@@ -115,15 +120,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                 name={user?._id && getSender(user, chat.users)}
                 src={getSenderInfo(user, chat.users).pic}
               >
-                <AvatarBadge
-                  boxSize={5}
-                  bg={
-                    getSenderInfo(user, chat.users).statusOnline
-                      ? "green.500"
-                      : "red.500"
-                  }
-                  borderColor={"white"}
-                ></AvatarBadge>
+               
               </Avatar>
             )}
 

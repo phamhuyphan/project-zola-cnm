@@ -62,6 +62,11 @@ io.on("connection", (socket) => {
     console.log("user joind room: " + room);
   });
 
+  socket.on("outchat", (room) => {
+    console.log("user out room: " + room);
+    socket.leave(room);
+  });
+
   //tying indicator socket
   socket.on("typing", (room) => socket.in(room).emit("typing"));
 
@@ -85,9 +90,5 @@ io.on("connection", (socket) => {
   socket.on("disconnect", async () => {
     //Thay doi status
     await User.findByIdAndUpdate(user, { statusOnline: false });
-  });
-
-  User.watch().on("change", (user) => {
-    socket.emit("change", user);
   });
 });

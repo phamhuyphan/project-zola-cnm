@@ -167,10 +167,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         setIsTyping(false);
         onToggle();
       });
-      socket.on("change", (user) => {
-        setFetchAgain(!fetchAgain);
-        console.log("feching again " + user.documentKeys._id);
-      });
+      // socket.on("change", (user) => {
+      //   setFetchAgain(!fetchAgain);
+      //   console.log("feching again " + user.documentKeys._id);
+      // });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -178,6 +178,9 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   useEffect(() => {
     fetchMessages();
     selectedChatCompare = selectedChat;
+
+
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat]);
 
@@ -296,7 +299,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         ? "blackAlpha.900"
                         : "whiteAlpha.900"
                     }
-                    onClick={() => setSelectedChat("")}
+                    onClick={() =>{
+                      selectedChat
+              ? socket.emit("outchat",selectedChat._id):console.log("out out out");  
+                       setSelectedChat("")}}
                   />
                   {selectedChat.isGroupChat ? (
                     <AvatarGroup size={"sm"} max={2} marginRight={3}>
