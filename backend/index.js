@@ -1,4 +1,5 @@
 const express = require("express");
+
 const dotenv = require("dotenv");
 const app = new express();
 const connectDB = require("./config/db");
@@ -21,7 +22,7 @@ app.use("/api/message", messageRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
 
-const PORT = process.env.PORT;
+const PORT = 5000;
 const server = app.listen(
   PORT,
   console.log(`server listening on port ${PORT}`.yellow.bold)
@@ -59,6 +60,11 @@ io.on("connection", (socket) => {
   socket.on("join chat", (room) => {
     socket.join(room);
     console.log("user joind room: " + room);
+  });
+
+  socket.on("outchat", (room) => {
+    console.log("user out room: " + room);
+    socket.leave(room);
   });
 
   //tying indicator socket

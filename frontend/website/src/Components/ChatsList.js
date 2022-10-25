@@ -12,7 +12,7 @@ import moment from "moment";
 import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
-
+import io from "socket.io-client";
 function ChatList({ fetchAgain, setFetchAgain }) {
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const toast = useToast();
@@ -66,7 +66,12 @@ function ChatList({ fetchAgain, setFetchAgain }) {
               border: "2px solid white",
               p: "6px",
             }}
-            onClick={() => setSelectedChat(chat)}
+            onClick={() => {
+              selectedChat
+                ? io("http://localhost:5000").emit("outchat", selectedChat._id)
+                : console.log("out out out");
+              setSelectedChat(chat);
+            }}
             cursor="pointer"
             bgColor={
               selectedChat
@@ -163,4 +168,4 @@ function ChatList({ fetchAgain, setFetchAgain }) {
   );
 }
 
-export default ChatList;
+export default memo(ChatList);

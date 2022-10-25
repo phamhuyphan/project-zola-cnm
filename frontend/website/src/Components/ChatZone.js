@@ -6,6 +6,7 @@ import {
 } from "@chakra-ui/icons";
 import {
   Avatar,
+  AvatarBadge,
   AvatarGroup,
   Box,
   Fade,
@@ -34,8 +35,6 @@ import animationData from "../animations/52671-typing-animation-in-chat.json";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import ProfileModal from "./ProfileModal";
 import moment from "moment";
-import MessagesProvider from "../providers/MessagesProvider";
-import ResponseMessage from "./ResponseMessage";
 
 const ENDPOINT = "http://localhost:5000";
 
@@ -49,7 +48,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  const [responseMessageID, setResponseMessageID] = useState(null);
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -57,8 +55,15 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const { onToggle } = useDisclosure();
   const [isOn, setIsOn] = useState(false);
   const toggleSwitch = () => setIsOn(!isOn);
-  const { user, selectedChat, setSelectedChat, notification, setNotification } =
-    ChatState();
+  const {
+    user,
+    selectedChat,
+    setSelectedChat,
+    notification,
+    setNotification,
+    response,
+    setResponse,
+  } = ChatState();
 
   const [toggle, setToggle] = useState(false);
   const fetchMessages = async () => {
@@ -100,7 +105,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const sendMessage = async (event) => {
     if ((event.key === "Enter" || event === "Send") && newMessage) {
       if (user) socket.emit("stop typing", selectedChat._id);
-
       try {
         const config = {
           headers: {
@@ -114,15 +118,16 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           {
             content: newMessage,
             chatId: selectedChat._id,
-            response: responseMessageID,
+            response: response,
           },
           config
         );
         socket.emit("new message", data);
-        console.log(data);
+        setResponse(null);
         setMessages([...messages, data]);
         setFetchAgain(!fetchAgain);
       } catch (error) {
+        console.log(error);
         toast({
           title: "Error Occured",
           description: "Failed to send message",
@@ -170,6 +175,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         setIsTyping(false);
         onToggle();
       });
+      // socket.on("change", (user) => {
+      //   setFetchAgain(!fetchAgain);
+      //   console.log("feching again " + user.documentKeys._id);
+      // });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -177,11 +186,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   useEffect(() => {
     fetchMessages();
     selectedChatCompare = selectedChat;
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat]);
 
   useEffect(() => {
-    console.log("recieved");
     socket.on("message recieved", (newMessageRecieved) => {
       if (
         !selectedChatCompare ||
@@ -197,7 +206,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     });
   });
-  console.log("chatZone is rendered");
+
   return (
     <Box
       w="full"
@@ -296,7 +305,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         ? "blackAlpha.900"
                         : "whiteAlpha.900"
                     }
-                    onClick={() => setSelectedChat("")}
+                    onClick={() => {
+                      selectedChat
+                        ? socket.emit("outchat", selectedChat._id)
+                        : console.log("out out out");
+                      setSelectedChat("");
+                    }}
                   />
                   {selectedChat.isGroupChat ? (
                     <AvatarGroup size={"sm"} max={2} marginRight={3}>
@@ -317,11 +331,28 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         marginRight={3}
                         name={user?._id && getSender(user, selectedChat.users)}
                         src={getSenderInfo(user, selectedChat.users).pic}
-                      ></Avatar>
+                      >
+                        <AvatarBadge
+                          boxSize={5}
+                          bg={
+                            getSenderInfo(user, selectedChat.users).statusOnline
+                              ? "green.500"
+                              : "red.500"
+                          }
+                          borderColor={"whiteAlpha.900"}
+                        ></AvatarBadge>
+                      </Avatar>
                     </>
                   )}
 
-                  <Box w="full" pr="5">
+                  <Text
+                    fontWeight={"bold"}
+                    textColor={
+                      colorMode === "light" ? "black" : "whiteAlpha.900"
+                    }
+                    w="full"
+                    pr="5"
+                  >
                     {selectedChat.isGroupChat ? (
                       <div>
                         <UpdateGroupChatModal
@@ -329,22 +360,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                           setFetchAgain={setFetchAgain}
                           fetchMessages={fetchMessages}
                         >
-                          <Text
-                            textColor={
-                              colorMode === "light" ? "black" : "whiteAlpha.900"
-                            }
-                            fontWeight={"bold"}
-                            _hover={{ textDecor: "underline" }}
-                          >
+                          <Text _hover={{ textDecor: "underline" }}>
                             {selectedChat.chatName}{" "}
                           </Text>
                         </UpdateGroupChatModal>
-                        <Text
-                          textColor={
-                            colorMode === "light" ? "black" : "whiteAlpha.900"
-                          }
-                          fontWeight={"normal"}
-                        >
+                        <Text fontWeight={"normal"}>
                           {selectedChat.users.length} members
                         </Text>
                       </div>
@@ -353,23 +373,9 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         <ProfileModal
                           user={getSenderInfo(user, selectedChat.users)}
                         >
-                          <Text
-                            textColor={
-                              colorMode === "light" ? "black" : "whiteAlpha.900"
-                            }
-                            fontWeight={"bold"}
-                            _hover={{ textDecor: "underline" }}
-                          >
-                            {getSender(user, selectedChat.users)}
-                          </Text>
+                          {getSender(user, selectedChat.users)}
                         </ProfileModal>
-                        <Text
-                          textColor={
-                            colorMode === "light" ? "black" : "whiteAlpha.900"
-                          }
-                          fontWeight={"normal"}
-                          opacity={0.8}
-                        >
+                        <Text fontWeight={"normal"} opacity={0.8}>
                           {getSenderInfo(user, selectedChat.users).statusOnline
                             ? "online"
                             : "Last online " +
@@ -380,7 +386,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         </Text>
                       </>
                     )}
-                  </Box>
+                  </Text>
                 </Box>
                 {/** button group*/}
                 <Box
@@ -449,126 +455,142 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     </motion.div>
                   </div>
                 </Box>
-                <MessagesProvider>
-                  <MessageList messages={messages} setMessages={setMessages} />
-                  <FormControl
-                    onKeyDown={sendMessage}
-                    isRequired
-                    bottom={0}
-                    left={0}
-                    p={5}
-                    pos="absolute"
-                  >
-                    {isTyping && (
-                      <Fade in={onToggle}>
-                        <Box
-                          w="fit-content"
-                          border={"1px solid black"}
-                          display="flex"
-                          pos="relative"
-                          bottom={-5}
-                          bgColor={"blackAlpha.800"}
-                          borderRadius={"full"}
-                          p={1}
+                <MessageList messages={messages} />
+                <FormControl
+                  onKeyDown={sendMessage}
+                  isRequired
+                  bottom={0}
+                  left={0}
+                  p={5}
+                  pos="absolute"
+                >
+                  {isTyping ? (
+                    <Fade in={onToggle}>
+                      <Box
+                        w="fit-content"
+                        border={"1px solid black"}
+                        display="flex"
+                        pos="relative"
+                        bottom={-5}
+                        bgColor={"blackAlpha.800"}
+                        borderRadius={"full"}
+                        p={1}
+                      >
+                        <Lottie
+                          width={40}
+                          options={{
+                            loop: true,
+                            autoplay: true,
+                            animationData: animationData,
+                            rendererSettings: {
+                              preserveAspectRatio: "xMidYMid slice",
+                            },
+                          }}
+                          style={{
+                            marginBottom: 0,
+                            marginLeft: 0,
+                          }}
+                        />
+                        <Text
+                          mixBlendMode={"difference"}
+                          textColor="whiteAlpha.900"
+                          fontSize={12}
                         >
-                          <Lottie
-                            width={40}
-                            options={{
-                              loop: true,
-                              autoplay: true,
-                              animationData: animationData,
-                              rendererSettings: {
-                                preserveAspectRatio: "xMidYMid slice",
-                              },
-                            }}
-                            style={{
-                              marginBottom: 0,
-                              marginLeft: 0,
-                            }}
-                          />
-                          <Text
-                            mixBlendMode={"difference"}
-                            textColor="whiteAlpha.900"
-                            fontSize={12}
-                          >
-                            {selectedChat.isGroupChat
-                              ? getSender(user, selectedChat.users)
-                              : selectedChat.users[0]._id !== user._id
-                              ? selectedChat.users[1].fullname
-                              : selectedChat.users[0].fullname}{" "}
-                            is typing
+                          {selectedChat.isGroupChat
+                            ? getSender(user, selectedChat.users)
+                            : selectedChat.users[0]._id !== user._id
+                            ? selectedChat.users[1].fullname
+                            : selectedChat.users[0].fullname}{" "}
+                          is typing
+                        </Text>
+                      </Box>
+                    </Fade>
+                  ) : (
+                    <></>
+                  )}
+                  <Box
+                    display={`${toggle ? "" : "none"}`}
+                    pos="absolute"
+                    bottom={"28"}
+                    right={5}
+                  >
+                    <EmojiPicker
+                      onEmojiClick={(emojiData, e) => {
+                        // setSelectedEmoji(emojiData.unified);
+                        setNewMessage(newMessage + emojiData.emoji);
+                      }}
+                      autoFocusSearch={false}
+                      theme={colorMode ? Theme.DARK : Theme.LIGHT}
+                    />
+                  </Box>
+                  <InputGroup size="lg" marginY={4}>
+                    {response && (
+                      <Box
+                        pos="absolute"
+                        bg="gray.500"
+                        zIndex={10}
+                        top={-10}
+                        right={10}
+                        p={2}
+                        borderTopRadius={"xl"}
+                      >
+                        <Box color={"white.500"} display="flex">
+                          <Text fontWeight={"bold"}>
+                            {(response?.sender._id !== user._id
+                              ? "@" + response?.sender.username
+                              : "You") + ": "}
+                          </Text>
+                          <Text className="truncate" maxW={"200px"} mx={1}>
+                            {response?.content}
                           </Text>
                         </Box>
-                      </Fade>
+                      </Box>
                     )}
-                    <Box
-                      display={`${toggle ? "" : "none"}`}
-                      pos="absolute"
-                      bottom={"28"}
-                      right={5}
+
+                    <Input
+                      variant="outline"
+                      rounded={"full"}
+                      bg="whiteAlpha.900"
+                      textColor={"black"}
+                      placeholder="Type something..."
+                      value={newMessage}
+                      onChange={typingHandler}
+                      _focus={{
+                        opacity: 0.8,
+                      }}
+                    />
+                    <InputRightElement
+                      width="5.5rem"
+                      justifyContent={"space-around"}
                     >
-                      <EmojiPicker
-                        onEmojiClick={(emojiData, e) => {
-                          setNewMessage(newMessage + emojiData.emoji);
-                        }}
-                        autoFocusSearch={false}
-                        theme={colorMode ? Theme.DARK : Theme.LIGHT}
-                      />
-                    </Box>
-
-                    <InputGroup size="lg" marginY={4}>
-                      <ResponseMessage
-                        setResponseMessageID={setResponseMessageID}
-                      />
-                      <Input
-                        variant="outline"
-                        rounded={"full"}
-                        bg="whiteAlpha.900"
-                        textColor={"black"}
-                        placeholder="Type something..."
-                        value={newMessage}
-                        onChange={typingHandler}
-                        _focus={{
-                          opacity: 0.8,
-                        }}
-                      />
-                      <InputRightElement
-                        width="15.5rem"
-                        justifyContent={"space-around"}
+                      <Text
+                        className={`shadow-md
+                      ${
+                        colorMode === "light"
+                          ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
+                          : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
+                      }
+                      rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
+                        onClick={() => setToggle(!toggle)}
                       >
-                        <Input size="sm" type="file"></Input>
-                        <Text
-                          className={`shadow-md
-                      ${
-                        colorMode === "light"
-                          ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
-                          : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
-                      }
-                      rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
-                          onClick={() => setToggle(!toggle)}
-                        >
-                          <i className="fa fa-smile" aria-hidden="true"></i>
-                        </Text>
+                        <i className="fa fa-smile" aria-hidden="true"></i>
+                      </Text>
 
-                        <Text
-                          className={`shadow-md
+                      <Text
+                        className={`shadow-md
                       ${
                         colorMode === "light"
                           ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
                           : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
                       }
                       rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
-                          onClick={() => sendMessage("Send")}
-                        >
-                          <i
-                            className="fa fa-paper-plane"
-                            aria-hidden="true"
-                          ></i>
-                        </Text>
-                      </InputRightElement>
-                    </InputGroup>
-                  </FormControl>
-                </MessagesProvider>
+                        onClick={() => sendMessage("Send")}
+                      >
+                        <i className="fa fa-paper-plane" aria-hidden="true"></i>
+                      </Text>
+                    </InputRightElement>
+                  </InputGroup>
+                </FormControl>
               </Box>
             )}
           </Box>

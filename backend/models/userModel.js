@@ -6,14 +6,13 @@ const userSchema = mongoose.Schema(
     fullname: { type: String, required: true, default: "Unknown User" },
     password: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    verify: { type: Boolean, required: true },
     pic: {
       type: String,
       default:
         "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
     friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    statusOnline: { type: Boolean, required: true, default: false },
+    statusOnline: { type: Boolean, required: true,  default: false},
   },
   {
     timestamps: true,

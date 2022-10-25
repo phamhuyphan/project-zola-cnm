@@ -24,22 +24,6 @@ const allMessages = asyncHandler(async (req, res) => {
   }
 });
 
-const pageMessages = asyncHandler(async (req, res) => {
-  const limit = 20;
-  const skip = Message.find({ chat: req.params.chatId }).length - 20;
-  try {
-    const messages = await Message.find({ chat: req.params.chatId })
-      .limit(limit)
-      .skip(skip)
-      .populate("sender", "username pic email")
-      .populate("chat");
-    res.json(messages);
-  } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
-  }
-});
-
 //@description     Create New Message
 //@route           POST /api/Message/
 //@access          Protected
@@ -61,18 +45,17 @@ const sendMessage = asyncHandler(async (req, res) => {
 
   try {
     let message = await Message.create(newMessage);
-    message = await message.populate("sender", "username pic email");
-    message = await message.populate("chat");
-    message = await message.populate("response");
+
+    message = await message.populate("sender", "username pic");
+    message = await (await message.populate("chat")).populate("response");
     message = await User.populate(message, {
-      path: "response.sender",
-      select: "username pic email fullname ",
+      path: "chat.users",
+      select: "username pic email fullname",
     });
 
     await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
 
     res.json(message);
-    console.log(message);
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
@@ -88,4 +71,4 @@ const deleteMessage = asyncHandler(async (req, res) => {
   );
 });
 
-module.exports = { allMessages, sendMessage, deleteMessage, pageMessages };
+module.exports = { allMessages, sendMessage, deleteMessage };
