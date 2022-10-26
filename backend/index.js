@@ -1,5 +1,4 @@
 const express = require("express");
-
 const dotenv = require("dotenv");
 const app = new express();
 const connectDB = require("./config/db");
@@ -39,7 +38,7 @@ const User = require("./models/userModel");
 /////////////////////////////////////////
 
 io.on("connection", (socket) => {
-  console.log("connected to socket:" + socket.id);
+  console.log("connected to socket.io:", socket.id);
   let user;
   //create a new socket where frontend join  data
   socket.on("setup", async (userData) => {
@@ -74,7 +73,6 @@ io.on("connection", (socket) => {
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
   socket.on("new message", (newMessageRecieved) => {
-    console.log(newMessageRecieved);
     let chat = newMessageRecieved.chat;
     if (!chat.users) return console.log("chat.users is empty");
     chat.users.forEach((user) => {

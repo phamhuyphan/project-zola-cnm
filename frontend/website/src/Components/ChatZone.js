@@ -26,7 +26,7 @@ import EmojiPicker, { Theme } from "emoji-picker-react";
 import axios from "axios";
 import Lottie from "react-lottie";
 import io from "socket.io-client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
 import MessageList from "./MessageList";
@@ -35,6 +35,7 @@ import animationData from "../animations/52671-typing-animation-in-chat.json";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import ProfileModal from "./ProfileModal";
 import moment from "moment";
+import useMessagePagination from "../hooks/useMessagePagination";
 
 const ENDPOINT = "http://localhost:5000";
 
@@ -45,7 +46,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
   );
-  const [messages, setMessages] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
@@ -55,6 +56,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const { onToggle } = useDisclosure();
   const [isOn, setIsOn] = useState(false);
   const toggleSwitch = () => setIsOn(!isOn);
+
   const {
     user,
     selectedChat,
@@ -65,7 +67,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     setResponse,
   } = ChatState();
 
+  const [pageNumber, setPageNumber] = useState(1);
+  const { messages, setMessages, hasMore, loadingMessage, error } =
+    useMessagePagination(user, selectedChat, pageNumber);
   const [toggle, setToggle] = useState(false);
+
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -78,12 +84,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         cancelToken: source.token,
       };
       setLoading(true);
-      const { data } = await axios.get(
-        `/api/message/${selectedChat._id}`,
-        config
-      );
-      setMessages(data);
+      await axios
+        .get(`/api/message/${selectedChat._id}/${1}`, config)
+        .then((data) => setMessages(data.data));
       setLoading(false);
+
       if (user) socket.emit("join chat", selectedChat._id);
     } catch (error) {
       if (axios.isCancel(error)) console.log("successfully aborted");
@@ -103,6 +108,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     };
   };
   const sendMessage = async (event) => {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
     if ((event.key === "Enter" || event === "Send") && newMessage) {
       if (user) socket.emit("stop typing", selectedChat._id);
       try {
@@ -113,19 +120,22 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           },
         };
         setNewMessage("");
-        const { data } = await axios.post(
-          "/api/message",
-          {
-            content: newMessage,
-            chatId: selectedChat._id,
-            response: response,
-          },
-          config
-        );
-        socket.emit("new message", data);
-        setResponse(null);
-        setMessages([...messages, data]);
-        setFetchAgain(!fetchAgain);
+        await axios
+          .post(
+            "/api/message",
+            {
+              content: newMessage,
+              chatId: selectedChat._id,
+              response: response,
+            },
+            config
+          )
+          .then((data) => {
+            socket.emit("new message", data.data);
+            setResponse(null);
+            setMessages([...messages, data.data]);
+            setFetchAgain(!fetchAgain);
+          });
       } catch (error) {
         console.log(error);
         toast({
@@ -137,6 +147,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           position: "bottom",
         });
       }
+      return () => {
+        // cancel the request before component unmounts
+        source.cancel();
+      };
     }
   };
 
@@ -175,10 +189,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         setIsTyping(false);
         onToggle();
       });
-      // socket.on("change", (user) => {
-      //   setFetchAgain(!fetchAgain);
-      //   console.log("feching again " + user.documentKeys._id);
-      // });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -206,7 +216,22 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     });
   });
-
+  useEffect(() => {
+    socket.on("message recieved", (newMessageRecieved) => {
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessageRecieved.chat._id
+      ) {
+        //notification
+        if (!notification.includes(newMessageRecieved)) {
+          setNotification([newMessageRecieved, ...notification]);
+          setFetchAgain(!fetchAgain);
+        }
+      } else {
+        setMessages([...messages, newMessageRecieved]);
+      }
+    });
+  }, []);
   return (
     <Box
       w="full"
@@ -455,7 +480,13 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     </motion.div>
                   </div>
                 </Box>
-                <MessageList messages={messages} />
+                <MessageList
+                  loadingMessage={loadingMessage}
+                  error={error}
+                  messages={messages}
+                  hasMore={hasMore}
+                  setPageNumber={setPageNumber}
+                />
                 <FormControl
                   onKeyDown={sendMessage}
                   isRequired
