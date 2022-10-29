@@ -7,6 +7,8 @@ const messageSchema = mongoose.Schema(
 
     isRead: { type: Boolean, default: false },
 
+    media: [{ type: String, default: false }],
+
     content: { type: String, trim: true },
 
     response: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
