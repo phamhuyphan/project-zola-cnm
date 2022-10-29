@@ -5,11 +5,11 @@ const messageSchema = mongoose.Schema(
 
     chat: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
 
-    isRead:{ type: Boolean , default: false},
+    isRead: { type: Boolean, default: false },
 
     content: { type: String, trim: true },
-    
-    response: { type: mongoose.Schema.Types.ObjectId, ref: "Message" }
+
+    response: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
   },
   { timestamps: true }
 );

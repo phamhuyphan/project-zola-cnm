@@ -19,29 +19,28 @@ const allMessages = asyncHandler(async (req, res) => {
     });
     res.json(messages);
   } catch (error) {
-    res.status(400);
     throw new Error(error.message);
   }
 });
 const pageMessages = asyncHandler(async (req, res) => {
   const limit = 20;
   const skip = limit * (req.params.pageNumber - 1);
-  try {
-    let messages = await Message.find({ chat: req.params.chatId })
-      .sort([["createdAt", -1]])
-      .skip(skip)
-      .limit(limit)
-      .populate("sender", "username pic email")
-      .populate("chat")
-      .populate("response");
-    messages = await User.populate(messages, {
-      path: "response.sender",
-      select: "username pic email fullname ",
-    }).then((dat) => res.json(dat.reverse()));
-  } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
-  }
+
+  let messages = await Message.find({ chat: req.params.chatId })
+    .sort([["createdAt", -1]])
+    .skip(skip)
+    .limit(limit)
+    .populate("sender", "username pic email")
+    .populate("chat")
+    .populate("response");
+  messages = await User.populate(messages, {
+    path: "response.sender",
+    select: "username pic email fullname ",
+  })
+    .then((dat) => res.json(dat.reverse()))
+    .catch((error) => {
+      throw new Error(error);
+    });
 });
 //@description     Create New Message
 //@route           POST /api/Message/
