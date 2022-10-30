@@ -36,6 +36,7 @@ import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import ProfileModal from "./ProfileModal";
 import moment from "moment";
 import useMessagePagination from "../hooks/useMessagePagination";
+import { useNavigate } from "react-router-dom";
 
 const ENDPOINT = "http://localhost:5000";
 
@@ -154,6 +155,31 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     }
   };
 
+  const callMess = () => {
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+    setNewMessage("");
+    axios
+      .post(
+        "/api/message",
+        {
+          content: "📞📞📞📞",
+          chatId: selectedChat._id,
+        },
+        config
+      )
+      .then((data) => {
+        socket.emit("call", data.data);
+        setResponse(null);
+        setMessages([...messages, data.data]);
+        setFetchAgain(!fetchAgain);
+      });
+  };
+
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
     if (!socketConnected) return;
@@ -173,6 +199,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     }, timerLength);
   };
+
+  ///////////////////////////////////
+
+  ///////////////////////////////////
 
   useEffect(() => {
     socket = io(ENDPOINT);
@@ -216,22 +246,18 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     });
   });
+
   useEffect(() => {
-    socket.on("message recieved", (newMessageRecieved) => {
-      if (
-        !selectedChatCompare ||
-        selectedChatCompare._id !== newMessageRecieved.chat._id
-      ) {
-        //notification
-        if (!notification.includes(newMessageRecieved)) {
-          setNotification([newMessageRecieved, ...notification]);
-          setFetchAgain(!fetchAgain);
-        }
-      } else {
-        setMessages([...messages, newMessageRecieved]);
-      }
+    console.log("");
+    socket.on("answer", (answer) => {
+      const win = window.open(
+        "http://localhost:3000/call/" + answer,
+        "Call",
+        "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
+      );
     });
   }, []);
+
   return (
     <Box
       w="full"
@@ -423,6 +449,14 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   alignItems={"center"}
                 >
                   <IconButton
+                    onClick={() => {
+                      window.open(
+                        "http://localhost:3000/call/null",
+                        "Call",
+                        "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
+                      );
+                      callMess();
+                    }}
                     variant={"ghost"}
                     className="transition-opacity"
                     borderRadius="full"
