@@ -38,7 +38,6 @@ const User = require("./models/userModel");
 /////////////////////////////////////////
 
 io.on("connection", (socket) => {
-  console.log("connected to socket.io:", socket.id);
   let user;
   //create a new socket where frontend join  data
   socket.on("setup", async (userData) => {
@@ -78,6 +77,16 @@ io.on("connection", (socket) => {
     chat.users.forEach((user) => {
       if (user._id == newMessageRecieved.sender._id) return;
       socket.in(user._id).emit("message recieved", newMessageRecieved);
+    });
+  });
+
+  socket.on("call", (newMessageRecieved) => {
+    let chat = newMessageRecieved.chat;
+    if (!chat.users) return console.log("chat.users is empty");
+    chat.users.forEach((user) => {
+      if (user._id == newMessageRecieved.sender._id) return;
+      socket.in(user._id).emit("message recieved", newMessageRecieved);
+      socket.in(user._id).emit("answer", newMessageRecieved.sender._id);
     });
   });
 
