@@ -3,31 +3,30 @@ import io from "socket.io-client";
 import { useParams } from "react-router-dom";
 import { Peer } from "peerjs";
 import { Checkbox } from "@chakra-ui/react";
+import { useRef } from "react";
 
 export default function CallPage() {
   const { caller } = useParams();
   let localStream;
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
   useEffect(() => {
     const peer = new Peer(userInfo._id);
-    peer.on("open", (id) => {
+    console.log("chay useEffect");
+    peer.on("open", () => {
+      console.log("chay open");
       openStream().then((stream) => {
         playStream("me", stream);
         localStream = stream;
         if (caller != "null") {
-          const call = peer.call(caller, stream);
-          call.on("stream", (remoteStream) => playStream("en", remoteStream));
-          peer.on("disconnected", () => {
-            console.log("Clossssssss");
-          });
+          var ac = window.confirm("Co Nhan Cuoc Goi");
+          if (ac) {
+            const call = peer.call(caller, stream);
+            call.on("stream", (remoteStream) => playStream("en", remoteStream));
+          }
         } else {
           peer.on("call", (call) => {
             call.answer(stream);
             call.on("stream", (remoteStream) => playStream("en", remoteStream));
-            peer.on("disconnected", () => {
-              console.log("Clossssssss");
-            });
           });
         }
       });
@@ -76,8 +75,7 @@ export default function CallPage() {
         <button
           className=" bg-slate-400"
           onClick={() => {
-            const peer = new Peer(userInfo._id);
-            peer.destroy();
+            window.close();
           }}
         >
           Out
