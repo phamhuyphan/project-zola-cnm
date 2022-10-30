@@ -158,57 +158,57 @@ const removeFromGroup = asyncHandler(async (req, res) => {
 });
 
 const deleteGroup = asyncHandler(async (req, res) => {
-
-  const findchat = await Chat.findById(req.body.chatId)
-  if(!findchat) {res.send("Not found group")} 
-  else{
-
-    if(findchat.isGroupChat==true){
-      
-      await Chat.findOneAndDelete({_id: req.body.chatId, chatAdmin: req.user._id}).then((data) => {        
-        if(data)
-        {
-          Message.deleteMany({chat:req.body.chatId}).then((data) => {console.log(data);})
-          res.send(data)
-        }
-        else
-        res.send("You are not chat admin")
-      })
-      
-    }else{
-      
-      await Chat.findByIdAndDelete({_id: req.body.chatId}).then((data) => { 
-        if(data)
-        {
-          Message.deleteMany({chat:req.body.chatId}).then((data) => {console.log(data);})
-          res.send(data)
-        }
-        
-        else
-        res.send("error delete")
-      })
+  const findchat = await Chat.findById(req.body.chatId);
+  if (!findchat) {
+    res.send("Not found group");
+  } else {
+    if (findchat.isGroupChat == true) {
+      await Chat.findOneAndDelete({
+        _id: req.body.chatId,
+        chatAdmin: req.user._id,
+      }).then((data) => {
+        if (data) {
+          Message.deleteMany({ chat: req.body.chatId }).then((data) => {
+            console.log(data);
+          });
+          res.send(data);
+        } else res.send("You are not chat admin");
+      });
+    } else {
+      await Chat.findByIdAndDelete({ _id: req.body.chatId }).then((data) => {
+        if (data) {
+          Message.deleteMany({ chat: req.body.chatId }).then((data) => {
+            console.log(data);
+          });
+          res.send(data);
+        } else res.send("error delete");
+      });
     }
-
   }
-})
+});
 
 const deleteMe = asyncHandler(async (req, res) => {
-  Message.deleteMany({chat:req.body.chatId}).then((data) => { res.send(data) })
-})
+  Message.deleteMany({ chat: req.body.chatId }).then((data) => {
+    res.send(data);
+  });
+});
 
 const changAdmin = asyncHandler(async (req, res) => {
-  const findchat = await Chat.findById(req.body.chatId)
-  if(!findchat) {res.send("Not found group")} 
-  else{
-    console.log("dasdasdasdasadas");
-    const up= await Chat.findOneAndUpdate({_id: req.body.chatId,chatAdmin:req.user._id},{chatAdmin:req.body.userId})
-    if(up){
-      res.send(up)
-    }else{
-      res.send("er")
+  const findchat = await Chat.findById(req.body.chatId);
+  if (!findchat) {
+    res.send("Not found group");
+  } else {
+    const up = await Chat.findOneAndUpdate(
+      { _id: req.body.chatId, chatAdmin: req.user._id },
+      { chatAdmin: req.body.userId }
+    );
+    if (up) {
+      res.send(up);
+    } else {
+      res.send("er");
     }
   }
-})
+});
 
 module.exports = {
   accessChat,
@@ -219,5 +219,5 @@ module.exports = {
   removeFromGroup,
   deleteGroup,
   deleteMe,
-  changAdmin
+  changAdmin,
 };

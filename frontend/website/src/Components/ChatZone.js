@@ -1,5 +1,6 @@
 import {
   ChevronLeftIcon,
+  CloseIcon,
   MoonIcon,
   PhoneIcon,
   SunIcon,
@@ -9,14 +10,17 @@ import {
   AvatarBadge,
   AvatarGroup,
   Box,
+  Button,
   Fade,
   FormControl,
   IconButton,
+  Image,
   Input,
   InputGroup,
   InputRightElement,
   Spinner,
   Text,
+  Tooltip,
   useColorMode,
   useColorModeValue,
   useDisclosure,
@@ -36,6 +40,8 @@ import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import ProfileModal from "./ProfileModal";
 import moment from "moment";
 import useMessagePagination from "../hooks/useMessagePagination";
+import DrawerInfoChat from "./DrawerInfoChat";
+import DrawerInfoUser from "./DrawerInfoUser";
 
 const ENDPOINT = "http://localhost:5000";
 
@@ -46,7 +52,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
   );
-
+  const [loadingPic, setLoadingPic] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
@@ -71,7 +77,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const { messages, setMessages, hasMore, loadingMessage, error } =
     useMessagePagination(user, selectedChat, pageNumber);
   const [toggle, setToggle] = useState(false);
-
+  const [pic, setPic] = useState("");
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -95,8 +101,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       else
         toast({
           title: "Error Occured",
-          description: "Failed to send message",
-          status: "warning",
+          description: "Failed to load message",
+          status: "error",
           duration: 2500,
           isClosable: true,
           position: "bottom",
@@ -107,11 +113,39 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       source.cancel();
     };
   };
+  const inputRef = useRef(null);
+  const selectChange = (event) => {
+    const picture = event.target.files && event.target.files[0];
+    if (!picture) {
+      return;
+    }
+    if (picture) {
+      setLoadingPic(true);
+      const data = new FormData();
+      console.log(data);
+      data.append("file", picture);
+      data.append("upload_preset", "chat-chit");
+      data.append("cloud_name", "voluu");
+      fetch("https://api.cloudinary.com/v1_1/voluu/image/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setPic(data.url.toString());
+          console.log("STRING");
+          console.log(data.url.toString());
+          setLoadingPic(false);
+        })
+        .catch((err) => {
+          setLoadingPic(false);
+        });
+    }
+  };
   const sendMessage = async (event) => {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-    if ((event.key === "Enter" || event === "Send") && newMessage) {
+    if ((event.key === "Enter" || event === "Send") && (newMessage || pic)) {
       if (user) socket.emit("stop typing", selectedChat._id);
+      inputRef.current.value = null;
       try {
         const config = {
           headers: {
@@ -120,24 +154,22 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           },
         };
         setNewMessage("");
-        await axios
-          .post(
-            "/api/message",
-            {
-              content: newMessage,
-              chatId: selectedChat._id,
-              response: response,
-            },
-            config
-          )
-          .then((data) => {
-            socket.emit("new message", data.data);
-            setResponse(null);
-            setMessages([...messages, data.data]);
-            setFetchAgain(!fetchAgain);
-          });
+        const { data } = await axios.post(
+          "/api/message",
+          {
+            multiMedia: pic,
+            content: newMessage,
+            chatId: selectedChat._id,
+            response: response,
+          },
+          config
+        );
+        setPic("");
+        socket.emit("new message", data);
+        console.log(data);
+        setMessages([...messages, data]);
+        setFetchAgain(!fetchAgain);
       } catch (error) {
-        console.log(error);
         toast({
           title: "Error Occured",
           description: "Failed to send message",
@@ -147,10 +179,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           position: "bottom",
         });
       }
-      return () => {
-        // cancel the request before component unmounts
-        source.cancel();
-      };
     }
   };
 
@@ -299,18 +327,18 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                 <Box
                   display={"flex"}
                   alignItems="center"
-                  position="absolute"
+                  position={{ base: "unset", md: "absolute" }}
                   top={5}
                   zIndex={2}
                   left={10}
                   bgGradient={bgColor}
                   minW="300"
-                  w="fit-content"
+                  w={{ base: "full", md: "fit-content" }}
                   p={2}
                   opacity="0.95"
-                  transition={"all 0.2s ease-in-out"}
+                  transition={"all 0.5s ease-in-out"}
                   _hover={{ opacity: 1 }}
-                  borderRadius="full"
+                  borderRadius={{ base: "0", md: "full" }}
                   textColor={
                     colorMode === "light" ? "whiteAlpha.900" : "blackAlpha.900"
                   }
@@ -395,11 +423,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       </div>
                     ) : (
                       <>
-                        <ProfileModal
-                          user={getSenderInfo(user, selectedChat.users)}
-                        >
-                          {getSender(user, selectedChat.users)}
-                        </ProfileModal>
+                        <Text>{getSender(user, selectedChat.users)}</Text>
                         <Text fontWeight={"normal"} opacity={0.8}>
                           {getSenderInfo(user, selectedChat.users).statusOnline
                             ? "online"
@@ -416,8 +440,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                 {/** button group*/}
                 <Box
                   position="absolute"
-                  top={7}
-                  right={10}
+                  top={{ base: 3.5, md: 7 }}
+                  right={{ base: 5, md: 10 }}
                   zIndex={2}
                   display="flex"
                   alignItems={"center"}
@@ -443,7 +467,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       isOn ? "justify-end" : "justify-start"
                     } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer 
                     `}
-                    onClick={toggleSwitch}
+                    onClick={() => {
+                      toggleSwitch();
+                      toggleColorMode();
+                    }}
                   >
                     <motion.div
                       className="handle w-[20px] flex justify-center items-center h-[20px]  rounded-full"
@@ -453,12 +480,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         stiffness: 700,
                         damping: 20,
                       }}
+                      onClick={toggleColorMode}
                     >
                       <IconButton
                         variant={"ghost"}
                         className="transition-opacity"
                         borderRadius="full"
-                        onClick={toggleColorMode}
                         transform="unset"
                         _hover={{
                           transform: "rotate(40deg)",
@@ -479,6 +506,13 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       />
                     </motion.div>
                   </div>
+                  <DrawerInfoChat
+                    fetchAgain={fetchAgain}
+                    setFetchAgain={setFetchAgain}
+                  />
+                  <DrawerInfoUser
+                    _user={getSenderInfo(user, selectedChat.users)}
+                  />
                 </Box>
                 <MessageList
                   loadingMessage={loadingMessage}
@@ -547,13 +581,38 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   >
                     <EmojiPicker
                       onEmojiClick={(emojiData, e) => {
-                        // setSelectedEmoji(emojiData.unified);
                         setNewMessage(newMessage + emojiData.emoji);
                       }}
                       autoFocusSearch={false}
                       theme={colorMode ? Theme.DARK : Theme.LIGHT}
                     />
                   </Box>
+
+                  {pic && (
+                    <>
+                      <Image
+                        pos="absolute"
+                        bottom={28}
+                        right={5}
+                        borderRadius="sm"
+                        border="1px solid white"
+                        maxH="100px"
+                        maxW="100px"
+                        w="fit-content"
+                        h="fit-content"
+                        objectFit="cover"
+                        src={pic}
+                      />
+                      <IconButton
+                        pos="absolute"
+                        bottom={28}
+                        right={5}
+                        rounded="full"
+                        icon={<CloseIcon />}
+                        onClick={() => setPic("")}
+                      ></IconButton>
+                    </>
+                  )}
                   <InputGroup size="lg" marginY={4}>
                     {response && (
                       <Box
@@ -591,9 +650,40 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       }}
                     />
                     <InputRightElement
-                      width="5.5rem"
+                      width="9rem"
                       justifyContent={"space-around"}
                     >
+                      <Input
+                        accept="image/*"
+                        id="icon-button-file"
+                        type="file"
+                        className="hidden"
+                        ref={inputRef}
+                        onChange={selectChange}
+                      />
+
+                      <Tooltip
+                        label={
+                          !loadingPic ? "Attach an image" : "Uploading image"
+                        }
+                        isOpen={loadingPic}
+                      >
+                        <label htmlFor="icon-button-file">
+                          <Button
+                            as="span"
+                            variant={"outline"}
+                            bg="blue.800"
+                            p="0"
+                            borderRadius={"full"}
+                          >
+                            <i
+                              class="text-2xl text-white fa fa-camera"
+                              aria-hidden="true"
+                            ></i>
+                          </Button>
+                        </label>
+                      </Tooltip>
+
                       <Text
                         className={`shadow-md
                       ${

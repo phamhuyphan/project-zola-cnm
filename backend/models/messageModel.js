@@ -7,7 +7,7 @@ const messageSchema = mongoose.Schema(
 
     isRead: { type: Boolean, default: false },
 
-    media: [{ type: String, default: false }],
+    multiMedia: { type: String, default: "" },
 
     content: { type: String, trim: true },
 
