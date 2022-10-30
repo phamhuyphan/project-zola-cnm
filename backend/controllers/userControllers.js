@@ -86,7 +86,6 @@ const authUser = asyncHandler(async (req, res) => {
       username: user.username,
       fullname: user.fullname,
       email: user.email,
-      //isAdmin: user.isAdmin,
       pic: user.pic,
       token: generateToken(user._id),
     });
@@ -114,7 +113,6 @@ const addFriend = asyncHandler(async (req, res) => {
       fullname: added.fullname,
       email: added.email,
       friends: added.friends,
-      //isAdmin: user.isAdmin,
       pic: added.pic,
     });
   }
@@ -140,7 +138,14 @@ const update = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("User not found");
   } else {
-    res.json(updateInfo);
+    res.json({
+      _id: updateInfo._id,
+      username: updateInfo.username,
+      fullname: updateInfo.fullname,
+      email: updateInfo.email,
+      pic: updateInfo.pic,
+      token: generateToken(updateInfo._id),
+    });
   }
 });
 //@description    get user by Email
