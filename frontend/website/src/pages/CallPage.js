@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Peer } from "peerjs";
+
 import { Avatar, Box, IconButton, Text } from "@chakra-ui/react";
 import axios from "axios";
 import { MdMic, MdMicOff } from "react-icons/md";
@@ -9,6 +10,7 @@ import {
   BsFillCameraVideoOffFill,
 } from "react-icons/bs";
 import { ImPhoneHangUp } from "react-icons/im";
+
 export default function CallPage() {
   const { id, user } = useParams();
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -36,6 +38,7 @@ export default function CallPage() {
           var ac = window.confirm("Co Nhan Cuoc Goi");
           if (ac) {
             const call = peer.call(id, stream);
+
             call.on("stream", (remoteStream) => playStream("en", remoteStream));
           }
         } else {
