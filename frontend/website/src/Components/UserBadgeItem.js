@@ -17,6 +17,7 @@ import {
   AlertDialogOverlay,
   Button,
   AlertDialogCloseButton,
+  Badge,
 } from "@chakra-ui/react";
 import axios from "axios";
 import React from "react";
@@ -115,6 +116,9 @@ function UserBadgeItem({
               >
                 @{_user?.username}
               </Text>
+              <Badge ml="1" colorScheme="gray">
+                Member
+              </Badge>
             </ProfileModal>
           </Box>
           {user._id === selectedChat.chatAdmin._id && (

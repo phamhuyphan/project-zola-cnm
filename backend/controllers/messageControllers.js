@@ -92,6 +92,7 @@ const deleteMessage = asyncHandler(async (req, res) => {
   Message.findByIdAndUpdate(messageId, {
     content: "deleted",
     multiMedia: "",
+    response: null,
   }).then((message) => {
     res.send(message);
   });

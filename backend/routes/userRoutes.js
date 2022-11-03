@@ -7,6 +7,7 @@ const {
   update,
   getUserByEmail,
   generateQRCode,
+  getUserById,
 } = require("../controllers/userControllers");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -19,4 +20,5 @@ router.post("/login", authUser);
 router.route("/update").put(protect, update);
 router.post("/:email", getUserByEmail);
 router.post("/:userId/qrcode", generateQRCode);
+router.get("/:userId/id", getUserById);
 module.exports = router;

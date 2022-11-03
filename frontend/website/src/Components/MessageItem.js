@@ -19,7 +19,9 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import moment from "moment";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useState } from "react";
+import ReactLinkify from "react-linkify";
+
 import {
   isLastMessage,
   isSameSender,
@@ -27,6 +29,7 @@ import {
   isSameUserMargin,
 } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
+import VideoPlayer from "./media/VideoPlayer";
 
 function MessageItem({ messages, setMessages, m, i }) {
   const [isHover, setIsHover] = useState(false);
@@ -54,7 +57,7 @@ function MessageItem({ messages, setMessages, m, i }) {
       else
         toast({
           title: "Error Occured",
-          description: "Failed to send message",
+          description: "Failed to load message",
           status: "warning",
           duration: 2500,
           isClosable: true,
@@ -141,12 +144,13 @@ function MessageItem({ messages, setMessages, m, i }) {
           display="flex"
           flexDirection="column"
           maxWidth="75%"
+          minW={"75px"}
           w={"fit-content"}
           borderRadius="10px"
           backgroundColor={`${
             m.sender._id === user._id ? "#BEE3F8" : "whiteAlpha.900"
           }`}
-          padding="10px"
+          padding={m?.content ? "10px" : 0}
           marginLeft={isSameSenderMargin(messages, m, i, user._id)}
           marginTop={isSameUserMargin(messages, m, i, user._id) ? "auto" : 30}
           position={"relative"}
@@ -189,11 +193,20 @@ function MessageItem({ messages, setMessages, m, i }) {
             </Box>
           )}
           <Text
+            fontSize={{ base: "sm", md: "md" }}
             width={"fit-content"}
             color={m.content === "deleted" && "gray.600"}
             fontStyle={m.content === "deleted" && "italic"}
           >
-            {m.content}
+            <ReactLinkify
+              component="button"
+              properties={{
+                target: "_blank",
+                style: { color: "red", fontWeight: "bold" },
+              }}
+            >
+              {m.content}
+            </ReactLinkify>
           </Text>
           {m?.multiMedia && (
             <Image
@@ -206,6 +219,7 @@ function MessageItem({ messages, setMessages, m, i }) {
               src={m?.multiMedia}
             />
           )}
+          {m?.multiVideo && <VideoPlayer src={m?.multiVideo} />}
           {(isSameSender(messages, m, i, user._id) ||
             isLastMessage(messages, i, user._id)) && (
             <Text

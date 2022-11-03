@@ -140,7 +140,14 @@ const update = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("User not found");
   } else {
-    res.json(updateInfo);
+    res.json({
+      _id: updateInfo._id,
+      username: updateInfo.username,
+      fullname: updateInfo.fullname,
+      email: updateInfo.email,
+      pic: updateInfo.pic,
+      token: generateToken(updateInfo._id),
+    });
   }
 });
 //@description    get user by Email

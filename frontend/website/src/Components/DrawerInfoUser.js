@@ -23,6 +23,7 @@ import {
 import { InfoIcon } from "@chakra-ui/icons";
 import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
+import { GalleryPhoto } from "./media/GalleryPhotoChat";
 export default function DrawerInfoUser({ _user }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode } = useColorMode();
@@ -31,7 +32,6 @@ export default function DrawerInfoUser({ _user }) {
   const [loading, setLoading] = useState(false);
   const { selectedChat, user } = ChatState();
   const toast = useToast();
-
   const fetchPictures = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -47,9 +47,16 @@ export default function DrawerInfoUser({ _user }) {
       await axios
         .get(`/api/message/${selectedChat._id}`, config)
         .then((data) => {
-          for (const element of data.data) {
+          for (const element of data.data.reverse()) {
             if (element.multiMedia) {
-              setPics((pics) => [...pics, element.multiMedia]);
+              setPics((pics) => [
+                ...pics,
+                {
+                  photo: element.multiMedia,
+                  caption: element.sender.username,
+                  subcaption: element.content,
+                },
+              ]);
             }
           }
         });
@@ -71,6 +78,8 @@ export default function DrawerInfoUser({ _user }) {
       source.cancel();
     };
   };
+  const [photoIndex, setPhotoIndex] = useState(1);
+  const [openGallery, setOpenGallery] = useState(false);
   return (
     !selectedChat.isGroupChat && (
       <>
@@ -152,19 +161,35 @@ export default function DrawerInfoUser({ _user }) {
               </Box>
               <Text>Gallery</Text>
               {pics.length > 0 ? (
-                <Grid
-                  overflowY={"scroll"}
-                  h="400px"
-                  templateColumns="repeat(5, 1fr)"
-                  gap={1}
-                  className="scrollbar-thin hover:scrollbar-thumb-slate-600 scrollbar-thumb-slate-300 scroll-smooth"
-                >
-                  {pics?.reverse().map((pic, index) => (
-                    <GridItem key={index} w="100%">
-                      <Image src={pic} objectFit="cover" />
-                    </GridItem>
-                  ))}
-                </Grid>
+                <>
+                  <Grid
+                    overflowY={"scroll"}
+                    h="350px"
+                    templateColumns="repeat(4, 1fr)"
+                    gap={1}
+                    className="scrollbar-thin hover:scrollbar-thumb-slate-600 scrollbar-thumb-slate-300 scroll-smooth"
+                  >
+                    {pics?.map((pic, i) => (
+                      <GridItem
+                        key={i}
+                        w="full"
+                        onClick={() => {
+                          setPhotoIndex(i);
+                          setOpenGallery(true);
+                        }}
+                        bg="blackAlpha.900"
+                      >
+                        <Image src={pic.photo} objectFit="contain" h="full" />
+                      </GridItem>
+                    ))}
+                  </Grid>
+                  <GalleryPhoto
+                    PHOTOS={pics}
+                    index={photoIndex}
+                    isOpen={openGallery}
+                    setIsOpen={setOpenGallery}
+                  />
+                </>
               ) : (
                 <Text fontSize={"2xl"} m="auto" textAlign={"center"}>
                   Send some pictures to show in here 😺📸
