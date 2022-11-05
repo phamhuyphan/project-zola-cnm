@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect } from "react";
 import {
   Avatar,
-  AvatarBadge,
   AvatarGroup,
   Box,
   Text,
@@ -55,7 +54,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
       source.cancel();
     };
   };
-
+  console.log("chatList is rendered");
   return (
     <VStack zIndex={1} mb={5}>
       {user &&

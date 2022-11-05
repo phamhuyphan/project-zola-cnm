@@ -5,17 +5,17 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
   Text,
   useDisclosure,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { memo } from "react";
+import ChangeInfoForm from "./ChangeInfoForm";
 
 function ProfileModal({ user, children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  console.log("ProfileModal is rendered");
   return (
     <>
       {children && (
@@ -23,7 +23,11 @@ function ProfileModal({ user, children }) {
           {children}
         </span>
       )}
-      <Modal size="lg" isOpen={isOpen} onClose={onClose}>
+      <Modal
+        size={{ base: "full", md: "md" }}
+        isOpen={isOpen}
+        onClose={onClose}
+      >
         <ModalOverlay />
         <ModalContent>
           <ModalHeader
@@ -32,14 +36,16 @@ function ProfileModal({ user, children }) {
             display="flex"
             justifyContent="center"
             pos={"relative"}
+            borderTopRadius={"10"}
           >
             <Box
               bg={"black"}
               w="full"
-              top="-10"
-              h="150px"
+              top="0"
+              h="80px"
               pos="absolute"
               zIndex={0}
+              borderTopRadius={"5"}
             ></Box>
             <Avatar
               size="2xl"
@@ -49,7 +55,7 @@ function ProfileModal({ user, children }) {
               src={user?.pic}
             />
           </ModalHeader>
-          <ModalCloseButton />
+          <ModalCloseButton _hover={{ color: "white" }} />
           <ModalBody
             display="flex"
             flexDir="column"
@@ -63,13 +69,13 @@ function ProfileModal({ user, children }) {
               </Text>
               <Text>Email: {user?.email}</Text>
             </Box>
-          </ModalBody>
 
-          <ModalFooter></ModalFooter>
+            <ChangeInfoForm userUpdate={user} />
+          </ModalBody>
         </ModalContent>
       </Modal>
     </>
   );
 }
 
-export default ProfileModal;
+export default memo(ProfileModal);

@@ -1,11 +1,11 @@
 import {
   Avatar,
-  AvatarBadge,
   Box,
   Button,
   Divider,
   Drawer,
   DrawerBody,
+  DrawerCloseButton,
   DrawerContent,
   DrawerFooter,
   DrawerHeader,
@@ -70,7 +70,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isHover, setHover] = useState(false);
+
   const toast = useToast();
   const [isOn, setIsOn] = useState(false);
 
@@ -142,7 +142,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
       });
     }
   };
-
+  console.log("SideBar is rendered");
   return (
     <>
       <Box
@@ -156,13 +156,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
         overflowX="hidden"
       >
         {/**Sidebar navigation */}
-        <Box
-          position={"sticky"}
-          top={0}
-          zIndex={10}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
-        >
+        <Box position={"sticky"} top={0} zIndex={10}>
           <Box
             display="flex"
             alignItems={"center"}
@@ -183,16 +177,6 @@ function SideBar({ fetchAgain, setFetchAgain }) {
               boxShadow="xl"
               justifyContent="space-between"
               alignItems="center"
-              _hover={{
-                py: { base: 20, md: 2 },
-                transitionProperty: "all",
-                transitionTimingFunction: " cubic-bezier(0.4, 0, 0.2, 1)",
-                transitionDuration: "150ms",
-                bgPosition: "top 40% right 0",
-                outline: { base: "1px solid whiteAlpha.900", md: "unset" },
-                borderTop: 0,
-                filter: "unset",
-              }}
             >
               <Box display="flex">
                 <Menu>
@@ -411,41 +395,47 @@ function SideBar({ fetchAgain, setFetchAgain }) {
             pos={"absolute"}
             top={0}
             zIndex={5}
-            h={isHover ? "75px" : "70px"}
+            h={"75px"}
             w={{ base: "full", md: "fit-content" }}
-            p={{ base: !isHover ? "10px" : "107px", md: "0" }}
+            p={{ base: "10px", md: "0" }}
             borderRadius={{ base: " 0 0 20px 20px ", md: "full" }}
             boxShadow="xl"
             bgImage={{ base: `url('${user?.pic}')`, md: "none" }}
             bgRepeat={"no-repeat"}
             bgSize="cover"
-            bgPosition={isHover ? "top 40% right 0" : "center"}
+            bgPosition={"center"}
             className="transition-all"
-            filter={!isHover && "grayscale(100%)"}
+            filter={"grayscale(100%)"}
           ></Box>
           {/** Background gradient*/}
           <Box
             pos={"absolute"}
             top={0}
             zIndex={6}
-            h={isHover ? "75px" : "70px"}
+            h={"75px"}
             w={{ base: "full", md: "fit-content" }}
-            p={{ base: !isHover ? "10px" : "107px", md: "0" }}
+            p={{ base: "10px", md: "0" }}
             borderRadius={{ base: " 0 0 20px 20px ", md: "full" }}
             boxShadow="xl"
             bgRepeat={"no-repeat"}
             bgSize="cover"
-            bgPosition={isHover ? "top 40% right 0" : "center"}
+            bgPosition={"center"}
             className={`transition-all bg-gradient-to-b ${
               colorMode === "dark" ? "from-[#00000d7d]" : "from-[#ffffff7d]"
             }`}
-            filter={!isHover && "grayscale(100%)"}
+            filter={"grayscale(100%)"}
           ></Box>
         </Box>
         <ChatList fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
-        <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+        <Drawer
+          placement="left"
+          onClose={onClose}
+          isOpen={isOpen}
+          size={{ base: "full", md: "sm" }}
+        >
           <DrawerOverlay />
           <DrawerContent>
+            <DrawerCloseButton display={{ base: "inline-block", md: "none" }} />
             <DrawerHeader borderBottomWidth="1px">Search User</DrawerHeader>
             <DrawerBody>
               <Box display="flex" pb={2}>
@@ -496,6 +486,7 @@ function SideBar({ fetchAgain, setFetchAgain }) {
         zIndex={0}
         opacity={0.3}
         w="full"
+        filter={"grayscale(80%)"}
         overflowX="hidden"
         bgRepeat={"no-repeat"}
         bgSize="cover"

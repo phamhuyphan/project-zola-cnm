@@ -43,7 +43,6 @@ const registerUser = asyncHandler(async (req, res) => {
     email,
     password,
     pic,
-
   });
 
   if (user) {
@@ -110,6 +109,28 @@ const addFriend = asyncHandler(async (req, res) => {
   }
 });
 
+// sửa thông tin user(username, fullname)
+const update = asyncHandler(async (req, res) => {
+  const { _id, username, fullname, pic } = req.body;
 
+  const updateInfo = await User.findByIdAndUpdate(
+    _id,
+    {
+      username,
+      fullname,
+      pic,
+    },
+    {
+      new: true,
+    }
+  );
 
-module.exports = { allUsers, registerUser, authUser, addFriend };
+  if (!updateInfo) {
+    res.status(400);
+    throw new Error("User not found");
+  } else {
+    res.json(updateInfo);
+  }
+});
+
+module.exports = { allUsers, registerUser, authUser, addFriend, update };

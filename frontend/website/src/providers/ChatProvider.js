@@ -17,7 +17,7 @@ const ChatProvider = ({ children }) => {
     setUser(userInfo);
     if (!userInfo) navigator("/");
   }, [navigator]);
-
+  console.log("ChatProvied is called");
   return (
     <ChatContext.Provider
       value={{

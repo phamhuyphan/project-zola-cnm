@@ -194,6 +194,7 @@ function UpdateGroupChatModal({
       setLoading(false);
     }
   };
+  console.log("UpdateGroupChatModal is rendered");
   return (
     <>
       {children ? (

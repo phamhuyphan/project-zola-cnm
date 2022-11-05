@@ -36,7 +36,7 @@ function WelcomePage() {
   }, [navigator]);
   const [show, setShow] = useState(false);
   //Animation
-
+  console.log("WelcomePage is rendered");
   return (
     <div className="overflow-hidden relative max-w-full transition-transform bg-gradient-to-b from-dark-blue to-deep-blue h-[100vh]">
       <Box
