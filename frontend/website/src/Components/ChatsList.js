@@ -68,11 +68,12 @@ function ChatList({ fetchAgain, setFetchAgain }) {
               border: "2px solid white",
               p: "6px",
             }}
-            onClick={() => {      
+            onClick={() => {
               selectedChat
-              ? io("http://localhost:5000").emit("outchat",selectedChat._id):console.log("out out out");  
-                              setSelectedChat(chat)    
-                            }}
+                ? io("http://localhost:5000").emit("outchat", selectedChat._id)
+                : console.log("out out out");
+              setSelectedChat(chat);
+            }}
             cursor="pointer"
             bgColor={
               selectedChat
@@ -119,9 +120,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                 size={"md"}
                 name={user?._id && getSender(user, chat.users)}
                 src={getSenderInfo(user, chat.users).pic}
-              >
-               
-              </Avatar>
+              ></Avatar>
             )}
 
             <Box flex="1" px="2" maxW="400px" w="0.5">
