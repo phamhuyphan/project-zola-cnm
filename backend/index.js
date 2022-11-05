@@ -1,4 +1,5 @@
 const express = require("express");
+
 const dotenv = require("dotenv");
 const app = new express();
 const connectDB = require("./config/db");
@@ -12,6 +13,8 @@ const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const friendRoutes = require("./routes/friendRoutes");
+const friendRequestRoutes = require("./routes/friendRequestRoutes");
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,6 +23,8 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
+app.use("/api/friend", friendRoutes);
+app.use("/api/friendRequest", friendRequestRoutes);
 
 const PORT = 5000;
 const server = app.listen(
@@ -38,6 +43,7 @@ const User = require("./models/userModel");
 /////////////////////////////////////////
 
 io.on("connection", (socket) => {
+  console.log("connected to socket:" + socket.id);
   let user;
   //create a new socket where frontend join  data
   socket.on("setup", async (userData) => {
@@ -77,16 +83,6 @@ io.on("connection", (socket) => {
     chat.users.forEach((user) => {
       if (user._id == newMessageRecieved.sender._id) return;
       socket.in(user._id).emit("message recieved", newMessageRecieved);
-    });
-  });
-
-  socket.on("call", (newMessageRecieved) => {
-    let chat = newMessageRecieved.chat;
-    if (!chat.users) return console.log("chat.users is empty");
-    chat.users.forEach((user) => {
-      if (user._id == newMessageRecieved.sender._id) return;
-      socket.in(user._id).emit("message recieved", newMessageRecieved);
-      socket.in(user._id).emit("answer", newMessageRecieved.sender._id);
     });
   });
 
