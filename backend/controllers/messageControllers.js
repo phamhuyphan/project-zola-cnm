@@ -46,9 +46,10 @@ const pageMessages = asyncHandler(async (req, res) => {
 //@route           POST /api/Message/
 //@access          Protected
 const sendMessage = asyncHandler(async (req, res) => {
-  const { content, chatId, response, multiMedia } = req.body;
+  const { content, chatId, response, multiMedia, multiFile, multiVideo } =
+    req.body;
 
-  if ((!content && !multiMedia) || !chatId) {
+  if ((!content && !multiMedia && !multiVideo && !multiFile) || !chatId) {
     console.log("Invalid data passed into request");
     return res.sendStatus(400);
   }
@@ -60,6 +61,8 @@ const sendMessage = asyncHandler(async (req, res) => {
     chat: chatId,
     response: response,
     multiMedia: multiMedia,
+    multiVideo: multiVideo,
+    multiFile: multiFile,
   };
 
   try {
@@ -92,6 +95,8 @@ const deleteMessage = asyncHandler(async (req, res) => {
   Message.findByIdAndUpdate(messageId, {
     content: "deleted",
     multiMedia: "",
+    multiFile: "",
+    multiVideo: "",
     response: null,
   }).then((message) => {
     res.send(message);

@@ -9,6 +9,7 @@ import {
   Avatar,
   AvatarBadge,
   AvatarGroup,
+  Badge,
   Box,
   Fade,
   FormControl,
@@ -17,7 +18,8 @@ import {
   Image,
   Input,
   InputGroup,
-  InputRightElement,
+  InputLeftAddon,
+  InputRightAddon,
   Spinner,
   Text,
   Textarea,
@@ -32,24 +34,28 @@ import axios from "axios";
 import Lottie from "react-lottie";
 import io from "socket.io-client";
 import React, { useEffect, useRef, useState } from "react";
-import { getSender, getSenderInfo } from "../logic/ChatLogic";
+import { getSender, getSenderInfo, isExistInArray } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
 import MessageList from "./MessageList";
 import { motion } from "framer-motion";
-import animationData from "../animations/52671-typing-animation-in-chat.json";
+import animationData from "../animations/81154-typing-in-chat.json";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import moment from "moment";
 import useMessagePagination from "../hooks/useMessagePagination";
 import DrawerInfoChat from "./DrawerInfoChat";
 import DrawerInfoUser from "./DrawerInfoUser";
+import { IoPersonAdd, IoResize } from "react-icons/io5";
 import { RiSendPlaneFill } from "react-icons/ri";
 import { AiFillSmile } from "react-icons/ai";
 import { MdAddPhotoAlternate } from "react-icons/md";
+import UploadMenuButton from "./UploadMenuButton";
+import AddFriendButton from "./AddFriendButton";
+import { HiVideoCamera } from "react-icons/hi";
 const ENDPOINT = "http://localhost:5000";
 
 let socket, selectedChatCompare;
 function ChatZone({ fetchAgain, setFetchAgain }) {
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { colorMode } = useColorMode();
   const bgColor = useColorModeValue(
     "linear(to-b,whiteAlpha.900,#B1AEC6)",
     "linear(to-b,#1E2B6F,#193F5F)"
@@ -61,11 +67,9 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+
   const toast = useToast();
   const { onToggle } = useDisclosure();
-  const [isOn, setIsOn] = useState(false);
-  const toggleSwitch = () => setIsOn(!isOn);
-
   const {
     user,
     selectedChat,
@@ -81,6 +85,13 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     useMessagePagination(user, selectedChat, pageNumber);
   const [toggle, setToggle] = useState(false);
   const [pic, setPic] = useState("");
+  const [video, setVideo] = useState("");
+  const [file, setFile] = useState("");
+
+  const inputRef = useRef(null);
+
+  const [toggleExpand, setToggleExpand] = useState(false);
+
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -116,8 +127,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       source.cancel();
     };
   };
-  const inputRef = useRef(null);
-  const selectChange = (event) => {
+  const selectImageChange = (event) => {
     const picture = event.target.files && event.target.files[0];
     if (!picture) {
       return;
@@ -145,8 +155,65 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         });
     }
   };
-  const sendMessage = async (event) => {
-    if ((event.key === "Enter" || event === "Send") && (newMessage || pic)) {
+  const selectVideoChange = (event) => {
+    const video = event.target.files[0];
+    if (!video) {
+      return;
+    }
+    if (video) {
+      const data = new FormData();
+      console.log(video);
+      data.append("file", video);
+      data.append("upload_preset", "chat-chit");
+      data.append("cloud_name", "voluu");
+      fetch("https://api.cloudinary.com/v1_1/voluu/video/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setVideo(data.url.toString());
+          console.log(data);
+          console.log(data.url.toString());
+          setLoading(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+        });
+    }
+  };
+  const selectFileChange = (event) => {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+    if (file) {
+      const data = new FormData();
+      console.log(file);
+      data.append("file", file);
+      data.append("upload_preset", "chat-chit");
+      data.append("cloud_name", "voluu");
+      fetch("https://api.cloudinary.com/v1_1/voluu/raw/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setFile(data.url.toString());
+          console.log(data);
+          console.log(data.url.toString());
+          setLoading(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+        });
+    }
+  };
+  const sendMessage = async (e) => {
+    if (
+      ((e.keyCode == 13 && !e.shiftKey) || e === "Send") &&
+      (newMessage || pic || video || file)
+    ) {
       if (user) socket.emit("stop typing", selectedChat._id);
       inputRef.current.value = null;
       try {
@@ -163,6 +230,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
             "/api/message",
             {
               multiMedia: pic,
+              multiFile: file,
+              multiVideo: video,
               content: newMessage,
               chatId: selectedChat._id,
               response: response,
@@ -171,6 +240,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
           )
           .then((data) => {
             setPic("");
+            setVideo("");
+            setFile("");
             setResponse(null);
             socket.emit("new message", data.data);
             console.log(data.data);
@@ -203,7 +274,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       .post(
         "/api/message",
         {
-          content: "📞📞📞📞",
+          content: "📞 A call was made by " + user.username,
           chatId: selectedChat._id,
         },
         config
@@ -215,9 +286,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         setFetchAgain(!fetchAgain);
       });
   };
-
   const typingHandler = (e) => {
-    setNewMessage(e.target.value);
+    if (e.keyCode === 13 && e.shiftKey) {
+      setNewMessage(newMessage + "&#13");
+    } else setNewMessage(e.target.value);
     if (!socketConnected) return;
     //if user is typing
     if (!typing) {
@@ -235,11 +307,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     }, timerLength);
   };
-
-  ///////////////////////////////////
-
-  ///////////////////////////////////
-
   useEffect(() => {
     socket = io(ENDPOINT);
     if (user) {
@@ -298,19 +365,14 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       w="full"
       h="full"
       bgImage={
-        selectedChat
+        selectedChat && colorMode === "light"
           ? selectedChat.isGroupChat
             ? selectedChat.chatAdmin.pic
             : `url(${getSenderInfo(user, selectedChat.users).pic})`
-          : "initial"
+          : "linear-gradient( 94.3deg,  rgba(26,33,64,1) 10.9%, rgba(81,84,115,1) 87.1% )"
       }
-      bgColor={useColorModeValue(
-        "linear(to-b,whiteAlpha.900,#B1AEC6)",
-        "linear(to-b,#1E2B6F,#193F5F)"
-      )}
-      bgRepeat="no-repeat"
-      bgPosition={"center"}
-      bgSize="cover"
+      bgRepeat="repeat"
+      bgSize="contain"
       position="relative"
     >
       {!selectedChat ? (
@@ -456,7 +518,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       </div>
                     ) : (
                       <>
-                        <Text>{getSender(user, selectedChat.users)}</Text>
+                        <AddFriendButton
+                          user={user}
+                          friend={getSenderInfo(user, selectedChat.users)}
+                          selectedChat={selectedChat}
+                        />
+
                         <Text fontWeight={"normal"} opacity={0.8}>
                           {getSenderInfo(user, selectedChat.users).statusOnline
                             ? "online"
@@ -479,73 +546,31 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   display="flex"
                   alignItems={"center"}
                 >
-                  <IconButton
-                    onClick={() => {
-                      window.open(
-                        "http://localhost:3000/call/null",
-                        "Call",
-                        "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
-                      );
-                      callMess();
-                    }}
-                    variant={"ghost"}
-                    className="transition-opacity"
-                    borderRadius="full"
-                    bgColor="transparent"
-                    _hover={{
-                      color: "black",
-                    }}
-                    icon={
-                      colorMode === "dark" ? (
-                        <PhoneIcon textColor={"whiteAlpha.900"} />
-                      ) : (
-                        <PhoneIcon textColor={"yellow"} />
-                      )
-                    }
-                  />
-                  <div
-                    className={`${
-                      isOn ? "justify-end" : "justify-start"
-                    } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer 
-                    `}
-                    onClick={() => {
-                      toggleSwitch();
-                      toggleColorMode();
-                    }}
-                  >
-                    <motion.div
-                      className="handle w-[20px] flex justify-center items-center h-[20px]  rounded-full"
-                      layout
-                      transition={{
-                        type: "spring",
-                        stiffness: 700,
-                        damping: 20,
+                  <Tooltip label={"Make a video call"} hasArrow>
+                    <IconButton
+                      onClick={() => {
+                        window.open(
+                          "http://localhost:3000/call/null",
+                          "Call",
+                          "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
+                        );
+                        callMess();
                       }}
-                      onClick={toggleColorMode}
-                    >
-                      <IconButton
-                        variant={"ghost"}
-                        className="transition-opacity"
-                        borderRadius="full"
-                        transform="unset"
-                        _hover={{
-                          transform: "rotate(40deg)",
-                          color: "black",
-                          bgGradient:
-                            colorMode === "light"
-                              ? "linear(to-b,#C39A9E,#808293)"
-                              : "linear(to-b,#1E2B6F,#193F5F)",
-                        }}
-                        icon={
-                          colorMode === "light" ? (
-                            <MoonIcon textColor={"whiteAlpha.900"} />
-                          ) : (
-                            <SunIcon textColor={"yellow"} />
-                          )
-                        }
-                      />
-                    </motion.div>
-                  </div>
+                      variant={"ghost"}
+                      className="transition-opacity"
+                      borderRadius="full"
+                      bgColor="transparent"
+                      _hover={{
+                        color: "black",
+                      }}
+                      icon={
+                        <HiVideoCamera
+                          fontSize={"24"}
+                          color={colorMode === "light" ? "white" : "yellow"}
+                        />
+                      }
+                    />
+                  </Tooltip>
 
                   <DrawerInfoChat
                     fetchAgain={fetchAgain}
@@ -568,7 +593,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                   isRequired
                   bottom={0}
                   left={0}
-                  pos={{ base: "relative", md: "unset" }}
+                  pos={"relative"}
                 >
                   {isTyping ? (
                     <Fade in={onToggle}>
@@ -576,15 +601,30 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         w="fit-content"
                         border={"1px solid black"}
                         display="flex"
-                        pos="relative"
-                        bottom={0}
+                        pos="absolute"
+                        top={-9}
+                        alignItems="center"
+                        className="backdrop-blur-lg bg-opacity-50"
                         bgColor={"blackAlpha.800"}
                         borderRadius={"full"}
                         roundedBottomLeft={0}
-                        p={1}
+                        p={2}
+                        px={4}
                       >
+                        <Text
+                          mixBlendMode={"difference"}
+                          textColor="whiteAlpha.900"
+                          fontSize={12}
+                        >
+                          {selectedChat.isGroupChat
+                            ? getSender(user, selectedChat.users)
+                            : selectedChat.users[0]._id !== user._id
+                            ? selectedChat.users[1].fullname
+                            : selectedChat.users[0].fullname}{" "}
+                          is typing
+                        </Text>
                         <Lottie
-                          width={40}
+                          width={30}
                           options={{
                             loop: true,
                             autoplay: true,
@@ -598,18 +638,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                             marginLeft: 0,
                           }}
                         />
-                        <Text
-                          mixBlendMode={"difference"}
-                          textColor="whiteAlpha.900"
-                          fontSize={12}
-                        >
-                          {selectedChat.isGroupChat
-                            ? getSender(user, selectedChat.users)
-                            : selectedChat.users[0]._id !== user._id
-                            ? selectedChat.users[1].fullname
-                            : selectedChat.users[0].fullname}{" "}
-                          is typing
-                        </Text>
                       </Box>
                     </Fade>
                   ) : (
@@ -654,7 +682,6 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       theme={colorMode ? Theme.DARK : Theme.LIGHT}
                     />
                   </Box>
-
                   {pic && (
                     <>
                       <Image
@@ -680,7 +707,13 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                       ></IconButton>
                     </>
                   )}
-                  <InputGroup size="lg">
+
+                  <InputGroup
+                    display={"flex"}
+                    alignItems={"center"}
+                    bg={colorMode === "light" ? "white" : "whiteAlpha.800"}
+                    py="2"
+                  >
                     {response && (
                       <Box
                         pos="absolute"
@@ -713,67 +746,98 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         </Box>
                       </Box>
                     )}
-
-                    <Textarea
-                      disabled={loadingNewMessage}
-                      variant="outline"
-                      bg="whiteAlpha.900"
-                      textColor={"black"}
-                      placeholder="Type something..."
-                      value={newMessage}
-                      h="20"
-                      rounded={"sm"}
-                      onChange={typingHandler}
-                      _focus={{
-                        opacity: 0.5,
-                      }}
-                    />
-                    <InputRightElement
-                      width="11rem"
-                      height={"full"}
-                      alignItems={"center"}
+                    <InputRightAddon bg="transparent" border="none">
+                      <UploadMenuButton
+                        inputRef={inputRef}
+                        selectVideoChange={selectVideoChange}
+                        selectFileChange={selectFileChange}
+                      />
+                    </InputRightAddon>
+                    <Box flex={1} pos="relative">
+                      <Textarea
+                        className={`crollbar-thin scrollbar-thumb-dark-blue
+                        ${
+                          colorMode === "light"
+                            ? "white"
+                            : "bg-white bg-opacity-50"
+                        }
+                            focus:bg-opacity-50`}
+                        disabled={loadingNewMessage}
+                        variant="outline"
+                        border="none"
+                        rows={1}
+                        maxH="80"
+                        minH="10"
+                        height={!toggleExpand ? 10 : 80}
+                        autosize
+                        textColor={"black"}
+                        placeholder="Type something..."
+                        value={newMessage}
+                        rounded={"sm"}
+                        onChange={typingHandler}
+                      />
+                      <IconButton
+                        variant={"ghost"}
+                        className="transition-opacity"
+                        borderRadius="full"
+                        transform="unset"
+                        right={0}
+                        bottom={0}
+                        resize="none"
+                        _hover={{
+                          bgGradient:
+                            colorMode === "light"
+                              ? "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
+                              : "linear(to-b,#1E2B6F,#193F5F)",
+                        }}
+                        pos="absolute"
+                        zIndex={10}
+                        size="xs"
+                        icon={<IoResize w="10" h="10" color="black" />}
+                        onClick={() => setToggleExpand(!toggleExpand)}
+                      />
+                    </Box>
+                    <InputLeftAddon
+                      bg="transparent"
+                      border={"transparent"}
+                      w={{ base: "8rem", md: "12rem" }}
+                      display="flex"
                       justifyContent={"space-evenly"}
                     >
                       <Input
                         accept="image/*"
-                        id="icon-button-file"
+                        id="icon-button-image"
                         type="file"
-                        className="hidden"
+                        hidden
                         ref={inputRef}
-                        onChange={selectChange}
+                        onChange={(e) => selectImageChange(e)}
                       />
-                      <Tooltip
-                        label={
-                          !loadingPic ? "Attach an image" : "Uploading image"
-                        }
-                        isOpen={loadingPic}
-                      >
-                        <label htmlFor="icon-button-file">
-                          <IconButton
-                            icon={
-                              <Icon
-                                color={
-                                  colorMode === "light"
-                                    ? "blackAlpha.800"
-                                    : "white"
-                                }
-                                as={MdAddPhotoAlternate}
-                                w="8"
-                                h="8"
-                              />
-                            }
-                            w="10"
-                            h="10"
-                            rounded="full"
-                            bgGradient={
-                              colorMode !== "light"
-                                ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
-                                : "unset"
-                            }
-                            _hover={{ opacity: 0.8 }}
-                          />
-                        </label>
-                      </Tooltip>
+                      <label htmlFor="icon-button-image">
+                        <IconButton
+                          icon={
+                            <Icon
+                              color={
+                                colorMode === "light"
+                                  ? "blackAlpha.800"
+                                  : "whiteAlpha.800"
+                              }
+                              as={MdAddPhotoAlternate}
+                              w={{ base: "4", md: "6" }}
+                              h={{ base: "4", md: "6" }}
+                            />
+                          }
+                          as={"span"}
+                          h={{ base: "6", md: "8" }}
+                          w={{ base: "6", md: "8" }}
+                          rounded="full"
+                          bgGradient={
+                            colorMode !== "light"
+                              ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
+                              : "unset"
+                          }
+                          _hover={{ opacity: 0.8 }}
+                        />
+                      </label>
 
                       <IconButton
                         icon={
@@ -782,10 +846,12 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                               colorMode === "light" ? "blackAlpha.800" : "white"
                             }
                             as={AiFillSmile}
-                            w="8"
-                            h="8"
+                            w={{ base: "4", md: "6" }}
+                            h={{ base: "4", md: "6" }}
                           />
                         }
+                        h={{ base: "6", md: "8" }}
+                        w={{ base: "6", md: "8" }}
                         rounded="full"
                         bgGradient={
                           colorMode !== "light"
@@ -795,29 +861,38 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         _hover={{ opacity: 0.8 }}
                         onClick={() => setToggle(!toggle)}
                       />
-                      <IconButton
-                        icon={
-                          <Icon
-                            color={
-                              colorMode === "light" ? "blackAlpha.800" : "white"
-                            }
-                            as={RiSendPlaneFill}
-                            w="8"
-                            h="8"
-                          />
+                      <Tooltip
+                        label={
+                          !loadingPic ? "Attach an image" : "Uploading file"
                         }
-                        w="10"
-                        h="10"
-                        rounded="full"
-                        bgGradient={
-                          colorMode !== "light"
-                            ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
-                            : "unset"
-                        }
-                        _hover={{ opacity: 0.8 }}
-                        onClick={() => sendMessage("Send")}
-                      />
-                    </InputRightElement>
+                        isOpen={loadingPic}
+                      >
+                        <IconButton
+                          icon={
+                            <Icon
+                              color={
+                                colorMode === "light"
+                                  ? "blackAlpha.800"
+                                  : "white"
+                              }
+                              as={RiSendPlaneFill}
+                              w={{ base: "4", md: "6" }}
+                              h={{ base: "4", md: "6" }}
+                            />
+                          }
+                          h={{ base: "6", md: "8" }}
+                          w={{ base: "6", md: "8" }}
+                          rounded="full"
+                          bgGradient={
+                            colorMode !== "light"
+                              ? "linear-gradient(to top right, #1E2B6F, #193F5F)"
+                              : "unset"
+                          }
+                          _hover={{ opacity: 0.8 }}
+                          onClick={() => sendMessage("Send")}
+                        />
+                      </Tooltip>
+                    </InputLeftAddon>
                   </InputGroup>
                 </FormControl>
               </Box>

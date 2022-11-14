@@ -34,8 +34,8 @@ function UserBadgeItem({
   console.log("UserBadgeItem is rendered");
   const { colorMode, toggleColorMode } = useColorMode();
   const bgColor = useColorModeValue(
-    "linear(to-b,whiteAlpha.900,#B1AEC6)",
-    "linear(to-b,#1E2B6F,#193F5F)"
+    "radial-gradient( circle farthest-corner at 10% 20%,  rgba(255,229,168,1) 0%, rgba(251,174,222,1) 100.7% )",
+    "radial-gradient( circle 610px at 5.2% 51.6%,  rgba(5,8,114,1) 0%, rgba(7,3,53,1) 97.5% )"
   );
   const { selectedChat, user } = ChatState();
   const toast = useToast();

@@ -161,6 +161,38 @@ const getUserByEmail = asyncHandler(async (req, res) => {
     res.json("a");
   }
 });
+//@description    get user by Email for login
+//@route           get/api/user/checkemail/:email
+//@access          Public
+const getUserByEmailForLogin = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.find({
+    email: { $regex: email, $options: "i" },
+  });
+  if (user) {
+    res.json({ email: user[0]?.email });
+  }
+  if (!user) {
+    res.send("non exist");
+  }
+});
+//@description    get user by Username for login
+//@route           get /api/user/checkusername/:username
+//@access          Public
+const getUserByUsernameForLogin = asyncHandler(async (req, res) => {
+  const { username } = req.body;
+  const user = await User.find({
+    username: { $regex: username, $options: "i" },
+  });
+  if (user) {
+    res.json({
+      username: user[0]?.username,
+    });
+  }
+  if (!user) {
+    res.json("non exist");
+  }
+});
 
 const generateQRCode = asyncHandler(async (req, res) => {
   let data = req.params.userId;
@@ -321,4 +353,6 @@ module.exports = {
   getOTPById,
   getUserById,
   update,
+  getUserByEmailForLogin,
+  getUserByUsernameForLogin,
 };

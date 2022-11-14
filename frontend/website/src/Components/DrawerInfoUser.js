@@ -7,8 +7,6 @@ import {
   DrawerOverlay,
   DrawerContent,
   DrawerCloseButton,
-  Button,
-  Input,
   useDisclosure,
   Avatar,
   Box,
@@ -98,7 +96,7 @@ export default function DrawerInfoUser({ _user }) {
             color: "black",
             bgGradient:
               colorMode === "light"
-                ? "linear(to-b,#C39A9E,#808293)"
+                ? "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)"
                 : "linear(to-b,#1E2B6F,#193F5F)",
           }}
           icon={
@@ -165,7 +163,10 @@ export default function DrawerInfoUser({ _user }) {
                   <Grid
                     overflowY={"scroll"}
                     h="350px"
-                    templateColumns="repeat(4, 1fr)"
+                    templateColumns={{
+                      base: "repeat(4, 1fr)",
+                      md: "repeat(3, 1fr)",
+                    }}
                     gap={1}
                     className="scrollbar-thin hover:scrollbar-thumb-slate-600 scrollbar-thumb-slate-300 scroll-smooth"
                   >
@@ -177,9 +178,10 @@ export default function DrawerInfoUser({ _user }) {
                           setPhotoIndex(i);
                           setOpenGallery(true);
                         }}
+                        maxH="150px"
                         bg="blackAlpha.900"
                       >
-                        <Image src={pic.photo} objectFit="contain" h="full" />
+                        <Image src={pic.photo} objectFit="cover" h="full" />
                       </GridItem>
                     ))}
                   </Grid>

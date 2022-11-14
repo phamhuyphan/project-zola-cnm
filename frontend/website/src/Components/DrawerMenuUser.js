@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  ArrowForwardIcon,
-  HamburgerIcon,
-  InfoIcon,
-  Search2Icon,
-  ViewOffIcon,
-} from "@chakra-ui/icons";
+import { ArrowForwardIcon, HamburgerIcon, InfoIcon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -18,11 +12,6 @@ import {
   DrawerHeader,
   DrawerOverlay,
   IconButton,
-  Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Text,
   useColorMode,
   useColorModeValue,
@@ -34,10 +23,10 @@ import { useNavigate } from "react-router-dom";
 import { ChatState } from "../providers/ChatProvider";
 function DrawerMenuUser() {
   const bg = useColorModeValue(
-    "linear(to-b,#C39A9E,#808293)",
+    "radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%)",
     "linear(to-t,blue.900,purple.900)"
   );
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { colorMode } = useColorMode();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = React.useRef();

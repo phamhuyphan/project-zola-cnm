@@ -12,6 +12,8 @@ const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const postRoutes = require("./routes/postRoutes");
 const commentRoutes = require("./routes/commentRoutes");
+const friendRoutes = require("./routes/friendRoutes");
+const friendRequestRoutes = require("./routes/friendRequestRoutes");
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -20,6 +22,8 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 app.use("/api/post", postRoutes);
 app.use("/api/comment", commentRoutes);
+app.use("/api/friends", friendRoutes);
+app.use("/api/friendRequest", friendRequestRoutes);
 
 const PORT = 5000;
 const server = app.listen(

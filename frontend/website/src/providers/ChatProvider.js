@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { Peer } from "peerjs";
 const { createContext, useContext, useState, useEffect } = require("react");
 
 const ChatContext = createContext();

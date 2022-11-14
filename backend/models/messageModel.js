@@ -9,6 +9,10 @@ const messageSchema = mongoose.Schema(
 
     multiMedia: { type: String, default: "" },
 
+    multiVideo: { type: String, default: "" },
+
+    multiFile: { type: String, default: "" },
+
     content: { type: String, trim: true },
 
     response: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },

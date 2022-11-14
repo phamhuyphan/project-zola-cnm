@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Peer } from "peerjs";
 
 import { Avatar, Box, IconButton, Text } from "@chakra-ui/react";
 import axios from "axios";
@@ -10,6 +9,7 @@ import {
   BsFillCameraVideoOffFill,
 } from "react-icons/bs";
 import { ImPhoneHangUp } from "react-icons/im";
+import Peer from "peerjs";
 
 export default function CallPage() {
   const { id, user } = useParams();
