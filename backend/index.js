@@ -1,4 +1,5 @@
 const express = require("express");
+
 const dotenv = require("dotenv");
 const app = new express();
 const connectDB = require("./config/db");
@@ -42,6 +43,7 @@ const User = require("./models/userModel");
 /////////////////////////////////////////
 
 io.on("connection", (socket) => {
+  console.log("connected to socket:" + socket.id);
   let user;
   //create a new socket where frontend join  data
   socket.on("setup", async (userData) => {
