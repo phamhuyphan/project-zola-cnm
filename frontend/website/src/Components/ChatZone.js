@@ -353,7 +353,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     console.log("");
     socket.on("answer", (answer) => {
       const win = window.open(
-        "http://localhost:3000/call/" + answer,
+        "http://localhost:3000/call/" + answer + "/" + answer,
         "Call",
         "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
       );
@@ -550,7 +550,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     <IconButton
                       onClick={() => {
                         window.open(
-                          "http://localhost:3000/call/null",
+                          "http://localhost:3000/call/null/" +
+                            getSenderInfo(user, selectedChat.users)._id,
                           "Call",
                           "toolbar=yes,scrollbars=yes,resizable=yes,top=50,left=70,width=1200,height=600"
                         );

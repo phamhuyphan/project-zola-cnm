@@ -212,6 +212,27 @@ const generateQRCode = asyncHandler(async (req, res) => {
     console.log(code);
   });
 });
+
+const changePassword = asyncHandler(async (req, res) => {
+  const { password1, password2 } = req.body;
+  const { email } = req.user;
+  const user = await User.findOne({ email });
+
+  if (user && (await user.matchPassword(password1))) {
+    await User.findByIdAndUpdate(user._id, { password: password2 });
+    res.json({
+      _id: user._id,
+      username: user.username,
+      fullname: user.fullname,
+      email: user.email,
+      pic: user.pic,
+    });
+  } else {
+    res.status(401);
+    throw new Error("Invalid Change Password");
+  }
+});
+
 const registerUser1 = asyncHandler(async (req, res) => {
   const { username, fullname, email, password, pic } = req.body;
 
@@ -333,8 +354,8 @@ const getOTPById = asyncHandler(async (req, res) => {
 });
 
 const getUserById = asyncHandler(async (req, res) => {
-  const id = req.body;
-  const user = await User.findOne(id);
+  const userId = req.params.userId;
+  const user = await User.findById(userId);
   if (user) {
     res.json(user);
   }

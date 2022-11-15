@@ -162,7 +162,8 @@ export default function DrawerInfoUser({ _user }) {
                 <>
                   <Grid
                     overflowY={"scroll"}
-                    h="350px"
+                    h="400px"
+                    gridGap={3}
                     templateColumns={{
                       base: "repeat(4, 1fr)",
                       md: "repeat(3, 1fr)",
@@ -173,16 +174,19 @@ export default function DrawerInfoUser({ _user }) {
                     {pics?.map((pic, i) => (
                       <GridItem
                         key={i}
-                        w="full"
+                        w="100%"
                         onClick={() => {
                           setPhotoIndex(i);
                           setOpenGallery(true);
                         }}
-                        maxH="150px"
+                        h="120px"
                         bg="blackAlpha.900"
-                      >
-                        <Image src={pic.photo} objectFit="cover" h="full" />
-                      </GridItem>
+                        bgImage={pic.photo}
+                        bgPos="center"
+                        bgRepeat={"no-repeat"}
+                        bgSize={"cover"}
+                        bgClip={"border-box"}
+                      ></GridItem>
                     ))}
                   </Grid>
                   <GalleryPhoto
