@@ -259,45 +259,43 @@ function FriendsZone({ display, user, setIsDisplay }) {
                 )}
               </Box>
             </TabPanel>
-            <TabPanel h="full">
-              <Box w="full">
-                {isLoadingUserRequestedList ? (
-                  <Box w="full">
-                    <Spinner size={"lg"} mx="auto" />
-                  </Box>
-                ) : userFriendRequests.length > 0 ? (
-                  <Grid
-                    p={{ base: "5", md: "10" }}
-                    templateColumns={{
-                      base: "repeat(2, 1fr)",
-                      md: "repeat(3, 1fr)",
-                      lg: "repeat(4, 1fr)",
-                    }}
-                    gap={6}
-                  >
-                    {userFriendRequests.map((fr, index) => (
-                      <GridItem
-                        key={index}
-                        border="1px solid"
-                        borderColor={colorMode === "light" && "blackAlpha.300"}
-                        bg={colorMode === "light" ? "white" : "whiteAlpha.200"}
-                        opacity="0.8"
-                        className="transition-opacity"
-                        _hover={{ opacity: 1 }}
-                        rounded="lg"
-                        boxShadow={"lg"}
-                      >
-                        <FriendRequestUserItem ufr={fr} user={user} />
-                      </GridItem>
-                    ))}
-                  </Grid>
-                ) : (
-                  <VStack opacity="0.5" m="auto">
-                    <IoMdListBox fontSize={"100"} />
-                    <Text>The list is empty</Text>
-                  </VStack>
-                )}
-              </Box>
+            <TabPanel>
+              {isLoadingUserRequestedList ? (
+                <Box w="full">
+                  <Spinner size={"lg"} mx="auto" />
+                </Box>
+              ) : userFriendRequests.length > 0 ? (
+                <Grid
+                  p={{ base: "5", md: "10" }}
+                  templateColumns={{
+                    base: "repeat(2, 1fr)",
+                    md: "repeat(3, 1fr)",
+                    lg: "repeat(4, 1fr)",
+                  }}
+                  gap={6}
+                >
+                  {userFriendRequests.map((fr, index) => (
+                    <GridItem
+                      key={index}
+                      border="1px solid"
+                      borderColor={colorMode === "light" && "blackAlpha.300"}
+                      bg={colorMode === "light" ? "white" : "whiteAlpha.200"}
+                      opacity="0.8"
+                      className="transition-opacity"
+                      _hover={{ opacity: 1 }}
+                      rounded="lg"
+                      boxShadow={"lg"}
+                    >
+                      <FriendRequestUserItem ufr={fr} user={user} />
+                    </GridItem>
+                  ))}
+                </Grid>
+              ) : (
+                <VStack opacity="0.5" m="auto">
+                  <IoMdListBox fontSize={"100"} />
+                  <Text>The list is empty</Text>
+                </VStack>
+              )}
             </TabPanel>
             <TabPanel>
               <Grid
@@ -308,7 +306,7 @@ function FriendsZone({ display, user, setIsDisplay }) {
                 }}
                 gap={6}
               >
-                {friends.length > 0 ? (
+                {friends.length > 0 &&
                   friends.map((user) => (
                     <GridItem
                       key={user._id}
@@ -326,16 +324,16 @@ function FriendsZone({ display, user, setIsDisplay }) {
                         handleFunction={() => accessChat(user._id)}
                       />
                     </GridItem>
-                  ))
-                ) : (
-                  <VStack opacity="0.5">
-                    <RiEmotionSadFill fontSize={"100"} />
-                    <Text textAlign={"center"}>
-                      You seems so lonely, find some friend to add to the list
-                    </Text>
-                  </VStack>
-                )}
+                  ))}
               </Grid>
+              {friends.length <= 0 && (
+                <VStack opacity="0.5" m="auto">
+                  <RiEmotionSadFill fontSize={"100"} />
+                  <Text textAlign={"center"}>
+                    You seems so lonely, find some friend to add to the list
+                  </Text>
+                </VStack>
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>
