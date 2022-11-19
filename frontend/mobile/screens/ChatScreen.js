@@ -1,14 +1,153 @@
-import { View, Text, SafeAreaView, TextInput } from "react-native";
-import React from "react";
+import { View, Text, ImageBackground, TouchableOpacity } from "react-native";
+import React, { useEffect, useLayoutEffect, useState } from "react";
+import { ChatState } from "../providers/ChatProvider";
+import axios from "axios";
+import ChatsList from "../components/ChatsList";
+import {
+  Box,
+  Icon,
+  IconButton,
+  Input,
+  SearchIcon,
+  StatusBar,
+} from "native-base";
 
-const ChatScreen = () => {
+import { LinearGradient } from "expo-linear-gradient";
+import { FontAwesome, Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+const link = "http://192.168.1.7:5000";
+const ChatScreen = ({ fetchAgain }) => {
+  const nav = useNavigation();
+  useLayoutEffect(() => {
+    nav.setOptions({
+      headerShown: false,
+    });
+  }, []);
+  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+  const [friends, setFriends] = useState([]);
+  useEffect(() => {
+    fetchChats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchAgain]);
+  const fetchChats = async () => {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem("userInfo")).token
+          }`,
+        },
+        cancelToken: source.token,
+      };
+      const { data } = await axios.get(`${link}/api/chat`, config);
+      if (user) setChats(data);
+    } catch (error) {
+      if (axios.isCancel(error)) console.log("successfully aborted");
+      else {
+        console.log(error);
+      }
+    }
+    return () => {
+      // cancel the request before component unmounts
+      source.cancel();
+    };
+  };
+
   return (
-    <SafeAreaView>
-      <View className="bg-slate-500 p-6">
-        <Text className=" text-3xl">Name</Text>
-        <TextInput className="mt-4 bg-white rounded-2xl border  "></TextInput>
-      </View>
-    </SafeAreaView>
+    <Box className="flex-1">
+      <StatusBar />
+      <Box style={{ width: "100%" }} shadow="9">
+        <ImageBackground
+          source={{ uri: user.pic }}
+          resizeMode="cover"
+          imageStyle={{
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+          }}
+        >
+          <LinearGradient
+            end={{ x: 0.5, y: 1 }}
+            colors={["rgba(238,174,202,0.75)", "rgba(148,187,233,0.75)"]}
+            style={{ borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+          >
+            <Box className="p-5 w-full">
+              <Text className="text-md text-white">@{user.username}</Text>
+              <Text className="text-xl text-white font-bold">
+                {user.fullname}
+              </Text>
+              <Box
+                display={"flex"}
+                flexDir="row"
+                justifyContent={"center"}
+                alignItems="center"
+                mt="5"
+                mx="2"
+              >
+                <Input
+                  w={"full"}
+                  bgColor="white"
+                  fontSize={18}
+                  variant="filled"
+                  rounded={"full"}
+                  InputLeftElement={<SearchIcon size={5} ml="2" />}
+                  placeholder="Search a chat"
+                  ml="1"
+                  mr="0.25"
+                />
+                <IconButton
+                  variant={"ghost"}
+                  icon={
+                    <FontAwesome name="user-plus" size={24} color="white" />
+                  }
+                  borderRadius="full"
+                ></IconButton>
+              </Box>
+            </Box>
+          </LinearGradient>
+        </ImageBackground>
+      </Box>
+      <ChatsList />
+      <LinearGradient
+        end={{ x: 1, y: 0.75 }}
+        colors={["#0660AB", "#B000CD"]}
+        style={{ borderRadius: 9999 }}
+      >
+        <Box
+          rounded={"full"}
+          w="full"
+          py="4"
+          display={"flex"}
+          flexDir="row"
+          justifyContent={"space-evenly"}
+          alignItems="center"
+          px="16"
+        >
+          <TouchableOpacity
+            className={`justify-center items-center ${
+              selectedChat ? "border-1 border-white" : ""
+            }`}
+            onPress={() => setSelectedChat(null)}
+          >
+            <Ionicons
+              name="chatbubble-ellipses"
+              size={selectedChat ? 36 : 24}
+              color="white"
+            />
+            <Text className="text-white font-bold text-lg">Messages</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="justify-center items-center">
+            <FontAwesome5 name="users" size={24} color="white" />
+            <Text className="text-white font-bold text-lg">Friend List</Text>
+          </TouchableOpacity>
+          <TouchableOpacity className="justify-center items-center">
+            <Ionicons name="settings-sharp" size={24} color="white" />
+            <Text className="text-white font-bold text-lg">Setting</Text>
+          </TouchableOpacity>
+        </Box>
+      </LinearGradient>
+    </Box>
   );
 };
 

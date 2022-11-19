@@ -19,7 +19,7 @@ const ChatProvider = ({ children }) => {
     if (!userInfo) {
       nav.navigate({ name: "SignIn" });
     }
-  }, []);
+  }, [nav]);
 
   return (
     <ChatContext.Provider
