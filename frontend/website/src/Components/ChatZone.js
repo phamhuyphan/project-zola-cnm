@@ -22,6 +22,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import EmojiPicker, { Theme } from "emoji-picker-react";
+import DropZone from "react-dropzone";
 import axios from "axios";
 import Lottie from "react-lottie";
 import io from "socket.io-client";
@@ -53,6 +54,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [file, setFile] = useState();
   const toast = useToast();
   const { onToggle } = useDisclosure();
   const [isOn, setIsOn] = useState(false);
@@ -99,7 +101,7 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   };
   const sendMessage = async (event) => {
     if ((event.key === "Enter" || event === "Send") && newMessage) {
-      if (user) socket.emit("stop typing", selectedChat._id);
+      if (user) socket.emit("stop typing", selectedChat._id); 
 
       try {
         const config = {
@@ -134,6 +136,11 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       }
     }
   };
+
+  const selectChange = (e) => {
+    setMessages(e.target.files[0].name)
+    setFiles(e.target.files[0])
+  }
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
@@ -373,10 +380,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                           {getSenderInfo(user, selectedChat.users).statusOnline
                             ? "online"
                             : "Last online " +
-                              moment(
-                                getSenderInfo(user, selectedChat.users)
-                                  .updatedAt
-                              ).calendar()}
+                            moment(
+                              getSenderInfo(user, selectedChat.users)
+                                .updatedAt
+                            ).calendar()}
                         </Text>
                       </>
                     )}
@@ -408,9 +415,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                     }
                   />
                   <div
-                    className={`${
-                      isOn ? "justify-end" : "justify-start"
-                    } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer 
+                    className={`${isOn ? "justify-end" : "justify-start"
+                      } w-[50px] h-[30px] bg-slate-400 flex rounded-full p-1 cursor-pointer 
                     `}
                     onClick={toggleSwitch}
                   >
@@ -494,8 +500,8 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                             {selectedChat.isGroupChat
                               ? getSender(user, selectedChat.users)
                               : selectedChat.users[0]._id !== user._id
-                              ? selectedChat.users[1].fullname
-                              : selectedChat.users[0].fullname}{" "}
+                                ? selectedChat.users[1].fullname
+                                : selectedChat.users[0].fullname}{" "}
                             is typing
                           </Text>
                         </Box>
@@ -536,14 +542,14 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         width="15.5rem"
                         justifyContent={"space-around"}
                       >
-                        <Input size="sm" type="file"></Input>
+                        <Input size="sm" onChange={selectChange} type="file"></Input>
+
                         <Text
                           className={`shadow-md
-                      ${
-                        colorMode === "light"
-                          ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
-                          : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
-                      }
+                      ${colorMode === "light"
+                              ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
+                              : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
+                            }
                       rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
                           onClick={() => setToggle(!toggle)}
                         >
@@ -552,11 +558,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
 
                         <Text
                           className={`shadow-md
-                      ${
-                        colorMode === "light"
-                          ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
-                          : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
-                      }
+                      ${colorMode === "light"
+                              ? "text-darkblue bg-gradient-to-bl from-whiteAlpha.900 to-[#B1AEC6]"
+                              : "text-whiteAlpha.900 bg-gradient-to-tr from-[#1E2B6F] to-[#193F5F]"
+                            }
                       rounded-full text-3xl w-8 h-8  hover:bg-opacity-50`}
                           onClick={() => sendMessage("Send")}
                         >
