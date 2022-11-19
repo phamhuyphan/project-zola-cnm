@@ -58,7 +58,7 @@ const SignIn = ({ navigation }) => {
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
       setLoading(false);
       setUser(userInfo);
-      navigation.navigate("ChatScreen");
+      navigation.navigate("ChatNavigator");
     } catch (error) {
       console.log("3");
       setLoading(false);

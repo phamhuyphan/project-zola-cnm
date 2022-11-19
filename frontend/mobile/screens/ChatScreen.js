@@ -63,16 +63,21 @@ const ChatScreen = ({ fetchAgain }) => {
           source={{ uri: user.pic }}
           resizeMode="cover"
           imageStyle={{
+            filler: "grayScale(100%)",
             borderBottomLeftRadius: 20,
             borderBottomRightRadius: 20,
           }}
         >
           <LinearGradient
             end={{ x: 0.5, y: 1 }}
-            colors={["rgba(238,174,202,0.75)", "rgba(148,187,233,0.75)"]}
-            style={{ borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
+            colors={["#1E2B6F", "#193F5F"]}
+            style={{
+              opacity: 0.75,
+              borderBottomLeftRadius: 20,
+              borderBottomRightRadius: 20,
+            }}
           >
-            <Box className="p-5 w-full">
+            <Box className="p-5 w-full border-[#1E2B6F] border-[3px] border-t-0 rounded-b-[20]">
               <Text className="text-md text-white">@{user.username}</Text>
               <Text className="text-xl text-white font-bold">
                 {user.fullname}
@@ -113,40 +118,7 @@ const ChatScreen = ({ fetchAgain }) => {
         end={{ x: 1, y: 0.75 }}
         colors={["#0660AB", "#B000CD"]}
         style={{ borderRadius: 9999 }}
-      >
-        <Box
-          rounded={"full"}
-          w="full"
-          py="4"
-          display={"flex"}
-          flexDir="row"
-          justifyContent={"space-evenly"}
-          alignItems="center"
-          px="16"
-        >
-          <TouchableOpacity
-            className={`justify-center items-center ${
-              selectedChat ? "border-1 border-white" : ""
-            }`}
-            onPress={() => setSelectedChat(null)}
-          >
-            <Ionicons
-              name="chatbubble-ellipses"
-              size={selectedChat ? 36 : 24}
-              color="white"
-            />
-            <Text className="text-white font-bold text-lg">Messages</Text>
-          </TouchableOpacity>
-          <TouchableOpacity className="justify-center items-center">
-            <FontAwesome5 name="users" size={24} color="white" />
-            <Text className="text-white font-bold text-lg">Friend List</Text>
-          </TouchableOpacity>
-          <TouchableOpacity className="justify-center items-center">
-            <Ionicons name="settings-sharp" size={24} color="white" />
-            <Text className="text-white font-bold text-lg">Setting</Text>
-          </TouchableOpacity>
-        </Box>
-      </LinearGradient>
+      ></LinearGradient>
     </Box>
   );
 };
