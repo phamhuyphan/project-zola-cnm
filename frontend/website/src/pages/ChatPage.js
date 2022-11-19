@@ -11,7 +11,6 @@ function ChatPage() {
   const { closeSideBar, selectedChat, user } = ChatState();
   const [fetchAgain, setFetchAgain] = useState(false); // cờ hiệu refresh
   const isPresent = useIsPresent();
-  console.log("ChatPage is rendered");
   return (
     <ErrorBoundary>
       <div className=" max-w-[100vw] h-[100vh] flex flex-row p-0 relative overflow-hidden">

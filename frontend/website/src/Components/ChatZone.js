@@ -21,6 +21,7 @@ import {
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
+import { useRef } from 'react';
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import DropZone from "react-dropzone";
 import axios from "axios";
@@ -54,7 +55,9 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const [file, setFile] = useState();
+  const [pics, setPic] = useState();
+  const [videos, setVideo] = useState();
+  const [files, setFile] = useState();
   const toast = useToast();
   const { onToggle } = useDisclosure();
   const [isOn, setIsOn] = useState(false);
@@ -99,10 +102,10 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
       source.cancel();
     };
   };
+
   const sendMessage = async (event) => {
     if ((event.key === "Enter" || event === "Send") && newMessage) {
-      if (user) socket.emit("stop typing", selectedChat._id); 
-
+      if (user) socket.emit("stop typing", selectedChat._id);
       try {
         const config = {
           headers: {
@@ -114,12 +117,18 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
         const { data } = await axios.post(
           "/api/message",
           {
+            multiMedia: pics,
+            multiVideo: videos,
+            multiFile:files,
             content: newMessage,
             chatId: selectedChat._id,
             response: responseMessageID,
           },
           config
         );
+        setPic("");
+        setVideo("");
+        setFile("")
         socket.emit("new message", data);
         console.log(data);
         setMessages([...messages, data]);
@@ -137,9 +146,90 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     }
   };
 
-  const selectChange = (e) => {
-    setMessages(e.target.files[0].name)
-    setFiles(e.target.files[0])
+  const inputRef = useRef(null);
+
+  const selectChange = (event) => {
+    const pics = event.target.files[0];
+    if (!pics) {
+      return;
+    }
+    if (pics) {
+      const data = new FormData();
+      console.log(pics);
+      data.append("file", pics);
+      data.append("upload_preset", "chat-chit");
+      data.append("cloud_name", "voluu");
+      fetch("https://api.cloudinary.com/v1_1/voluu/image/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setPic(data.url.toString());
+          console.log(data);
+          console.log(data.url.toString())
+          setLoading(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+        });
+    }
+  }
+
+  const handleFileChange = (event) => {
+    const video = event.target.files[0];
+    if (!video) {
+      return;
+    }
+    if (video) {
+      const data = new FormData();
+      console.log(video);
+      data.append("file", video);
+      data.append("upload_preset", "chat-chit");
+      data.append("cloud_name", "voluu");
+      fetch("https://api.cloudinary.com/v1_1/voluu/video/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setVideo(data.url.toString());
+          console.log(data);
+          console.log(data.url.toString())
+          setLoading(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+        });
+    }
+  }
+
+  const selectChangeFile = (event) => {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+    if (file) {
+      const data = new FormData();
+      console.log(file);
+      data.append("file", file);
+      data.append("upload_preset", "chat-chit");
+      data.append("cloud_name", "voluu");
+      fetch("https://api.cloudinary.com/v1_1/voluu/raw/upload", {
+        method: "POST",
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setVideo(data.url.toString());
+          console.log(data);
+          console.log(data.url.toString())
+          setLoading(false);
+        })
+        .catch((err) => {
+          setLoading(false);
+        });
+    }
   }
 
   const typingHandler = (e) => {
@@ -542,7 +632,14 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
                         width="15.5rem"
                         justifyContent={"space-around"}
                       >
-                        <Input size="sm" onChange={selectChange} type="file"></Input>
+
+                        <Input size="sm" ref={inputRef} multiple={true} onChange={selectChange} accept="image/*" type="file"></Input>
+                        <Input size="sm" ref={inputRef} multiple={true} onChange={handleFileChange}
+                          accept="video/*"
+                          type="file"></Input>
+                        <Input size="sm" ref={inputRef} multiple={true} onChange={selectChangeFile}
+                          accept="file_extension"
+                          type="file"></Input>
 
                         <Text
                           className={`shadow-md
@@ -582,5 +679,4 @@ function ChatZone({ fetchAgain, setFetchAgain }) {
     </Box>
   );
 }
-
 export default ChatZone;

@@ -1,4 +1,5 @@
 import { ChatIcon, DeleteIcon } from "@chakra-ui/icons";
+import { AspectRatio, Link } from '@chakra-ui/react'
 import {
   Avatar,
   Box,
@@ -27,6 +28,7 @@ import {
 } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
 import { MessageState } from "../providers/MessagesProvider";
+import { Image } from '@chakra-ui/react'
 
 function MessageItem({ messages, setMessages, m, i }) {
   const [isHover, setIsHover] = useState(false);
@@ -76,7 +78,6 @@ function MessageItem({ messages, setMessages, m, i }) {
           Authorization: `Bearer ${user.token}`,
         },
       };
-
       await axios
         .put(
           "/api/message/delete",
@@ -117,24 +118,24 @@ function MessageItem({ messages, setMessages, m, i }) {
         {/** messages, m, i, _id */}
         {(isSameSender(messages, m, i, user._id) ||
           isLastMessage(messages, i, user._id)) && (
-          <Tooltip
-            label={"@" + m.sender.username}
-            hasArrow
-            placeContent="bottom-start"
-          >
-            <Avatar
-              size="md"
-              showBorder={true}
-              cursor="pointer"
-              my="auto"
-              mr={2}
-              display={m.sender._id === user._id && "none"}
-              name={m.sender.username}
-              src={m.sender.pic}
-              marginTop={isSameUserMargin(messages, m, i, user._id) ? 0 : 45}
-            />
-          </Tooltip>
-        )}
+            <Tooltip
+              label={"@" + m.sender.username}
+              hasArrow
+              placeContent="bottom-start"
+            >
+              <Avatar
+                size="md"
+                showBorder={true}
+                cursor="pointer"
+                my="auto"
+                mr={2}
+                display={m.sender._id === user._id && "none"}
+                name={m.sender.username}
+                src={m.sender.pic}
+                marginTop={isSameUserMargin(messages, m, i, user._id) ? 0 : 45}
+              />
+            </Tooltip>
+          )}
 
         <Box
           className="shadow-lg"
@@ -143,9 +144,8 @@ function MessageItem({ messages, setMessages, m, i }) {
           maxWidth="75%"
           w={"fit-content"}
           borderRadius="10px"
-          backgroundColor={`${
-            m.sender._id === user._id ? "#BEE3F8" : "whiteAlpha.900"
-          }`}
+          backgroundColor={`${m.sender._id === user._id ? "#BEE3F8" : "whiteAlpha.900"
+            }`}
           padding="10px"
           marginLeft={isSameSenderMargin(messages, m, i, user._id)}
           marginTop={isSameUserMargin(messages, m, i, user._id) ? "auto" : 30}
@@ -174,23 +174,37 @@ function MessageItem({ messages, setMessages, m, i }) {
             </Box>
           )}
           <Text
-            width={"fit-content"}
+            width="300px"
             color={m.content === "deleted" && "gray.600"}
             fontStyle={m.content === "deleted" && "italic"}
           >
             {m.content}
           </Text>
+          <Box boxSize='sm'>
+            <Image id="image"
+              boxSize='400px'
+              src={m.multiMedia
+              } alt='Loading image fails' />
+          </Box>
+          <AspectRatio maxW='560px' ratio={1}>
+            <iframe
+              title='naruto'
+              src={m.multiVideo}
+              allowFullScreen
+            />
+          </AspectRatio>
+
           {(isSameSender(messages, m, i, user._id) ||
             isLastMessage(messages, i, user._id)) && (
-            <Text
-              width={"fit-content"}
-              fontSize={9}
-              marginLeft={0}
-              textColor={"blackAlpha.900"}
-            >
-              {moment(m.createdAt).calendar()}
-            </Text>
-          )}
+              <Text
+                width={"fit-content"}
+                fontSize={9}
+                marginLeft={0}
+                textColor={"blackAlpha.900"}
+              >
+                {moment(m.createdAt).calendar()}
+              </Text>
+            )}
           <Box
             display={isHover && m.content !== "deleted" ? "flex" : "none"}
             position="absolute"

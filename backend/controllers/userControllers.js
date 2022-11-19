@@ -106,7 +106,7 @@ const getUserByEmail = asyncHandler(async (req, res) => {
     res.json((user));
   }
   if (!user) {
-    res.json("a");
+    res.json("Find not found email address");
   }
 });
 
@@ -307,10 +307,50 @@ const update = asyncHandler(async (req, res) => {
   }
 });
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  try {
+    const oldUser = await User.findOne({ email });
+    if (!oldUser) {
+      return res.json({ status: "User Not Exists!!" });
+    }
+    // const secret = JWT_SECRET + oldUser.password;
+    // const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, {
+    //   expiresIn: "5m",
+    // });
+    // const link = `http://localhost:3000/reset-password/${oldUser._id}/${token}`;
+
+    const link = `http://localhost:3000/reset-password/${oldUser._id}`;
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.MAIL_USERNAME, // generated ethereal user
+        pass: process.env.MAIL_PASSWORD, // generated ethereal password
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.MAIL_FROM_ADDRESS, // sender address
+      to: JSON.stringify(email), // list of receivers
+      subject: "Verify Your Email ✔", // Subject line
+      text: link, // plain text body
+    }
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+      }
+    });
+  } catch (error) { }
+});
+
 module.exports = {
   getUserByEmail,
   allUsers,
   registerUser,
   sendEmail,
-  authUser, addFriend, generateQRCode, getOTPById, getUserById,update
+  authUser, addFriend, generateQRCode, getOTPById, getUserById, update, forgotPassword
 };

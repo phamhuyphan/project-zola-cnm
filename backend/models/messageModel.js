@@ -5,10 +5,16 @@ const messageSchema = mongoose.Schema(
 
     chat: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
 
-    isRead:{ type: Boolean , default: false},
+    isRead: { type: Boolean, default: false },
 
     content: { type: String, trim: true },
-    
+
+    multiMedia: { type: Array, trim: true, default: "" },
+
+    multiVideo: { type: Array, trim: true, default: "" },
+
+    multiFile: {type:Array,trim: true, default: ""},
+
     response: { type: mongoose.Schema.Types.ObjectId, ref: "Message" }
   },
   { timestamps: true }

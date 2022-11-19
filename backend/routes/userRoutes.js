@@ -8,7 +8,7 @@ const {
   getUserByEmail,
   sendEmail,
   getOTPById, getUserById,
-  update,
+  update,forgotPassword
 } = require("../controllers/userControllers");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -23,6 +23,7 @@ router.post("/login", authUser);
 router.post("/:email", getUserByEmail);
 router.post("/:id", getUserById);
 router.post("/:userId/qrcode", generateQRCode);
+router.post("/forgot-password/:email",forgotPassword);
 
 router.route("/update").put(protect, update);
 module.exports = router;

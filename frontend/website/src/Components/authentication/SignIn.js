@@ -3,16 +3,23 @@ import {
   Button,
   Input,
   ScaleFade,
-  Text,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   useToast,
   VStack,
 } from "@chakra-ui/react";
 import GoogleButton from 'react-google-button'
 import axios from "axios";
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ChatState } from "../../providers/ChatProvider";
 import { initializeApp } from "firebase/app";
+import OtpInput from 'react-otp-input';
 import {
   GoogleAuthProvider,
   getAuth,
@@ -36,7 +43,14 @@ const firebaseConfig = {
   measurementId: "G-XYCVGGYCK3"
 };
 
+
+
 function SignIn({ setShow, isOpen }) {
+
+  const [modalShow, setModalShow] = React.useState(true);
+  const handleClose = () => setModalShow(false);
+  const handleShow = () => setModalShow(console.log("true"));
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setUser } = ChatState();
@@ -131,6 +145,22 @@ function SignIn({ setShow, isOpen }) {
     }
 
   };
+
+  const sendCodeLink = async () => {
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+
+    await axios.post(
+      "/api/user/forgot-password/:email",
+      {
+        email: email
+      },
+      config,
+    ).then().catch(err => console.log(err))
+  }
 
   const submitHandler = async () => {
     setLoading(true);
@@ -233,17 +263,36 @@ function SignIn({ setShow, isOpen }) {
           textColor={"gray.500"}
         />
       </VStack>
-      <Text
+      <Button
         transitionDuration={"150ms"}
-        textAlign="right"
+        variant="link"
         textColor={"whiteAlpha.900"}
+        colorScheme={"whiteAlpha.00"}
         _hover={{
           bgClip: "text",
-          bgGradient: "linear(to-br,blue.300, pink.400)",
+          bgGradient: "linear(to-br,blue.300,red.300)",
         }}
+        onClick={handleShow}
       >
         forgot password, eh? Press here, bro.
-      </Text>
+      </Button>
+
+      {/* <Link to="/login/reset">
+        <Button
+          transitionDuration={"150ms"}
+          variant="link"
+          textColor={"whiteAlpha.900"}
+          colorScheme={"whiteAlpha.00"}
+          _hover={{
+            bgClip: "text",
+            bgGradient: "linear(to-br,blue.300,red.300)",
+          }}
+          onClick={handleShow}
+        >
+          forgot password, eh? Press here, bro.
+        </Button>
+      </Link> */}
+
       <Box zIndex={10}>
         <Button
           variant={"link"}
@@ -282,6 +331,39 @@ function SignIn({ setShow, isOpen }) {
           Sign In GG
         </GoogleButton>
       </Box>
+
+      <Modal
+        isOpen={isOpen}
+      // modalShow={modalShow} onHide={handleClose}
+
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader >Forgot Password</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="abc@gmail.com">
+            </Input>
+          </ModalBody>
+          <ModalFooter>
+            <span className="font-bold">
+              <Button
+                variant="link"
+                colorScheme={"whiteAlpha.900"}
+                _hover={{
+                  bgClip: "text",
+                  bgGradient: "linear(to-br,blue.300,red.300)",
+                }}
+                onClick={sendCodeLink} >
+                Forgot Password
+              </Button>
+            </span>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
     </ScaleFade>
   );
 }

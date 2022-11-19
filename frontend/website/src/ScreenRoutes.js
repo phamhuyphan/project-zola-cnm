@@ -6,6 +6,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import LoadingPage from "./Components/loading/LoadingPage";
+import ForgotPage from "./pages/ForgotPage";
 const ChatPage = lazy(() => import("./pages/ChatPage"));
 const WelcomePage = lazy(() => import("./pages/WelcomePage"));
 
@@ -17,6 +18,7 @@ function ScreenRoutes() {
         <Routes location={location} key={location.pathname}>
           <Route exact path="/chats" element={<ChatPage />} />
           <Route exact path="/" element={<WelcomePage />} />
+          <Route exact path="/reset-password/:id" element={<ForgotPage/>} />
         </Routes>
       </Suspense>
     </AnimatePresence>

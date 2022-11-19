@@ -47,7 +47,7 @@ function WelcomePage() {
         p={{ lg: "10", base: "10" }}
         ml={{ lg: "28" }}
         flex={{ lg: "flex" }}
-        flexDir={{ lg: "column" }}
+        flexDir={{ lg: "column" }}  
         justifyContent={{ lg: "justify-end" }}
         shadow="2xl"
         borderRadius={"xl"}
@@ -112,6 +112,7 @@ function WelcomePage() {
         ) : (
           <SignUp setShow={setShow} isOpening={!isOpen} />
         )}
+
         {!show ? (
           <Text textColor={"whiteAlpha.900"}>
             don't have an account?{" "}
@@ -153,6 +154,7 @@ function WelcomePage() {
             </span>
           </Text>
         )}
+
       </Box>
       <Box id="picture_login"></Box>
       <Box id="square1"></Box>
