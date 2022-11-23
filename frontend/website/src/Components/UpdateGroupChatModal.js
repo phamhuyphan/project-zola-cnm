@@ -13,6 +13,7 @@ import {
   ModalHeader,
   ModalOverlay,
   Spinner,
+  Text,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -36,7 +37,7 @@ function UpdateGroupChatModal({
   const toast = useToast();
   const { user, selectedChat, setSelectedChat } = ChatState();
   const handleRemove = async (u) => {
-    if (selectedChat.groupAdmin._id !== user._id && u._id !== user._id) {
+    if (selectedChat.chatAdmin._id !== user._id && u._id !== user._id) {
       toast({
         title: "Only admins can remove member(s)",
         description: "error",
@@ -220,6 +221,7 @@ function UpdateGroupChatModal({
 
           <ModalCloseButton />
           <ModalBody>
+            <Text>Members</Text>
             <Box display="flex" flexWrap="wrap" w="100%" pb={3}>
               {selectedChat.users.map((u) => (
                 <UserBadgeItem
@@ -227,6 +229,8 @@ function UpdateGroupChatModal({
                   _user={u}
                   isAdmin={selectedChat?.chatAdmin._id === u._id}
                   handleFunction={() => handleRemove(u)}
+                  setFetchAgain={setFetchAgain}
+                  fetchAgain={fetchAgain}
                 />
               ))}
             </Box>

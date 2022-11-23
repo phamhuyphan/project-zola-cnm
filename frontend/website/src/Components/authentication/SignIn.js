@@ -1,6 +1,8 @@
 import {
   Box,
   Button,
+  Divider,
+  HStack,
   Input,
   ScaleFade,
   Modal,
@@ -13,18 +15,22 @@ import {
   useToast,
   VStack,
 } from "@chakra-ui/react";
-import GoogleButton from 'react-google-button'
+import GoogleButton from "react-google-button";
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { ChatState } from "../../providers/ChatProvider";
 import { initializeApp } from "firebase/app";
+<<<<<<< HEAD
 import OtpInput from 'react-otp-input';
 import {
   GoogleAuthProvider,
   getAuth,
   signInWithPopup
 } from "firebase/auth";
+=======
+import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
+>>>>>>> a8051d6d529d7fb914e19211093dc7eb41657401
 import {
   getFirestore,
   query,
@@ -40,7 +46,7 @@ const firebaseConfig = {
   storageBucket: "authen-server-zola.appspot.com",
   messagingSenderId: "514728568830",
   appId: "1:514728568830:web:eba8144d502e759045c2af",
-  measurementId: "G-XYCVGGYCK3"
+  measurementId: "G-XYCVGGYCK3",
 };
 
 
@@ -59,13 +65,13 @@ function SignIn({ setShow, isOpen }) {
   let navigate = useNavigate();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
+
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
   const googleProvider = new GoogleAuthProvider();
 
   const signInWithGoogle = async () => {
-
     try {
       const res = await signInWithPopup(auth, googleProvider);
       const user = res.user;
@@ -79,7 +85,7 @@ function SignIn({ setShow, isOpen }) {
           authProvider: "google",
           email: user.email,
           pic: user.photoURL,
-          verify: true
+          verify: true,
         });
       }
 
@@ -89,13 +95,15 @@ function SignIn({ setShow, isOpen }) {
         },
       };
 
-      const use = await axios.post(
-        "/api/user/:email",
-        {
-          email: user.email
-        },
-        config
-      ).catch(err => console.log(err));
+      const use = await axios
+        .post(
+          "/api/user/:email",
+          {
+            email: user.email,
+          },
+          config
+        )
+        .catch((err) => console.log(err));
 
       if (use.data === "a") {
         const { data } = await axios.post(
@@ -106,7 +114,7 @@ function SignIn({ setShow, isOpen }) {
             email: user.email,
             password: user.uid,
             pic: user.photoURL,
-            verify: true
+            verify: true,
           },
           config
         );
@@ -130,7 +138,7 @@ function SignIn({ setShow, isOpen }) {
           config
         );
         localStorage.setItem("userInfo", JSON.stringify(data));
-        const userInfo = JSON.parse(localStorage.getItem("userInfo"))
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
         setLoading(false);
         setUser(userInfo);
         navigate("/chats");
@@ -145,7 +153,6 @@ function SignIn({ setShow, isOpen }) {
       });
       alert(error.message);
     }
-
   };
 
   const sendCodeLink = async () => {
@@ -197,10 +204,10 @@ function SignIn({ setShow, isOpen }) {
       const verify = await axios.post(
         "/api/user/:email",
         {
-          email: email
+          email: email,
         },
         config
-      )
+      );
       if (verify.data.verify === true) {
         toast({
           title: "Sign in successfully",
@@ -225,12 +232,10 @@ function SignIn({ setShow, isOpen }) {
           position: "bottom",
         });
       }
-
-
-
     } catch (error) {
       toast({
-        title: "Sign in failed!Email isn't verify. Your password or email address is invalid!  ",
+        title:
+          "Sign in failed!Email isn't verify. Your password or email address is invalid!  ",
         status: "error",
         duration: 2500,
         isClosable: true,
@@ -268,7 +273,64 @@ function SignIn({ setShow, isOpen }) {
           padding="3"
           textColor={"gray.500"}
         />
+
+        <Text
+          transitionDuration={"150ms"}
+          textAlign="right"
+          textColor={"whiteAlpha.900"}
+          _hover={{
+            bgClip: "text",
+            bgGradient: "linear(to-br,blue.300, pink.400)",
+          }}
+        >
+          forgot password, eh? Press here, bro.
+        </Text>
+        <Box zIndex={10}>
+          <Button
+            variant={"link"}
+            colorScheme={"yellow"}
+            fontWeight={"bold"}
+            transition="all 0.25s ease-in-out"
+            fontSize={32}
+            _hover={{
+              bgClip: "text",
+              bgGradient: "linear(to-br,red.600,yellow.600)",
+            }}
+            onClick={submitHandler}
+            isLoading={loading}
+            isDisabled={!password || !email}
+          >
+            Sign In
+          </Button>
+        </Box>
+        <HStack w="full" my="3">
+          <Divider />
+          <Text bg="whiteAlpha.300" rounded="full" px="2" color="white">
+            or
+          </Text>
+          <Divider />
+        </HStack>
+        <Box zIndex={10}>
+          <GoogleButton
+            variant={"link"}
+            colorScheme={"yellow"}
+            fontWeight={"bold"}
+            transition="ease-in-out"
+            transitionDuration={150}
+            fontSize={32}
+            _hover={{
+              bgClip: "text",
+              bgGradient: "linear(to-br,red.600,yellow.600)",
+            }}
+            mb="5"
+            onClick={signInWithGoogle}
+            isLoading={loading}
+          >
+            Sign In GG
+          </GoogleButton>
+        </Box>
       </VStack>
+<<<<<<< HEAD
       <Button
         transitionDuration={"150ms"}
         variant="link"
@@ -370,6 +432,8 @@ function SignIn({ setShow, isOpen }) {
         </ModalContent>
       </Modal>
 
+=======
+>>>>>>> a8051d6d529d7fb914e19211093dc7eb41657401
     </ScaleFade>
   );
 }

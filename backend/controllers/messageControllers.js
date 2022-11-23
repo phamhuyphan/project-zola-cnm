@@ -19,34 +19,41 @@ const allMessages = asyncHandler(async (req, res) => {
     });
     res.json(messages);
   } catch (error) {
-    res.status(400);
     throw new Error(error.message);
   }
 });
-
 const pageMessages = asyncHandler(async (req, res) => {
   const limit = 20;
-  const skip = Message.find({ chat: req.params.chatId }).length - 20;
-  try {
-    const messages = await Message.find({ chat: req.params.chatId })
-      .limit(limit)
-      .skip(skip)
-      .populate("sender", "username pic email")
-      .populate("chat");
-    res.json(messages);
-  } catch (error) {
-    res.status(400);
-    throw new Error(error.message);
-  }
-});
+  const skip = limit * (req.params.pageNumber - 1);
 
+  let messages = await Message.find({ chat: req.params.chatId })
+    .sort([["createdAt", -1]])
+    .skip(skip)
+    .limit(limit)
+    .populate("sender", "username pic email")
+    .populate("chat")
+    .populate("response");
+  messages = await User.populate(messages, {
+    path: "response.sender",
+    select: "username pic email fullname ",
+  })
+    .then((dat) => res.json(dat.reverse()))
+    .catch((error) => {
+      throw new Error(error);
+    });
+});
 //@description     Create New Message
 //@route           POST /api/Message/
 //@access          Protected
 const sendMessage = asyncHandler(async (req, res) => {
+<<<<<<< HEAD
   const { content, chatId, response, multiMedia, multiVideo,multiFile } = req.body;
+=======
+  const { content, chatId, response, multiMedia, multiFile, multiVideo } =
+    req.body;
+>>>>>>> a8051d6d529d7fb914e19211093dc7eb41657401
 
-  if (!content || !chatId) {
+  if ((!content && !multiMedia && !multiVideo && !multiFile) || !chatId) {
     console.log("Invalid data passed into request");
     return res.sendStatus(400);
   }
@@ -60,13 +67,20 @@ const sendMessage = asyncHandler(async (req, res) => {
     isRead: false,
     chat: chatId,
     response: response,
+    multiMedia: multiMedia,
+    multiVideo: multiVideo,
+    multiFile: multiFile,
   };
 
   try {
     let message = await Message.create(newMessage);
-    message = await message.populate("sender", "username pic email");
-    message = await message.populate("chat");
-    message = await message.populate("response");
+
+    message = await message.populate("sender", "username pic");
+    message = await (await message.populate("chat")).populate("response");
+    message = await User.populate(message, {
+      path: "chat.users",
+      select: "username pic email fullname",
+    });
     message = await User.populate(message, {
       path: "response.sender",
       select: "username pic email fullname ",
@@ -75,20 +89,25 @@ const sendMessage = asyncHandler(async (req, res) => {
     await Chat.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
 
     res.json(message);
-    console.log(message);
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
   }
 });
-
+/**
+ *
+ */
 const deleteMessage = asyncHandler(async (req, res) => {
   const { messageId } = req.body;
-  Message.findByIdAndUpdate(messageId, { content: "deleted" }).then(
-    (message) => {
-      res.send(message);
-    }
-  );
+  Message.findByIdAndUpdate(messageId, {
+    content: "deleted",
+    multiMedia: "",
+    multiFile: "",
+    multiVideo: "",
+    response: null,
+  }).then((message) => {
+    res.send(message);
+  });
 });
 
 module.exports = { allMessages, sendMessage, deleteMessage, pageMessages };

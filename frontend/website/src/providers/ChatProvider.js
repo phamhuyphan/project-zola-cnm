@@ -9,8 +9,12 @@ const ChatProvider = ({ children }) => {
   const [chats, setChats] = useState([]);
   const [closeSideBar, setCloseSideBar] = useState(false);
   const [notification, setNotification] = useState([]);
+<<<<<<< HEAD
   const [forgotPass, setForgotPass] = useState(false);
 
+=======
+  const [response, setResponse] = useState(null);
+>>>>>>> a8051d6d529d7fb914e19211093dc7eb41657401
   const navigator = useNavigate();
   useEffect(() => {
     //fecth local storage
@@ -22,7 +26,7 @@ const ChatProvider = ({ children }) => {
     else
     if (!userInfo) navigator("/");
   }, [navigator]);
-  console.log("ChatProvied is called");
+
   return (
     <ChatContext.Provider
       value={{
@@ -37,6 +41,8 @@ const ChatProvider = ({ children }) => {
         setCloseSideBar,
         user,
         setUser,
+        response,
+        setResponse,
       }}
     >
       {children}

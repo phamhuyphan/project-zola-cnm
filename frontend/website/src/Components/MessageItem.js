@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 import { ChatIcon, DeleteIcon } from "@chakra-ui/icons";
 import { AspectRatio, Link } from '@chakra-ui/react'
+=======
+import { ChatIcon, DeleteIcon, DownloadIcon } from "@chakra-ui/icons";
+>>>>>>> a8051d6d529d7fb914e19211093dc7eb41657401
 import {
   Avatar,
   Box,
   Button,
   IconButton,
+  Image,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -14,12 +19,15 @@ import {
   ModalOverlay,
   Text,
   Tooltip,
+  useColorMode,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import moment from "moment";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useState } from "react";
+import ReactLinkify from "react-linkify";
+
 import {
   isLastMessage,
   isSameSender,
@@ -27,16 +35,20 @@ import {
   isSameUserMargin,
 } from "../logic/ChatLogic";
 import { ChatState } from "../providers/ChatProvider";
+<<<<<<< HEAD
 import { MessageState } from "../providers/MessagesProvider";
 import { Image } from '@chakra-ui/react'
+=======
+import VideoPlayer from "./media/VideoPlayer";
+>>>>>>> a8051d6d529d7fb914e19211093dc7eb41657401
 
 function MessageItem({ messages, setMessages, m, i }) {
   const [isHover, setIsHover] = useState(false);
   const toast = useToast();
-  const { user, selectedChat } = ChatState();
-  const { setResponseMessage } = MessageState();
+  const { user, selectedChat, setResponse } = ChatState();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
+  const { colorMode } = useColorMode();
+  const { file, setFile } = useState("");
   const fetchMessages = async () => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -52,12 +64,13 @@ function MessageItem({ messages, setMessages, m, i }) {
         config
       );
       setMessages(data);
+      setFile(data.multiFile);
     } catch (error) {
       if (axios.isCancel(error)) console.log("successfully aborted");
       else
         toast({
           title: "Error Occured",
-          description: "Failed to send message",
+          description: "Failed to load message",
           status: "warning",
           duration: 2500,
           isClosable: true,
@@ -105,10 +118,10 @@ function MessageItem({ messages, setMessages, m, i }) {
   return (
     <>
       <Box
+        id={m._id}
         key={m._id}
         marginBottom={1}
         display="flex"
-        textColor={"blackAlpha.900"}
         alignItems="center"
         position={"relative"}
         zIndex={0}
@@ -142,11 +155,27 @@ function MessageItem({ messages, setMessages, m, i }) {
           display="flex"
           flexDirection="column"
           maxWidth="75%"
+          minW={"75px"}
           w={"fit-content"}
           borderRadius="10px"
+<<<<<<< HEAD
           backgroundColor={`${m.sender._id === user._id ? "#BEE3F8" : "whiteAlpha.900"
             }`}
           padding="10px"
+=======
+          backgroundColor={`${
+            m.sender._id === user._id
+              ? colorMode === "light"
+                ? "#BEE3F8"
+                : "whiteAlpha.300"
+              : colorMode === "light"
+              ? "whiteAlpha.900"
+              : "whiteAlpha.300"
+          }`}
+          border="1px solid"
+          borderColor={colorMode === "light" ? "transparent" : "whiteAlpha.900"}
+          padding={m?.content ? "10px" : 0}
+>>>>>>> a8051d6d529d7fb914e19211093dc7eb41657401
           marginLeft={isSameSenderMargin(messages, m, i, user._id)}
           marginTop={isSameUserMargin(messages, m, i, user._id) ? "auto" : 30}
           position={"relative"}
@@ -155,31 +184,74 @@ function MessageItem({ messages, setMessages, m, i }) {
             <Box pos="relative">
               <Text
                 fontSize={"xs"}
-                color="blackAlpha.800"
+                textColor={
+                  colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
+                }
                 pos="relative"
                 top={0}
                 left={0}
               >
-                @{m?.response?.sender.username}
+                @{m.response?.sender.username}
               </Text>
-              <Box bg="blackAlpha.500" p={1} pt={4} rounded="sm" display="flex">
+              <Box
+                bg="blackAlpha.500"
+                p={1}
+                pt={2}
+                rounded="sm"
+                display="flex"
+                flexDir={"column"}
+              >
                 <Text
-                  color="whiteAlpha.800"
+                  textColor={
+                    colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
+                  }
                   className="truncate"
                   maxW={"150px"}
                 >
-                  {m?.response?.content}
+                  {m.response?.content}
                 </Text>
+                {m.response?.multiMedia && (
+                  <Image
+                    borderRadius={"sm"}
+                    boxSize="100px"
+                    objectFit="cover"
+                    src={m.response?.multiMedia}
+                  />
+                )}
               </Box>
             </Box>
           )}
           <Text
+<<<<<<< HEAD
             width="300px"
             color={m.content === "deleted" && "gray.600"}
+=======
+            fontSize={{ base: "sm", md: "md" }}
+            width={"fit-content"}
+            color={
+              m.content === "deleted"
+                ? colorMode === "light"
+                  ? "gray.900"
+                  : "whiteAlpha.900"
+                : colorMode === "light"
+                ? "blackAlpha.900"
+                : "whiteAlpha.900"
+            }
+            whiteSpace="pre-wrap"
+>>>>>>> a8051d6d529d7fb914e19211093dc7eb41657401
             fontStyle={m.content === "deleted" && "italic"}
           >
-            {m.content}
+            <ReactLinkify
+              component="button"
+              properties={{
+                target: "_blank",
+                style: { color: "red", fontWeight: "bold" },
+              }}
+            >
+              {m.content}
+            </ReactLinkify>
           </Text>
+<<<<<<< HEAD
           <Box boxSize='sm'>
             <Image id="image"
               boxSize='400px'
@@ -205,6 +277,52 @@ function MessageItem({ messages, setMessages, m, i }) {
                 {moment(m.createdAt).calendar()}
               </Text>
             )}
+=======
+          {m.multiFile && (
+            <ReactLinkify
+              component="button"
+              properties={{
+                target: "_blank",
+                style: { color: "red", fontWeight: "bold" },
+              }}
+            >
+              {m.multiFile.endsWith("doc" || "txt" || "docx" || "dotx") &&
+                "A Document file:"}
+              {m.multiFile.endsWith("pdf") && "A Pdf file:"}
+              {m.multiFile.endsWith("xls") && "A Excel file:"}
+              {m.multiFile.endsWith("ppt" || "pptx" || "pot" || "ppsx") &&
+                "A Ppt file:"}
+              <Button as="a" href={m.multiFile} className="text-blue-600">
+                <DownloadIcon />
+              </Button>
+            </ReactLinkify>
+          )}
+          {m?.multiMedia && (
+            <Image
+              borderRadius={"md"}
+              maxWidth="300px"
+              maxHeight="450px"
+              w="fit-content"
+              h="fit-content"
+              objectFit="cover"
+              src={m?.multiMedia}
+            />
+          )}
+          {m?.multiVideo && <VideoPlayer src={m?.multiVideo} />}
+          {(isSameSender(messages, m, i, user._id) ||
+            isLastMessage(messages, i, user._id)) && (
+            <Text
+              width={"fit-content"}
+              fontSize={9}
+              marginLeft={0}
+              textColor={
+                colorMode === "light" ? "blackAlpha.900" : "whiteAlpha.900"
+              }
+            >
+              {moment(m.createdAt).calendar()}
+            </Text>
+          )}
+>>>>>>> a8051d6d529d7fb914e19211093dc7eb41657401
           <Box
             display={isHover && m.content !== "deleted" ? "flex" : "none"}
             position="absolute"
@@ -220,7 +338,7 @@ function MessageItem({ messages, setMessages, m, i }) {
             <IconButton
               borderRadius={"full"}
               onClick={() => {
-                setResponseMessage(m);
+                setResponse(m);
               }}
               icon={<ChatIcon fontSize={15} />}
             ></IconButton>

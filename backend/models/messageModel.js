@@ -6,6 +6,7 @@ const messageSchema = mongoose.Schema(
     chat: { type: mongoose.Schema.Types.ObjectId, ref: "Chat" },
 
     isRead: { type: Boolean, default: false },
+<<<<<<< HEAD
 
     content: { type: String, trim: true },
 
@@ -16,6 +17,18 @@ const messageSchema = mongoose.Schema(
     multiFile: {type:Array,trim: true, default: ""},
 
     response: { type: mongoose.Schema.Types.ObjectId, ref: "Message" }
+=======
+
+    multiMedia: { type: String, default: "" },
+
+    multiVideo: { type: String, default: "" },
+
+    multiFile: { type: String, default: "" },
+
+    content: { type: String, trim: true },
+
+    response: { type: mongoose.Schema.Types.ObjectId, ref: "Message" },
+>>>>>>> a8051d6d529d7fb914e19211093dc7eb41657401
   },
   { timestamps: true }
 );
