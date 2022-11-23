@@ -49,7 +49,7 @@ const updatePost = asyncHandler(async (req, res) => {
         res.json(update)
     }else{
         res.status(404);
-        throw new Error(`Delete not su`);
+        throw new Error(`Delete not sure`);
     }
 })
 

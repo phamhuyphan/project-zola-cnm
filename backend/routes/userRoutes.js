@@ -5,7 +5,7 @@ const {
   allUsers,
   addFriend,
   generateQRCode,
-  getUserByEmail,
+  getUserByEmail,reserPassword,
   sendEmail,
   getOTPById, getUserById,
   update,forgotPassword
@@ -23,7 +23,8 @@ router.post("/login", authUser);
 router.post("/:email", getUserByEmail);
 router.post("/:id", getUserById);
 router.post("/:userId/qrcode", generateQRCode);
-router.post("/forgot-password/:email",forgotPassword);
+router.post("/forgot-password/:userId",forgotPassword);
+router.post("/forgot-password/:userId/reset",reserPassword);
 
 router.route("/update").put(protect, update);
 module.exports = router;

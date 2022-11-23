@@ -78,7 +78,7 @@ const registerUser1 = asyncHandler(async (req, res) => {
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).catch(err => { console.log(err) });
 
   if (user && (await user.matchPassword(password))) {
     res.json({
@@ -106,9 +106,21 @@ const getUserByEmail = asyncHandler(async (req, res) => {
     res.json((user));
   }
   if (!user) {
-    res.json("Find not found email address");
+    res.json("a");
   }
 });
+
+const reserPassword = asyncHandler(async (req, res) => {
+  const id = req.params.userId;
+  console.log(req.params)
+  const updatepass = await User.findOne({userId:id});
+  if (updatepass) {
+    res.json((updatepass));
+  } else {
+    res.status(404);
+    throw new Error(`Update not sure`);
+  }
+})
 
 const getUserById = asyncHandler(async (req, res) => {
   const id = req.body;
@@ -333,7 +345,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
     const mailOptions = {
       from: process.env.MAIL_FROM_ADDRESS, // sender address
       to: JSON.stringify(email), // list of receivers
-      subject: "Verify Your Email ✔", // Subject line
+      subject: "Forgot PassWord ✔", // Subject line
       text: link, // plain text body
     }
 
@@ -352,5 +364,7 @@ module.exports = {
   allUsers,
   registerUser,
   sendEmail,
-  authUser, addFriend, generateQRCode, getOTPById, getUserById, update, forgotPassword
+  authUser, addFriend,
+  generateQRCode, getOTPById, getUserById, update,
+  forgotPassword, reserPassword
 };

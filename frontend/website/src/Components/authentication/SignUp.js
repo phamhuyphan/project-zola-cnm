@@ -161,6 +161,7 @@ function SignUp({ setShow }) {
         { userId: data.data._id, otp: OTP.otp }
       ).then(data1 => {
         console.log(data)
+        console.log(data1)
         localStorage.setItem("userInfo", JSON.stringify(data));
         setLoading(false);
         navigate("/chats");

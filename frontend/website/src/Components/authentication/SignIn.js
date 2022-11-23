@@ -51,6 +51,8 @@ function SignIn({ setShow, isOpen }) {
   const handleClose = () => setModalShow(false);
   const handleShow = () => setModalShow(console.log("true"));
 
+  const { forgotPass, setForgotPass } = ChatState();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { setUser } = ChatState();
@@ -159,7 +161,11 @@ function SignIn({ setShow, isOpen }) {
         email: email
       },
       config,
-    ).then().catch(err => console.log(err))
+    ).then(()=>{
+      setForgotPass(true)
+      console.log(forgotPass)
+    }).catch(err => console.log(err))
+    console.log(forgotPass)
   }
 
   const submitHandler = async () => {
@@ -333,7 +339,7 @@ function SignIn({ setShow, isOpen }) {
       </Box>
 
       <Modal
-        isOpen={isOpen}
+        // isOpen={isOpen}
       // modalShow={modalShow} onHide={handleClose}
 
       >
