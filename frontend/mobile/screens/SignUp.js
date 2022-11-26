@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "localstorage-polyfill"; //import { useToast } from "@chakra-ui/react";
 import { useToast } from "native-base";
-const link = "http://192.168.1.163:6000";
+const link = "https://zolachatapp.herokuapp.com";
 const SignUp = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
