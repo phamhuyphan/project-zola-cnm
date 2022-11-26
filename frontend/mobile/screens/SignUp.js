@@ -2,7 +2,8 @@ import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import axios from "axios";
 import "localstorage-polyfill"; //import { useToast } from "@chakra-ui/react";
-const link = "http://192.168.1.163:5000";
+import { useToast } from "native-base";
+const link = "https://zolachatapp.herokuapp.com";
 const SignUp = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,19 +13,16 @@ const SignUp = ({ navigation }) => {
   const [pic, setPic] = useState("");
 
   const [loading, setLoading] = useState(false);
-  //const toast = useToast();
+  const toast = useToast();
   //let navigate = useNavigate();
 
   function postDetails(pics) {
     setLoading(true);
     if (pic === undefined) {
-      // toast({
-      //   title: "Please select a picture",
-      //   status: "warning",
-      //   duration: 2500,
-      //   isClosable: true,
-      //   position: "bottom",
-      // });
+      toast.show({
+        title: "Please select a picture",
+        placement: "bottom",
+      });
       console.log("6");
       return;
     }
@@ -46,13 +44,10 @@ const SignUp = ({ navigation }) => {
           setLoading(false);
         });
     } else {
-      // toast({
-      //   title: "Please select a (another) picture",
-      //   status: "warning",
-      //   duration: 2500,
-      //   isClosable: true,
-      //   position: "bottom",
-      // });
+      toast.show({
+        title: "Please select a (another) picture",
+        placement: "bottom",
+      });
       console.log("7");
       setLoading(false);
       return;
@@ -61,36 +56,27 @@ const SignUp = ({ navigation }) => {
   const submitHandler = async () => {
     setLoading(true);
     if (!fullname || !email || !password || !confirmpassword || !username) {
-      // toast({
-      //   title: "Please fill all fields",
-      //   status: "warning",
-      //   duration: 2500,
-      //   isClosable: true,
-      //   position: "bottom",
-      // });
+      toast.show({
+        title: "Please fill all fields",
+        placement: "bottom",
+      });
       console.log("1");
       setLoading(false);
       return;
     }
 
     if (password !== confirmpassword) {
-      // toast({
-      //   title: "The passwords do not match",
-      //   status: "error",
-      //   duration: 2500,
-      //   isClosable: true,
-      //   position: "bottom",
-      // });
+      toast.show({
+        title: "The passwords do not match",
+        placement: "bottom",
+      });
       console.log("2");
       return;
     } else {
-      // toast({
-      //   title: "Sign up successfully",
-      //   status: "success",
-      //   duration: 2500,
-      //   isClosable: true,
-      //   position: "bottom",
-      // });
+      toast.show({
+        title: "Sign up successfully",
+        placement: "bottom",
+      });
       console.log("3");
     }
 
@@ -119,13 +105,10 @@ const SignUp = ({ navigation }) => {
       setLoading(false);
       navigation.navigate("SignIn");
     } catch (error) {
-      // toast({
-      //   title: "Sign up failed " + error,
-      //   status: "error",
-      //   duration: 2500,
-      //   isClosable: true,
-      //   position: "bottom",
-      // });
+      toast.show({
+        title: "Sign up failed " + error,
+        placement: "bottom",
+      });
       console.log("5 5 " + error);
     }
   };

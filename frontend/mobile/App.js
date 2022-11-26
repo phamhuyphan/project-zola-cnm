@@ -4,11 +4,17 @@ import ChatProvider from "./providers/ChatProvider";
 
 import { NativeBaseProvider } from "native-base";
 import LoginNavigator from "./navigators/LoginNavigator";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function App() {
+  const config = {
+    dependencies: {
+      "linear-gradient": LinearGradient,
+    },
+  };
   return (
     <NavigationContainer>
-      <NativeBaseProvider>
+      <NativeBaseProvider config={config}>
         <ChatProvider>
           <LoginNavigator />
         </ChatProvider>

@@ -23,11 +23,6 @@ export default function ChatNavigator() {
       barStyle={{
         position: "absolute",
         backgroundColor: "#1E2B6F",
-        margin: 10,
-        paddingVertical: 10,
-        paddingHorizontal: 30,
-        marginHorizontal: 50,
-        borderRadius: 48,
       }}
     >
       <Tab.Screen

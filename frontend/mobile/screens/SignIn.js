@@ -5,38 +5,34 @@ import {
   TextInput,
   Pressable,
 } from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import axios from "axios";
 import { ChatState } from "../providers/ChatProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import "localstorage-polyfill";
-import { Box, Icon, Input, KeyboardAvoidingView } from "native-base";
-const link = "http://192.168.1.10:5000";
+import { Box, Icon, Input, KeyboardAvoidingView, useToast } from "native-base";
+const link = "https://zolachatapp.herokuapp.com";
 const SignIn = ({ navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
   }, []);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("trongtrong099@gmail.com");
+  const [password, setPassword] = useState("123");
   const [loading, setLoading] = useState(false);
   const { setUser } = ChatState();
+  const toast = useToast();
   //let navigate = useNavigate;
   const [show, setShow] = useState(false);
   const submitHandler = async () => {
     setLoading(true);
     if (!email || !password) {
-      //  toast({
-      //    title: "Please fill all fields",
-      //    status: "warning",
-      //    duration: 2500,
-      //    isClosable: true,
-      //    position: "bottom",
-      //  });
-      console.log("1");
-      console.log("11");
+      toast.show({
+        title: "Please fill all field!",
+        placement: "bottom",
+      });
       setLoading(false);
       return;
     }
@@ -64,6 +60,7 @@ const SignIn = ({ navigation }) => {
       setLoading(false);
     }
   };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS == "ios" ? "padding" : "height"}
@@ -95,7 +92,7 @@ const SignIn = ({ navigation }) => {
           <View className="items-center w-[80%] m-auto">
             <Input
               my={5}
-              variant="filled"
+              variant="outline"
               className="w-full  "
               h="50px"
               fontSize={"lg"}
@@ -108,7 +105,7 @@ const SignIn = ({ navigation }) => {
               w="100%"
               h="50px"
               fontSize={"lg"}
-              variant="filled"
+              variant="outline"
               onChangeText={(e) => setPassword(e)}
               type={show ? "text" : "password"}
               InputRightElement={
