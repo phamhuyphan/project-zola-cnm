@@ -48,11 +48,7 @@ const MessageScreen = () => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
   const [messages, setMessages] = useState([]);
-  useLayoutEffect(() => {
-    nav.setOptions({
-      headerShown: false,
-    });
-  }, []);
+
   const sendMessage = async (e) => {
     if (e === "Send") {
       if (user) socket.emit("stop typing", selectedChat._id);
@@ -130,6 +126,15 @@ const MessageScreen = () => {
       source.cancel();
     };
   };
+  const {
+    selectedChat,
+    setSelectedChat,
+    user,
+    chats,
+    setChats,
+    response,
+    setResponse,
+  } = ChatState();
   useEffect(() => {
     socket = io(link);
     if (user) {
@@ -151,36 +156,13 @@ const MessageScreen = () => {
   }, []);
   useEffect(() => {
     fetchMessages();
-    selectedChatCompare = selectedChat;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedChat]);
+  }, []);
   useEffect(() => {
     socket.on("message recieved", (newMessageRecieved) => {
-      if (
-        !selectedChatCompare ||
-        selectedChatCompare._id !== newMessageRecieved.chat._id
-      ) {
-        // TODO document why this block is empty
-      } else {
-        console.log(
-          "đã nhận tin nhắn:" +
-            newMessageRecieved.content +
-            " lúc " +
-            moment(newMessageRecieved.createdAt).calendar()
-        );
-        setMessages([...messages, newMessageRecieved]);
-      }
+      console.log("đã nhận tin nhắn:" + newMessageRecieved);
+      setMessages([...messages, newMessageRecieved]);
     });
-  });
-  const {
-    selectedChat,
-    setSelectedChat,
-    user,
-    chats,
-    setChats,
-    response,
-    setResponse,
-  } = ChatState();
+  }, []);
 
   const typingHandler = (e) => {
     setNewMessage(e);

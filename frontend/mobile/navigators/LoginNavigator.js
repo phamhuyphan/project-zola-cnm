@@ -12,7 +12,10 @@ import ChatNavigator from "./ChatNavigator";
 const Stack = createNativeStackNavigator();
 export function LoginNavigator() {
   return (
-    <Stack.Navigator initialRouteName="ScreenStart">
+    <Stack.Navigator
+      initialRouteName="ScreenStart"
+      screenOptions={{ headerShown: false }}
+    >
       <Stack.Screen name="ScreenStart" component={ScreenStart} />
       <Stack.Screen name="SignIn" component={SignIn} />
       <Stack.Screen name="SignUp" component={SignUp} />

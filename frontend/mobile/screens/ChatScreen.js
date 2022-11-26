@@ -24,19 +24,14 @@ const link = "https://zolachatapp.herokuapp.com";
 import { io } from "socket.io-client";
 
 let socket;
-const ChatScreen = ({ fetchAgain }) => {
+const ChatScreen = () => {
   const nav = useNavigation();
-  useLayoutEffect(() => {
-    nav.setOptions({
-      headerShown: false,
-    });
-  }, []);
+
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
-  const [friends, setFriends] = useState([]);
+
   useEffect(() => {
     fetchChats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchAgain]);
+  }, []);
   const fetchChats = async () => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
