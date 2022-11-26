@@ -12,6 +12,7 @@ const ChatProvider = ({ children }) => {
   const [closeSideBar, setCloseSideBar] = useState(false);
   const [notification, setNotification] = useState([]);
   const [response, setResponse] = useState(null);
+  const [message1, setMessage1] = useState([]);
   const nav = useNavigation();
   useEffect(() => {
     //fecth local storage
@@ -25,6 +26,8 @@ const ChatProvider = ({ children }) => {
   return (
     <ChatContext.Provider
       value={{
+        message1,
+        setMessage1,
         notification,
         response,
         setResponse,

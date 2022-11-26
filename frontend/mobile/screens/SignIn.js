@@ -19,8 +19,8 @@ const SignIn = ({ navigation }) => {
       headerShown: false,
     });
   }, []);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("trongtrong099@gmail.com");
+  const [password, setPassword] = useState("123");
   const [loading, setLoading] = useState(false);
   const { setUser } = ChatState();
   const toast = useToast();

@@ -31,6 +31,7 @@ import moment from "moment";
 import { Entypo, FontAwesome, Foundation, Octicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import MessageLoading from "../loading/MessageLoading";
+import "localstorage-polyfill";
 import AddFriendButton from "../components/AddFriendButton";
 let socket, selectedChatCompare;
 const link = "https://zolachatapp.herokuapp.com";
@@ -95,6 +96,7 @@ const MessageScreen = () => {
       }
     }
   };
+
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -109,7 +111,10 @@ const MessageScreen = () => {
       setLoading(true);
       await axios
         .get(`${link}/api/message/${selectedChat._id}/${1}`, config)
-        .then((data) => setMessages(data.data));
+        .then((data) => {
+          setMessages(data.data);
+          localStorage.setItem("mess", JSON.stringify(data.data));
+        });
       setLoading(false);
 
       socket.emit("join chat", selectedChat._id);
@@ -134,6 +139,8 @@ const MessageScreen = () => {
     setChats,
     response,
     setResponse,
+    message1,
+    setMessage1,
   } = ChatState();
   useEffect(() => {
     socket = io(link);
@@ -159,8 +166,11 @@ const MessageScreen = () => {
   }, []);
   useEffect(() => {
     socket.on("message recieved", (newMessageRecieved) => {
-      console.log("đã nhận tin nhắn:" + newMessageRecieved);
-      setMessages([...messages, newMessageRecieved]);
+      console.log("đã nhận tin nhắn:" + newMessageRecieved.content);
+      let mess = JSON.parse(localStorage.getItem("mess"));
+      mess.push(newMessageRecieved);
+      setMessages(mess);
+      localStorage.setItem("mess", JSON.stringify(mess));
     });
   }, []);
 
