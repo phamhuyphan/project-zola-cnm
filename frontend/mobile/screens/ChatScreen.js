@@ -133,7 +133,7 @@ const ChatScreen = ({ fetchAgain }) => {
                   }
                   borderRadius="full"
                   onPress={() => {
-                    navigation.navigate("AddGroup");
+                    nav.navigate("AddGroup");
                   }}
                 ></IconButton>
               </Box>

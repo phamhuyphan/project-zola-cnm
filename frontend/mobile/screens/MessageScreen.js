@@ -33,6 +33,8 @@ import { Pressable } from "react-native";
 import MessageLoading from "../loading/MessageLoading";
 import AddFriendButton from "../components/AddFriendButton";
 let socket, selectedChatCompare;
+const link = "https://zolachatapp.herokuapp.com";
+
 const MessageScreen = () => {
   const [newMessage, setNewMessage] = useState("");
   const [typing, setTyping] = useState(false);
@@ -43,7 +45,7 @@ const MessageScreen = () => {
   const inputRef = useRef(null);
   const nav = useNavigation();
   const [toggleExpand, setToggleExpand] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const toast = useToast();
   const [messages, setMessages] = useState([]);
   useLayoutEffect(() => {
