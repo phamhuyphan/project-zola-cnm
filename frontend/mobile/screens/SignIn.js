@@ -12,7 +12,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import "localstorage-polyfill";
 import { Box, Icon, Input, KeyboardAvoidingView } from "native-base";
-const link = "http://192.168.1.7:5000";
+const link = "http://192.168.1.10:5000";
 const SignIn = ({ navigation }) => {
   useLayoutEffect(() => {
     navigation.setOptions({

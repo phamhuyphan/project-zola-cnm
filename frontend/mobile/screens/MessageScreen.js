@@ -26,7 +26,7 @@ import { Entypo, FontAwesome, Octicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import MessageLoading from "../loading/MessageLoading";
 let socket, selectedChatCompare;
-const link = "http://192.168.1.7:5000";
+const link = "http://192.168.1.10:5000";
 const MessageScreen = () => {
   const [loadingNewMessage, setLoadingNewMessage] = useState(false);
   const [loadingPic, setLoadingPic] = useState(false);

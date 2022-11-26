@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AddGroup from "../screens/AddGroup";
 import MessageScreen from "../screens/MessageScreen";
 
 import ScreenStart from "../screens/ScreenStart";
@@ -14,6 +15,7 @@ export function LoginNavigator() {
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="MessageScreen" component={MessageScreen} />
       <Stack.Screen name="ChatNavigator" component={ChatNavigator} />
+      <Stack.Screen name="AddGroup" component={AddGroup} />
     </Stack.Navigator>
   );
 }

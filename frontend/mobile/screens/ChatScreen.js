@@ -13,10 +13,16 @@ import {
 } from "native-base";
 
 import { LinearGradient } from "expo-linear-gradient";
-import { FontAwesome, Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import {
+  FontAwesome,
+  Ionicons,
+  FontAwesome5,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-const link = "http://192.168.1.7:5000";
-const ChatScreen = ({ fetchAgain }) => {
+const link = "http://192.168.1.10:5000";
+
+const ChatScreen = ({ fetchAgain, navigation }) => {
   const nav = useNavigation();
   useLayoutEffect(() => {
     nav.setOptions({
@@ -78,10 +84,13 @@ const ChatScreen = ({ fetchAgain }) => {
             }}
           >
             <Box className="p-5 w-full border-[#1E2B6F] border-[3px] border-t-0 rounded-b-[20]">
-              <Text className="text-md text-white">@{user.username}</Text>
-              <Text className="text-xl text-white font-bold">
-                {user.fullname}
-              </Text>
+              <Box>
+                <Text className="text-md text-white">@{user.username}</Text>
+                <Text className="text-xl text-white font-bold">
+                  {user.fullname}
+                </Text>
+              </Box>
+
               <Box
                 display={"flex"}
                 flexDir="row"
@@ -104,9 +113,12 @@ const ChatScreen = ({ fetchAgain }) => {
                 <IconButton
                   variant={"ghost"}
                   icon={
-                    <FontAwesome name="user-plus" size={24} color="white" />
+                    <MaterialIcons name="group-add" size={28} color="white" />
                   }
                   borderRadius="full"
+                  onPress={() => {
+                    navigation.navigate("AddGroup");
+                  }}
                 ></IconButton>
               </Box>
             </Box>
