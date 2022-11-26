@@ -15,7 +15,10 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome, Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-const link = "http://192.168.1.7:5000";
+const link = "https://zolachatapp.herokuapp.com";
+import { io } from "socket.io-client";
+
+let socket;
 const ChatScreen = ({ fetchAgain }) => {
   const nav = useNavigation();
   useLayoutEffect(() => {
@@ -54,19 +57,33 @@ const ChatScreen = ({ fetchAgain }) => {
       source.cancel();
     };
   };
-
+  useEffect(() => {
+    socket = io(link);
+    if (user) {
+      socket.emit("setup", user);
+      socket.on("connected", (e) => {
+        console.log("first:" + e);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
-    <Box className="flex-1">
-      <StatusBar />
-      <Box style={{ width: "100%" }} shadow="9">
+    <Box className="flex-1" safeAreaTop>
+      <Box
+        style={{
+          width: "100%",
+          borderBottomLeftRadius: 20,
+          borderBottomRightRadius: 20,
+        }}
+        shadow="9"
+      >
         <ImageBackground
-          source={{ uri: user.pic }}
-          resizeMode="cover"
           imageStyle={{
-            filler: "grayScale(100%)",
             borderBottomLeftRadius: 20,
             borderBottomRightRadius: 20,
           }}
+          source={{ uri: user.pic }}
+          resizeMode="cover"
         >
           <LinearGradient
             end={{ x: 0.5, y: 1 }}
@@ -114,11 +131,6 @@ const ChatScreen = ({ fetchAgain }) => {
         </ImageBackground>
       </Box>
       <ChatsList />
-      <LinearGradient
-        end={{ x: 1, y: 0.75 }}
-        colors={["#0660AB", "#B000CD"]}
-        style={{ borderRadius: 9999 }}
-      ></LinearGradient>
     </Box>
   );
 };

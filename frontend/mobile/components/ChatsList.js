@@ -24,11 +24,14 @@ import {
 } from "native-base";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-const link = "http://192.168.1.7:5000";
+import ChatLoading from "../loading/ChatLoading";
+import { io } from "socket.io-client";
+const link = "https://zolachatapp.herokuapp.com";
 
 function ChatList({ fetchAgain, setFetchAgain }) {
   const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const { colorMode } = useColorMode();
+  const [loading, setLoading] = useState(false);
   const [friends, setFriends] = useState([]);
   const nav = useNavigation();
   useEffect(() => {
@@ -39,6 +42,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
   const fetchChats = async () => {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
+    setLoading(true);
     try {
       const config = {
         headers: {
@@ -49,11 +53,17 @@ function ChatList({ fetchAgain, setFetchAgain }) {
         cancelToken: source.token,
       };
       const { data } = await axios.get(`${link}/api/chat`, config);
-      if (user) setChats(data);
+      if (user) {
+        setLoading(false);
+        setChats(data);
+      }
     } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else {
+      if (axios.isCancel(error)) {
+        console.log("successfully aborted");
+        setLoading(false);
+      } else {
         console.log(error);
+        setLoading(false);
       }
     }
     return () => {
@@ -90,39 +100,32 @@ function ChatList({ fetchAgain, setFetchAgain }) {
 
   console.log("chatList is rendered");
   return (
-    <ScrollView width={"full"} h="full">
-      {chats ? (
+    <ScrollView width={"full"} h="full" bgColor={"white"}>
+      {!loading ? (
         <VStack zIndex={1} mb={5} spacing="0" pb="20">
           {user &&
             chats.map((chat, index) => (
               <TouchableOpacity
                 key={index}
                 onPress={() => {
-                  //   selectedChat
-                  //     ? io("http://localhost:5000").emit(
-                  //         "outchat",
-                  //         selectedChat._id
-                  //       )
-                  //     : console.log("out out out");
+                  selectedChat
+                    ? io("https://zolachatapp.herokuapp.com").emit(
+                        "outchat",
+                        selectedChat._id
+                      )
+                    : console.log("out out out");
                   setSelectedChat(chat);
                   nav.navigate("MessageScreen");
                 }}
               >
                 <Box
                   display={"flex"}
-                  bg="amber.200"
                   flexDirection="row"
                   width="full"
                   justifyItems={"center"}
                   alignItems="center"
                   // className="transition-colors "
-                  bgColor={
-                    selectedChat?._id !== chat?._id
-                      ? ""
-                      : colorMode === "light"
-                      ? "white"
-                      : "brown"
-                  }
+
                   mx={3}
                 >
                   <Box
@@ -251,60 +254,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
             ))}
         </VStack>
       ) : (
-        <>
-          <HStack my="2">
-            <Skeleton rounded="full" h="10"></Skeleton>
-            <Skeleton
-              px="4"
-              my="4"
-              rounded="md"
-              flex="1"
-              startColor="gray.800"
-            />
-          </HStack>
-          <HStack my="2">
-            <Skeleton rounded="full" h="10"></Skeleton>
-            <Skeleton
-              px="4"
-              my="4"
-              rounded="md"
-              flex="1"
-              startColor="gray.400"
-            />
-          </HStack>
-
-          <HStack my="2">
-            <Skeleton rounded="full" h="10"></Skeleton>
-            <Skeleton
-              px="4"
-              my="4"
-              rounded="md"
-              flex="1"
-              startColor="gray.200"
-            />
-          </HStack>
-
-          <HStack my="2">
-            <Skeleton rounded="full" h="10"></Skeleton>
-            <Skeleton
-              px="4"
-              my="4"
-              rounded="md"
-              flex="1"
-              startColor="gray.100"
-            />
-          </HStack>
-          <HStack my="2">
-            <Skeleton rounded="full" h="10"></Skeleton>
-            <Skeleton
-              px="4"
-              my="4"
-              rounded="md"
-              flex="1"
-              startColor="gray.50"
-            />
-          </HStack>
-        </>
+        <ChatLoading />
       )}
     </ScrollView>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   Avatar,
   Box,
@@ -14,7 +14,13 @@ import {
   Skeleton,
   StatusBar,
   Text,
+  InfoIcon,
+  InfoOutlineIcon,
+  CloseIcon,
+  useToast,
+  FormControl,
 } from "native-base";
+import { io } from "socket.io-client";
 import { useNavigation } from "@react-navigation/native";
 import { ChatState } from "../providers/ChatProvider";
 import { LinearGradient } from "expo-linear-gradient";
@@ -22,26 +28,79 @@ import axios from "axios";
 import MessageItem from "../components/MessageItem";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
 import moment from "moment";
-import { Entypo, FontAwesome, Octicons } from "@expo/vector-icons";
+import { Entypo, FontAwesome, Foundation, Octicons } from "@expo/vector-icons";
 import { Pressable } from "react-native";
 import MessageLoading from "../loading/MessageLoading";
+import AddFriendButton from "../components/AddFriendButton";
 let socket, selectedChatCompare;
-const link = "http://192.168.1.7:5000";
+const link = "https://zolachatapp.herokuapp.com";
 const MessageScreen = () => {
   const [loadingNewMessage, setLoadingNewMessage] = useState(false);
   const [loadingPic, setLoadingPic] = useState(false);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [pic, setPic] = useState("");
+  const [video, setVideo] = useState("");
+  const [file, setFile] = useState("");
+  const inputRef = useRef(null);
   const nav = useNavigation();
+  const [toggleExpand, setToggleExpand] = useState(false);
+
+  const toast = useToast();
   const [messages, setMessages] = useState([]);
   useLayoutEffect(() => {
     nav.setOptions({
       headerShown: false,
     });
   }, []);
+  const sendMessage = async (e) => {
+    if (e === "Send") {
+      if (user) socket.emit("stop typing", selectedChat._id);
+      //inputRef.current.value = null;
+      try {
+        setLoadingNewMessage(true);
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `Bearer ${user.token}`,
+          },
+        };
+        setNewMessage("");
+        await axios
+          .post(
+            `${link}/api/message`,
+            {
+              multiMedia: pic,
+              multiFile: file,
+              multiVideo: video,
+              content: newMessage,
+              chatId: selectedChat._id,
+              response: response,
+            },
+            config
+          )
+          .then((data) => {
+            setPic("");
+            setVideo("");
+            setFile("");
+            setResponse(null);
+            socket.emit("new message", data.data);
+            console.log(data.data);
+            setMessages([...messages, data.data]);
+            setLoadingNewMessage(false);
+            //setFetchAgain(!fetchAgain);
+          });
+      } catch (error) {
+        toast.show({
+          title: "Error Occured!" + err,
+          placement: "bottom",
+        });
+        setLoadingNewMessage(false);
+      }
+    }
+  };
   const fetchMessages = async () => {
     if (!selectedChat) return;
     const CancelToken = axios.CancelToken;
@@ -55,22 +114,18 @@ const MessageScreen = () => {
       };
       setLoading(true);
       await axios
-        .get(`${link}/api/message/${selectedChat._id}`, config)
+        .get(`${link}/api/message/${selectedChat._id}/${1}`, config)
         .then((data) => setMessages(data.data));
       setLoading(false);
 
-      // if (user) socket.emit("join chat", selectedChat._id);
-    } catch (error) {
-      if (axios.isCancel(error)) console.log("successfully aborted");
-      else console.log(error);
-      //   toast({
-      //     title: "Error Occured",
-      //     description: "Failed to load message",
-      //     status: "error",
-      //     duration: 2500,
-      //     isClosable: true,
-      //     position: "bottom",
-      //   });
+      socket.emit("join chat", selectedChat._id);
+    } catch (err) {
+      if (axios.isCancel(err)) console.log("successfully aborted");
+      else
+        toast.show({
+          title: "Error Occured!" + err,
+          placement: "bottom",
+        });
     }
     return () => {
       // cancel the request before component unmounts
@@ -78,19 +133,84 @@ const MessageScreen = () => {
     };
   };
   useEffect(() => {
+    socket = io(link);
+    if (user) {
+      socket.emit("setup", user);
+      socket.on("connected", (e) => {
+        console.log("first:" + e);
+      });
+      socket.on("typing", () => {
+        setIsTyping(true);
+        console.log("typing....");
+        //onToggle();
+      });
+      socket.on("stop typing", () => {
+        setIsTyping(false);
+        //onToggle();
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
     fetchMessages();
     selectedChatCompare = selectedChat;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat]);
+  useEffect(() => {
+    socket.on("message recieved", (newMessageRecieved) => {
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessageRecieved.chat._id
+      ) {
+        // TODO document why this block is empty
+      } else {
+        console.log(
+          "đã nhận tin nhắn:" +
+            newMessageRecieved.content +
+            " lúc " +
+            moment(newMessageRecieved.createdAt).calendar()
+        );
+        setMessages([...messages, newMessageRecieved]);
+      }
+    });
+  });
+  const {
+    selectedChat,
+    setSelectedChat,
+    user,
+    chats,
+    setChats,
+    response,
+    setResponse,
+  } = ChatState();
 
-  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+  const typingHandler = (e) => {
+    setNewMessage(e);
+    //if user is typing
+    if (typing === false) {
+      setTyping(true);
+      socket.emit("typing", selectedChat._id);
+    }
+    let lastTypingTime = new Date().getTime();
+    let timerLength = 3000;
+    setTimeout(() => {
+      let timeNow = new Date().getTime();
+      let timerDiff = timeNow - lastTypingTime;
+      if (timerDiff >= timerLength && typing) {
+        socket.emit("stop typing", selectedChat._id);
+        setTyping(false);
+      }
+    }, timerLength);
+  };
+
   return (
     <>
       <Box flex="1">
         <StatusBar />
         <LinearGradient
           end={{ x: 0.5, y: 1 }}
-          colors={["rgba(238,174,202,1)", "rgba(148,187,233,1)"]}
+          //colors={["rgba(238,174,202,1)", "rgba(148,187,233,1)"]}
+          colors={["#1E2B6F", "#193F5F"]}
           style={{ borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }}
         >
           <Box
@@ -112,13 +232,13 @@ const MessageScreen = () => {
               h="55px"
               borderRadius="full"
               display={{ base: "flex", md: "none" }}
-              icon={<ChevronLeftIcon fontSize={"lg"} />}
+              icon={<ChevronLeftIcon fontSize={"lg"} color="white" />}
               size="20px"
               colorScheme={"light"}
               onPress={() => {
-                // selectedChat
-                //   ? socket.emit("outchat", selectedChat._id)
-                //   : console.log("out out out");
+                selectedChat
+                  ? socket.emit("outchat", selectedChat._id)
+                  : console.log("out out out");
                 setSelectedChat(null);
                 nav.goBack();
               }}
@@ -128,7 +248,7 @@ const MessageScreen = () => {
                 _avatar={{
                   size: "sm",
                 }}
-                max={3}
+                max={2}
                 py={0.5}
                 pl={1}
                 marginRight={3}
@@ -160,35 +280,47 @@ const MessageScreen = () => {
                       ? "green.500"
                       : "red.500"
                   }
-                  borderColor={"whiteAlpha.900"}
+                  borderColor={"white"}
                 ></Avatar.Badge>
               </Avatar>
             )}
-            <Text fontWeight={"bold"} textColor={"black"} w="full" pr="5">
+            <Box
+              opacity={0.9}
+              justifyContent="center"
+              alignItems={"center"}
+              flex="1"
+              pr="5"
+            >
               {selectedChat.isGroupChat ? (
                 <Box display={"flex"} justifyContent={"center"}>
-                  {/* <UpdateGroupChatModal
-                fetchAgain={fetchAgain}
-                setFetchAgain={setFetchAgain}
-                fetchMessages={fetchMessages}
-              > */}
-                  <Text fontSize={"lg"}>{selectedChat.chatName} </Text>
-                  {/* </UpdateGroupChatModal> */}
-                  <Text fontWeight={"normal"}>
+                  <Text fontSize={"lg"} color={"white"} maxWidth="200px">
+                    {selectedChat.chatName}
+                  </Text>
+
+                  <Text fontWeight={"normal"} color={"white"}>
                     {selectedChat.users.length} members
                   </Text>
                 </Box>
               ) : (
                 <Box display={"flex"} justifyContent={"center"}>
-                  {/* <AddFriendButton
-                user={user}
-                friend={getSenderInfo(user, selectedChat.users)}
-                selectedChat={selectedChat}
-              /> */}
-                  <Text fontWeight={"bold"} opacity={0.8}>
+                  <Text
+                    fontWeight={"bold"}
+                    opacity={0.9}
+                    color="white"
+                    maxWidth="200"
+                    w="100%"
+                    isTruncated
+                  >
                     {getSender(user, selectedChat.users)}
                   </Text>
-                  <Text fontWeight={"normal"} opacity={0.8}>
+                  <Text
+                    fontWeight={"normal"}
+                    opacity={0.9}
+                    color="white"
+                    maxWidth="200"
+                    w="100%"
+                    isTruncated
+                  >
                     {getSenderInfo(user, selectedChat.users).statusOnline
                       ? "online"
                       : "Last online " +
@@ -198,10 +330,47 @@ const MessageScreen = () => {
                   </Text>
                 </Box>
               )}
-            </Text>
+            </Box>
+            <HStack>
+              <IconButton
+                mx={1}
+                my={2}
+                bg="none"
+                w="55px"
+                h="55px"
+                borderRadius="full"
+                display={{ base: "flex", md: "none" }}
+                icon={<Foundation name="video" size={24} color="white" />}
+                size="20px"
+                colorScheme={"light"}
+              />
+              <IconButton
+                onPress={() => {
+                  if (selectedChat.isGroupChat)
+                    nav.navigate("ChatDrawerNavigator");
+                }}
+                mx={1}
+                my={2}
+                bg="none"
+                w="55px"
+                h="55px"
+                borderRadius="full"
+                display={{ base: "flex", md: "none" }}
+                icon={<InfoOutlineIcon size={"lg"} color={"white"} />}
+                size="20px"
+                colorScheme={"light"}
+              />
+            </HStack>
           </Box>
         </LinearGradient>
-        <ScrollView w={"full"} flex={1} py="5" pr="2">
+
+        <AddFriendButton
+          user={user}
+          friend={getSenderInfo(user, selectedChat.users)}
+          selectedChat={selectedChat}
+        />
+
+        <ScrollView w={"full"} flex={1} pr="2">
           {!loading ? (
             messages.map((m, i) => (
               <MessageItem key={i} messages={messages} m={m} i={i} />
@@ -210,44 +379,124 @@ const MessageScreen = () => {
             <MessageLoading />
           )}
         </ScrollView>
-        <InputGroup w={"full"}>
-          <Input
-            flex="1"
-            variant="filled"
-            bg={"white"}
-            placeholder="Type something to your friend..."
-            fontSize={"lg"}
-            InputLeftElement={
-              <Pressable>
-                <Icon
-                  as={<Entypo name="attachment" size={24} color="black" />}
-                  size={5}
-                  color="blue.400"
-                />
-              </Pressable>
-            }
-            InputRightElement={
-              <HStack mr="2">
-                <Pressable>
-                  <Icon
-                    as={<Octicons name="smiley" size={24} color="black" />}
-                    size={5}
-                    mr="2"
-                    color="blue.400"
-                  />
-                </Pressable>
-                <Pressable>
-                  <Icon
-                    as={<FontAwesome name="send" size={24} color="black" />}
-                    size={5}
-                    mr="2"
-                    color="blue.400"
-                  />
-                </Pressable>
-              </HStack>
-            }
-          />
-        </InputGroup>
+
+        <FormControl
+          //on={sendMessage}
+          isRequired
+          bottom={0}
+          left={0}
+          pos={"relative"}
+        >
+          {isTyping ? (
+            <HStack
+              border={"1px solid black"}
+              display="flex"
+              posistion="absolute"
+              top={0}
+            >
+              <Text
+                color="white"
+                fontSize={15}
+                bg={"black:alpha.50"}
+                p={2}
+                px={4}
+                borderTopRightRadius="10"
+              >
+                {selectedChat.isGroupChat
+                  ? "someone "
+                  : selectedChat.users[0]._id !== user._id
+                  ? selectedChat.users[1].fullname
+                  : selectedChat.users[0].fullname}{" "}
+                is typing...
+              </Text>
+              <Spacer />
+            </HStack>
+          ) : (
+            <></>
+          )}
+          <InputGroup w={"full"} alignItems={"center"}>
+            {response && (
+              <Box
+                position="absolute"
+                colorScheme="dark"
+                justifyContent={"center"}
+                alignItems="center"
+                zIndex={10}
+                flexDir="row"
+                top={-47}
+                right={0}
+                p={2}
+                pr="0"
+                pb="0"
+                borderTopRadius={"xl"}
+              >
+                <Box
+                  color={"white"}
+                  flexDir="row"
+                  justifyContent={"center"}
+                  alignItems="center"
+                >
+                  <Text fontWeight={"bold"}>
+                    {(response?.sender._id !== user._id
+                      ? "@" + response?.sender.username
+                      : "You") + ": "}
+                  </Text>
+                  <Text className="truncate" maxW={"200px"} mx={1}>
+                    {response?.content}
+                  </Text>
+                  <IconButton
+                    zIndex={10}
+                    colorScheme="dark"
+                    variant="ghost"
+                    icon={<CloseIcon fontSize="lg" />}
+                    onPress={() => setResponse(null)}
+                  ></IconButton>
+                </Box>
+              </Box>
+            )}
+            <Input
+              flex="1"
+              value={newMessage}
+              variant="filled"
+              onChangeText={typingHandler}
+              bg={"white"}
+              placeholder="Type something to your friend..."
+              fontSize={"lg"}
+              InputLeftElement={
+                <Box mx="2">
+                  <Pressable>
+                    <Icon
+                      as={<Entypo name="attachment" size={24} color="black" />}
+                      size={5}
+                      color="blue.400"
+                    />
+                  </Pressable>
+                </Box>
+              }
+              InputRightElement={
+                <HStack mr="2">
+                  <Pressable>
+                    <Icon
+                      as={<Octicons name="smiley" size={24} color="black" />}
+                      size={5}
+                      mr="2"
+                      color="blue.400"
+                    />
+                  </Pressable>
+                  <Pressable onPress={() => sendMessage("Send")}>
+                    <Icon
+                      as={<FontAwesome name="send" size={24} color="black" />}
+                      size={5}
+                      mr="2"
+                      color="blue.400"
+                    />
+                    <Text color="blue.400">Send</Text>
+                  </Pressable>
+                </HStack>
+              }
+            />
+          </InputGroup>
+        </FormControl>
       </Box>
     </>
   );
