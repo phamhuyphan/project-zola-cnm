@@ -108,6 +108,9 @@ const ChatScreen = () => {
                   placeholder="Search a chat"
                   ml="1"
                   mr="0.25"
+                  onPressIn={() => {
+                    navigation.navigate("SearchChat");
+                  }}
                 />
                 <IconButton
                   variant={"ghost"}

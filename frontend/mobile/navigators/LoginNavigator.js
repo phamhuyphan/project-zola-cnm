@@ -3,6 +3,7 @@ import ChatInfoScreen from "../screens/ChatInfoScreen";
 import MessageScreen from "../screens/MessageScreen";
 
 import ScreenStart from "../screens/ScreenStart";
+import SearchChat from "../screens/SearchChat";
 import SignIn from "../screens/SignIn";
 import SignUp from "../screens/SignUp";
 import AddGroup from "../screens/AddGroup";
@@ -23,6 +24,8 @@ export function LoginNavigator() {
       <Stack.Screen name="MessageScreen" component={MessageScreen} />
       <Stack.Screen name="AddGroup" component={AddGroup} />
       <Stack.Screen name="ChatPersonDetail" component={ChatPersonDetail} />
+
+      <Stack.Screen name="SearchChat" component={SearchChat} />
 
       <Stack.Screen name="ChatNavigator" component={ChatNavigator} />
       <Stack.Screen
