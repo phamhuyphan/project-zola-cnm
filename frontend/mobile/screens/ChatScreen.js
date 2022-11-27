@@ -56,14 +56,23 @@ const ChatScreen = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <Box className="flex-1" safeAreaTop>
+    <Box
+      className="flex-1"
+      safeAreaTop
+      bg={{
+        linearGradient: {
+          colors: ["lightBlue.600", "violet.900"],
+          start: [1, 0],
+          end: [0, 1],
+        },
+      }}
+    >
       <Box
         style={{
           width: "100%",
           borderBottomLeftRadius: 20,
           borderBottomRightRadius: 20,
         }}
-        shadow="9"
       >
         <ImageBackground
           imageStyle={{
@@ -109,7 +118,7 @@ const ChatScreen = () => {
                   ml="1"
                   mr="0.25"
                   onPressIn={() => {
-                    navigation.navigate("SearchChat");
+                    nav.navigate("SearchChat");
                   }}
                 />
                 <IconButton

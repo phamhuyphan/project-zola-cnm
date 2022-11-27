@@ -5,6 +5,7 @@ import { FlatList, TouchableOpacity } from "react-native";
 import { ChatState } from "../../providers/ChatProvider";
 import axios from "axios";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
+const link = "https://zolachatapp.herokuapp.com";
 export default function FriendRequest() {
   const [friends, setFriends] = React.useState([]);
 
@@ -20,14 +21,9 @@ export default function FriendRequest() {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    axios
-      .get(
-        `https://zolachatapp.herokuapp.com/api/friendRequest/request`,
-        config
-      )
-      .then((data) => {
-        setFriends(data.data[0].user);
-      });
+    axios.get(`${link}/api/friendRequest/request`, config).then((data) => {
+      setFriends(data.data[0].user);
+    });
   }, []);
 
   const FriendItem = ({ item }) => (
@@ -51,13 +47,13 @@ export default function FriendRequest() {
           }}
         ></Avatar>
         <Box>
-          <Text fontWeight={"bold"} fontSize={"lg"}>
+          <Text color="white" fontWeight={"bold"} fontSize={"lg"}>
             {item.fullname}
           </Text>
-          <Text fontSize={"sm"} color={"coolGray"}>
+          <Text color="white" fontSize={"sm"}>
             @{item.username}
           </Text>
-          <Text>{item.email}</Text>
+          <Text color="white">{item.email}</Text>
         </Box>
       </Center>
       <Center>
@@ -98,8 +94,7 @@ export default function FriendRequest() {
             <AlertDialog.CloseButton />
             <AlertDialog.Header>Delete Friend</AlertDialog.Header>
             <AlertDialog.Body>
-              This will remove all data relating to Alex. This action cannot be
-              reversed. Deleted data can not be recovered.
+              This action cannot be reversed. Deleted data can not be recovered.
             </AlertDialog.Body>
             <AlertDialog.Footer>
               <Button.Group space={2}>

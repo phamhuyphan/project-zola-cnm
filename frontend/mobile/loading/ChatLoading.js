@@ -4,27 +4,26 @@ import { HStack, Skeleton } from "native-base";
 const ChatLoading = () => {
   return (
     <>
-      <HStack m="2">
-        <Skeleton m="2" rounded="full" h="10"></Skeleton>
-        <Skeleton px="4" my="4" flex="1" startColor="gray.800" />
+      <HStack opacity="30" mt="2" justifyContent={"center"} alignItems="center">
+        <Skeleton m="3" w="12" h="12" rounded="full"></Skeleton>
+        <Skeleton px="4" my="4" flex="1" />
       </HStack>
-      <HStack m="2">
-        <Skeleton m="2" rounded="full" h="10"></Skeleton>
-        <Skeleton px="4" my="4" flex="1" startColor="gray.400" />
+      <HStack opacity="25" mt="2" justifyContent={"center"} alignItems="center">
+        <Skeleton m="3" w="12" h="12" rounded="full"></Skeleton>
+        <Skeleton px="4" my="4" flex="1" />
+      </HStack>
+      <HStack opacity="20" mt="2" justifyContent={"center"} alignItems="center">
+        <Skeleton m="3" w="12" h="12" rounded="full"></Skeleton>
+        <Skeleton px="4" my="4" flex="1" />
       </HStack>
 
-      <HStack m="2">
-        <Skeleton m="2" rounded="full" h="10"></Skeleton>
-        <Skeleton px="4" my="4" flex="1" startColor="gray.200" />
+      <HStack opacity="10" mt="2" justifyContent={"center"} alignItems="center">
+        <Skeleton m="3" w="12" h="12" rounded="full"></Skeleton>
+        <Skeleton px="4" my="4" flex="1" />
       </HStack>
-
-      <HStack m="2">
-        <Skeleton m="2" rounded="full" h="10"></Skeleton>
-        <Skeleton px="4" my="4" flex="1" startColor="gray.100" />
-      </HStack>
-      <HStack m="2">
-        <Skeleton m="2" rounded="full" h="10"></Skeleton>
-        <Skeleton px="4" my="4" flex="1" startColor="gray.50" />
+      <HStack opacity="5" mt="2" justifyContent={"center"} alignItems="center">
+        <Skeleton m="3" w="12" h="12" rounded="full"></Skeleton>
+        <Skeleton px="4" my="4" flex="1" />
       </HStack>
     </>
   );

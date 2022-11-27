@@ -1,4 +1,3 @@
-import { View } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
   Avatar,
@@ -12,24 +11,19 @@ import {
   Pressable,
   Text,
   useColorMode,
-  useToast,
   VStack,
 } from "native-base";
-import { getSender, getSenderInfo } from "../logic/ChatLogic";
-import moment from "moment";
 import { ChatState } from "../providers/ChatProvider";
 import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-const link = "https://zolachatapp.herokuapp.com";
 const ChatInfoScreen = () => {
-  const { selectedChat, setSelectedChat, user } = ChatState();
+  const { selectedChat } = ChatState();
   const [showModal, setShowModal] = useState(false);
   const [newName, setNewName] = useState("");
   const nav = useNavigation();
   useEffect(() => {
     setNewName(selectedChat.chatName);
   }, [selectedChat]);
-  const toast = useToast();
   const { colorMode } = useColorMode();
   const [renameLoading, setRenameLoading] = useState(false);
 

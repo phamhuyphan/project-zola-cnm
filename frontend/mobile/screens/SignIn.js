@@ -11,7 +11,16 @@ import { ChatState } from "../providers/ChatProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import "localstorage-polyfill";
-import { Box, Icon, Input, KeyboardAvoidingView, useToast } from "native-base";
+import {
+  Box,
+  Button,
+  HStack,
+  Icon,
+  Input,
+  KeyboardAvoidingView,
+  useToast,
+  VStack,
+} from "native-base";
 const link = "https://zolachatapp.herokuapp.com";
 const SignIn = ({ navigation }) => {
   useLayoutEffect(() => {
@@ -49,7 +58,15 @@ const SignIn = ({ navigation }) => {
         { email, password },
         config
       );
-      console.log("2");
+      toast.show({
+        render: () => {
+          return (
+            <Box bg="green.500" px="2" py="1" rounded="sm" mb={5}>
+              Log in successfully
+            </Box>
+          );
+        },
+      });
       localStorage.setItem("userInfo", JSON.stringify(data));
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
       setLoading(false);
@@ -132,21 +149,31 @@ const SignIn = ({ navigation }) => {
                 forgot password, eh?
               </Text>
             </TouchableOpacity>
-            <View className="top-[60%] w-full">
-              <TouchableOpacity onPress={submitHandler}>
-                <Text className="text-[30px] font-bold text-blue-700">
-                  Sign In
-                </Text>
-              </TouchableOpacity>
+            <VStack className="top-[60%] w-full justify-start">
               <View className="flex-row">
+                <Button
+                  variant={"ghost"}
+                  isLoading={loading}
+                  padding="0"
+                  onPress={submitHandler}
+                >
+                  <Text className=" text-[30px] font-bold text-white">
+                    Sign In
+                  </Text>
+                </Button>
+              </View>
+              <HStack alignItems={"center"}>
                 <Text>don't have an account ?</Text>
-                <TouchableOpacity>
+                <Button
+                  variant={"ghost"}
+                  onPress={() => navigation.navigate("SignUp")}
+                >
                   <Text className="text-[15px] font-bold text-blue-700">
                     Sign Up
                   </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+                </Button>
+              </HStack>
+            </VStack>
           </View>
         </View>
 

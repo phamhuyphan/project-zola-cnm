@@ -1,15 +1,25 @@
 import * as React from "react";
 import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { Box, Text, Center, Avatar, Button, AlertDialog } from "native-base";
+import {
+  Box,
+  Text,
+  Center,
+  Avatar,
+  Button,
+  AlertDialog,
+  HStack,
+  Spinner,
+} from "native-base";
 import { FlatList, TouchableOpacity } from "react-native";
 import { ChatState } from "../../providers/ChatProvider";
 import axios from "axios";
+const link = "https://zolachatapp.herokuapp.com";
 export default function SendedRequest() {
   const [friends, setFriends] = React.useState([]);
 
   const [isOpen, setIsOpen] = React.useState(false);
-
+  const [loading, setLoading] = React.useState(false);
   const onClose = () => setIsOpen(false);
   const { user } = ChatState();
   const cancelRef = React.useRef(null);
@@ -20,11 +30,11 @@ export default function SendedRequest() {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    axios
-      .get(`https://zolachatapp.herokuapp.com/api/friendRequest/sended`, config)
-      .then((data) => {
-        setFriends(data.data[0].user);
-      });
+    setLoading(true);
+    axios.get(`${link}/api/friendRequest/sended`, config).then((data) => {
+      setFriends(data.data[0].user);
+      setLoading(false);
+    });
   }, []);
 
   const FriendItem = ({ item }) => (
@@ -48,13 +58,13 @@ export default function SendedRequest() {
           }}
         ></Avatar>
         <Box>
-          <Text fontWeight={"bold"} fontSize={"lg"}>
+          <Text color="white" fontWeight={"bold"} fontSize={"lg"}>
             {item.fullname}
           </Text>
-          <Text fontSize={"sm"} color={"coolGray"}>
+          <Text color="white" fontSize={"sm"}>
             @{item.username}
           </Text>
-          <Text>{item.email}</Text>
+          <Text color="white">{item.email}</Text>
         </Box>
       </Center>
 
@@ -74,11 +84,20 @@ export default function SendedRequest() {
 
   return (
     <Box mt={1} flex={1} ml={2} mr={2}>
-      <FlatList
-        data={friends}
-        renderItem={FriendItem}
-        keyExtractor={(item) => item._id}
-      ></FlatList>
+      {loading ? (
+        <HStack justifyContent={"center"} alignItems="center">
+          <Spinner color={"white"} />
+          <Text color={"white"} fontSize="lg">
+            Loading your sent request...
+          </Text>
+        </HStack>
+      ) : (
+        <FlatList
+          data={friends}
+          renderItem={FriendItem}
+          keyExtractor={(item) => item._id}
+        ></FlatList>
+      )}
       <Center>
         <AlertDialog
           leastDestructiveRef={cancelRef}
@@ -89,8 +108,7 @@ export default function SendedRequest() {
             <AlertDialog.CloseButton />
             <AlertDialog.Header>Delete Friend</AlertDialog.Header>
             <AlertDialog.Body>
-              This will remove all data relating to Alex. This action cannot be
-              reversed. Deleted data can not be recovered.
+              This action cannot be reversed. Deleted data can not be recovered.
             </AlertDialog.Body>
             <AlertDialog.Footer>
               <Button.Group space={2}>

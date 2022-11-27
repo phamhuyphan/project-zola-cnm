@@ -1,12 +1,25 @@
 import { View, Text } from "react-native";
 import React, { useState } from "react";
-import { Center, FormControl, Box, Input, Button, Heading } from "native-base";
+import {
+  Center,
+  FormControl,
+  Box,
+  Input,
+  Button,
+  Heading,
+  HStack,
+  IconButton,
+  ChevronLeftIcon,
+  Spacer,
+} from "native-base";
 import axios from "axios";
+import { useNavigation } from "@react-navigation/native";
 
 export default function ChangePassword({ navigation }) {
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
   const [password3, setPassword3] = useState("");
+  const nav = useNavigation();
 
   const [passwordVl, setPasswordVl] = useState(false);
   const [password2Vl, setPassword2Vl] = useState(false);
@@ -49,7 +62,14 @@ export default function ChangePassword({ navigation }) {
           },
         }}
       >
-        <Heading className="text-white">Chang Password</Heading>
+        <HStack pt={5} pl="1">
+          <IconButton
+            icon={<ChevronLeftIcon color="white" />}
+            onPress={() => nav.goBack()}
+          ></IconButton>
+          <Spacer></Spacer>
+        </HStack>
+        <Heading className="text-white">Change Password</Heading>
         <FormControl isRequired w="90%" className="mt-20">
           <FormControl.Label
             _text={{

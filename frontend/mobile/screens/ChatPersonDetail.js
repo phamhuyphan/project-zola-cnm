@@ -1,10 +1,11 @@
-import { Text, TouchableOpacity, Image } from "react-native";
+import { TouchableOpacity, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import {
   Box,
   Avatar,
   Center,
   FlatList,
+  Text,
   Heading,
   IconButton,
   ChevronLeftIcon,
@@ -14,12 +15,13 @@ import { ImageGallery } from "@georstat/react-native-image-gallery";
 import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
 import { getSenderInfo } from "../logic/ChatLogic";
+import { useNavigation } from "@react-navigation/native";
 const link = "https://zolachatapp.herokuapp.com";
 
 export default function ChatPersonDetail({ route }) {
   const [pics, setPics] = useState([]);
   const { selectedChat, user } = ChatState();
-
+  const nav = useNavigation();
   useEffect(() => {
     const config = {
       headers: {
@@ -61,9 +63,24 @@ export default function ChatPersonDetail({ route }) {
         },
       }}
     >
-      <HStack>
-        <IconButton icon={<ChevronLeftIcon />}></IconButton>
-        <Text>User Infomation</Text>
+      <HStack
+        position={"relative"}
+        justifyContent={"center"}
+        alignItems="center"
+        h="16"
+        px="4"
+      >
+        <IconButton
+          icon={<ChevronLeftIcon color="white" />}
+          onPress={() => nav.goBack()}
+        ></IconButton>
+        <Heading flex="1" textAlign={"center"} color="white">
+          User Infomation
+        </Heading>
+        <IconButton
+          opacity={0}
+          icon={<ChevronLeftIcon color="white" />}
+        ></IconButton>
       </HStack>{" "}
       <Box w="full">
         <Box w="full" mt={100} alignItems="center">

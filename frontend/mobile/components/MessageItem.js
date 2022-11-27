@@ -270,7 +270,7 @@ function MessageItem({ messages, setMessages, m, i }) {
                       }
                     ></IconButton>
                     <IconButton
-                      //display={m.sender._id === user._id ? "inline" : "none"}
+                      opacity={m.sender._id === user._id ? 1 : 0}
                       onPress={() => setIsOpen(!isOpen)}
                       borderRadius={"full"}
                       icon={<DeleteIcon fontSize={15} />}

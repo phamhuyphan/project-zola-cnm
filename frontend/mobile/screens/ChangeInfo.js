@@ -1,8 +1,20 @@
 import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Center, FormControl, Box, Input, Button, Heading } from "native-base";
+import {
+  Center,
+  FormControl,
+  Box,
+  Input,
+  Button,
+  Heading,
+  HStack,
+  IconButton,
+  ChevronLeftIcon,
+  Spacer,
+} from "native-base";
 import axios from "axios";
 import { ChatState } from "../providers/ChatProvider";
+import { useNavigation } from "@react-navigation/native";
 
 export default function ChangeInfo({ navigation }) {
   const [fullname, setFullname] = useState("");
@@ -12,7 +24,7 @@ export default function ChangeInfo({ navigation }) {
     setFullname(user.fullname);
     setUsername(user.username);
   }, []);
-
+  const nav = useNavigation();
   async function validateUserName(value) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -31,7 +43,7 @@ export default function ChangeInfo({ navigation }) {
         };
         await axios
           .post(
-            "https://zolachatapp.herokuapp.com/api/user/checkusername/:username",
+            "https://zolachatapp.herokuapp.comapi/user/checkusername/:username",
             { username: value },
             config
           )
@@ -70,7 +82,14 @@ export default function ChangeInfo({ navigation }) {
           },
         }}
       >
-        <Heading className="text-white">Chang Infomation</Heading>
+        <HStack pt={5} pl="1">
+          <IconButton
+            icon={<ChevronLeftIcon color="white" />}
+            onPress={() => nav.goBack()}
+          ></IconButton>
+          <Spacer></Spacer>
+        </HStack>
+        <Heading className="text-white">Change Infomation</Heading>
         <FormControl isRequired w="90%" className="mt-20">
           <FormControl.Label
             _text={{
@@ -139,7 +158,7 @@ export default function ChangeInfo({ navigation }) {
             onPress={() => {
               axios
                 .put(
-                  "https://zolachatapp.herokuapp.com/api/user/update/",
+                  "https://zolachatapp.herokuapp.comapi/user/update/",
                   {
                     _id: user._id,
                     fullname: fullname,

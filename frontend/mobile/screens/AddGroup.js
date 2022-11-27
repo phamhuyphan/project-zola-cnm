@@ -1,21 +1,30 @@
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
-import { Avatar, Box, Input } from "native-base";
+import {
+  Avatar,
+  Box,
+  ChevronLeftIcon,
+  HStack,
+  IconButton,
+  Input,
+  Spacer,
+} from "native-base";
 import axios from "axios";
 import UserListItem from "./UserListItem";
-const link = "http://192.168.1.10:5000";
+const link = "https://zolachatapp.herokuapp.com";
 import "localstorage-polyfill";
 import { ChatState } from "../providers/ChatProvider";
-
+import { useToast } from "native-base";
+import { useNavigation } from "@react-navigation/native";
 const AddGroup = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [searchResult, setSearchResult] = useState([]);
   const [groupChatName, setGroupChatName] = useState("");
-
+  const toast = useToast();
   const { user, chats, setChats } = ChatState();
-
+  const nav = useNavigation();
   const handleRemove = (userToRemove) => {
     setSelectedUsers(selectedUsers.filter((u) => u._id !== userToRemove._id));
   };
@@ -43,15 +52,17 @@ const AddGroup = () => {
       setLoading(false);
     } catch (error) {
       if (axios.isCancel(error)) console.log("successfully aborted");
-      //   toast({
-      //     title: "Error Occured",
-      //     description: "Failed to load search results",
-      //     status: "error",
-      //     duration: 2500,
-      //     isClosable: true,
-      //     position: "bottom-left",
-      //   });
-      else console.log("1");
+      else {
+        toast.show({
+          render: () => {
+            return (
+              <Box bg="red.500" px="2" py="1" rounded="sm" mb={5}>
+                Failed to load search results
+              </Box>
+            );
+          },
+        });
+      }
     }
     return () => {
       source.cancel();
@@ -60,14 +71,16 @@ const AddGroup = () => {
   const handleGroup = (userToAdd) => {
     console.log("1111111");
     if (selectedUsers.includes(userToAdd)) {
-      // toast({
-      //   title: "User already added",
-      //   status: "error",
-      //   duration: 2500,
-      //   isClosable: true,
-      //   position: "top",
-      // });
-      console.log("2");
+      toast.show({
+        render: () => {
+          return (
+            <Box bg="amber.500" px="2" py="1" rounded="sm" mb={5}>
+              User already added
+            </Box>
+          );
+        },
+      });
+
       return;
     }
     console.log("33333333");
@@ -75,14 +88,16 @@ const AddGroup = () => {
   };
   const handlerSubmit = async () => {
     if (!groupChatName || !selectedUsers) {
-      // toast({
-      //   title: "Please flill all the fields",
-      //   status: "error",
-      //   duration: 2500,
-      //   isClosable: true,
-      //   position: "top",
-      // });
-      console.log("10");
+      toast.show({
+        render: () => {
+          return (
+            <Box bg="amber.500" px="2" py="1" rounded="sm" mb={5}>
+              Please flill all the fields
+            </Box>
+          );
+        },
+      });
+
       return;
     }
     try {
@@ -103,29 +118,52 @@ const AddGroup = () => {
       );
       setChats([data, ...chats]);
       //onClose();
-      // toast({
-      //   title: `${groupChatName} was successfully created!`,
-      //   status: "success",
-      //   duration: 2500,
-      //   isClosable: true,
-      //   position: "bottom",
-      // });
+      toast.show({
+        render: () => {
+          return (
+            <Box bg="green.500" px="2" py="1" rounded="sm" mb={5}>
+              {`${groupChatName} was successfully created!`}
+            </Box>
+          );
+        },
+      });
+
       console.log("11");
       setLoading(false);
     } catch (error) {
-      // toast({
-      //   title: "Failed to create the chat",
-      //   status: "error",
-      //   duration: 2500,
-      //   isClosable: true,
-      //   position: "bottom",
-      // });
-      console.log("12");
+      toast.show({
+        render: () => {
+          return (
+            <Box bg="red.500" px="2" py="1" rounded="sm" mb={5}>
+              Failed to create the chat
+            </Box>
+          );
+        },
+      });
     }
   };
   return (
-    <Box className=" flex-1 items-center p-4 m-4">
-      <Text className="text-3xl font-bold">Create group chat</Text>
+    <Box
+      className=" flex-1 items-center p-4"
+      bg={{
+        linearGradient: {
+          colors: ["lightBlue.600", "violet.900"],
+          start: [1, 0],
+          end: [0, 1],
+        },
+      }}
+      safeArea
+    >
+      <HStack pt={5}>
+        <IconButton
+          icon={<ChevronLeftIcon color="white" />}
+          onPress={() => nav.goBack()}
+        ></IconButton>
+        <Spacer></Spacer>
+      </HStack>
+      <Text className="text-3xl font-bold text-white pb-5">
+        Create group chat
+      </Text>
       <Input
         w={"full"}
         bgColor="white"
@@ -184,15 +222,6 @@ const AddGroup = () => {
       {loading ? (
         <Text>loading</Text>
       ) : (
-        // searchResult
-        //   ?.slice(0, 3)
-        //   .map((user) => (
-        //     <UserListItem
-        //       key={user._id}
-        //       user={user}
-        //       handleFunction={() => handleGroup(user)}
-        //     />
-        //   ))
         <FlatList
           data={searchResult}
           renderItem={({ item }) => (
@@ -206,7 +235,7 @@ const AddGroup = () => {
       )}
       <TouchableOpacity
         onPress={() => handlerSubmit()}
-        className="bg-blue-600 w-[40%] h-[10%] items-center justify-center rounded-xl mt-2"
+        className="bg-blue-600 w-[40%] h-[50] items-center justify-center rounded-xl mt-2"
       >
         <Text className="text-xl text-white font-bold">Create</Text>
       </TouchableOpacity>

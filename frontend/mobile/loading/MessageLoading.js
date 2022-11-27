@@ -5,6 +5,7 @@ export default function MessageLoading() {
   return (
     <VStack space={2}>
       <Skeleton
+        opacity={20}
         size="5"
         ml="20"
         w="20%"
@@ -13,6 +14,7 @@ export default function MessageLoading() {
         rounded="xl"
       ></Skeleton>
       <Skeleton
+        opacity={20}
         size="5"
         ml="20"
         w="45%"
@@ -21,6 +23,7 @@ export default function MessageLoading() {
         rounded="xl"
       ></Skeleton>
       <Skeleton
+        opacity={20}
         size="5"
         ml="20"
         w="25%"
@@ -29,8 +32,16 @@ export default function MessageLoading() {
         rounded="xl"
       ></Skeleton>
       <HStack mr="5" space="2" alignItems="center">
-        <Skeleton size="6" w="50px" h="50px" mx="3" rounded="full"></Skeleton>
         <Skeleton
+          opacity={20}
+          size="6"
+          w="50px"
+          h="50px"
+          mx="3"
+          rounded="full"
+        ></Skeleton>
+        <Skeleton
+          opacity={20}
           size="5"
           w="50%"
           marginBottom={1}
@@ -42,6 +53,7 @@ export default function MessageLoading() {
       <HStack mr="5" space="2" alignItems="center">
         <Spacer></Spacer>
         <Skeleton
+          opacity={20}
           size="5"
           w="50%"
           marginBottom={1}
@@ -50,8 +62,16 @@ export default function MessageLoading() {
         ></Skeleton>
       </HStack>
       <HStack mr="5" space="2" alignItems="center">
-        <Skeleton size="6" w="50px" h="50px" mx="3" rounded="full"></Skeleton>
         <Skeleton
+          opacity={20}
+          size="6"
+          w="50px"
+          h="50px"
+          mx="3"
+          rounded="full"
+        ></Skeleton>
+        <Skeleton
+          opacity={20}
           size="5"
           w="50%"
           marginBottom={1}
@@ -62,6 +82,7 @@ export default function MessageLoading() {
       <HStack mr="5" space="2" alignItems="center">
         <Spacer></Spacer>
         <Skeleton
+          opacity={20}
           size="5"
           w="15%"
           marginBottom={1}
@@ -70,8 +91,16 @@ export default function MessageLoading() {
         ></Skeleton>
       </HStack>
       <HStack mr="5" space="2" alignItems="center">
-        <Skeleton size="6" w="50px" h="50px" mx="3" rounded="full"></Skeleton>
         <Skeleton
+          opacity={20}
+          size="6"
+          w="50px"
+          h="50px"
+          mx="3"
+          rounded="full"
+        ></Skeleton>
+        <Skeleton
+          opacity={20}
           size="5"
           w="15%"
           marginBottom={1}
@@ -82,6 +111,7 @@ export default function MessageLoading() {
       <HStack mr="5" space="2" alignItems="center">
         <Spacer></Spacer>
         <Skeleton
+          opacity={20}
           size="5"
           w="30%"
           marginBottom={1}
@@ -92,6 +122,7 @@ export default function MessageLoading() {
       <HStack mr="5" space="2" alignItems="center">
         <Spacer></Spacer>
         <Skeleton
+          opacity={20}
           size="5"
           w="50%"
           marginBottom={1}
@@ -102,6 +133,7 @@ export default function MessageLoading() {
       <HStack mr="5" space="2" alignItems="center">
         <Spacer></Spacer>
         <Skeleton
+          opacity={20}
           size="5"
           w="45%"
           marginBottom={1}

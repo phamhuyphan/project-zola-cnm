@@ -4,7 +4,7 @@ import { ChatState } from "../providers/ChatProvider";
 import { Box } from "native-base";
 
 const ChatZone = () => {
-  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+  const { selectedChat } = ChatState();
   return (
     <Box flex="1">
       <Text>{selectedChat?.chatName}</Text>

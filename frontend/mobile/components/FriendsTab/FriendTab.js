@@ -1,16 +1,7 @@
 import * as React from "react";
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  StatusBar,
-  TouchableOpacity,
-  Animated,
-  Pressable,
-} from "react-native";
+import { Dimensions, StatusBar, Animated, Pressable } from "react-native";
 import { TabView, SceneMap } from "react-native-tab-view";
-import { Box, Text, Center, useColorModeValue } from "native-base";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Box, useColorModeValue } from "native-base";
 import FriendRequest from "./FriendRequest";
 import SendedRequest from "./SendedRequest";
 import ListFriend from "./ListFriend";
@@ -61,6 +52,7 @@ export default function FriendTab() {
               : useColorModeValue("coolGray.200", "gray.400");
           return (
             <Box
+              key={i}
               borderBottomWidth={1}
               borderColor={borderColor}
               flex={1}

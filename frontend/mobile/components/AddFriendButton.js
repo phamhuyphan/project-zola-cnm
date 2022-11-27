@@ -122,7 +122,7 @@ const AddFriendButton = ({ user, selectedChat, friend }) => {
 
         <Pressable
           w="full"
-          bg="white"
+          bg="white:alpha.25"
           display={"flex"}
           py="2"
           flexDir="row"
@@ -130,10 +130,10 @@ const AddFriendButton = ({ user, selectedChat, friend }) => {
           alignItems="center"
           onPress={() => setIsOpen(!isOpen)}
         >
-          <Text colorScheme="darkBlue" mx="2">
+          <Text color="white" mx="2">
             Add Friend to {getSender(user, selectedChat.users)}
           </Text>
-          <FontAwesome name="user-plus" size={12} color="black" />
+          <FontAwesome name="user-plus" size={12} color="white" />
         </Pressable>
       </>
     )

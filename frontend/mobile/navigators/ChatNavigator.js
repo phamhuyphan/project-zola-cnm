@@ -8,6 +8,7 @@ import ChatPersonDetail from "../screens/ChatPersonDetail";
 import ChatScreen from "../screens/ChatScreen";
 import Friends from "../screens/Friends";
 import SettingScreen from "../screens/SettingScreen";
+import UserInfo from "../screens/UserInfo";
 
 const Tab = createMaterialBottomTabNavigator();
 export default function ChatNavigator() {
@@ -55,8 +56,8 @@ export default function ChatNavigator() {
             <Ionicons name="settings-sharp" size={24} color={color} />
           ),
         }}
-        name="ChatInfoScreen"
-        component={ChatInfoScreen}
+        name="UserInfo"
+        component={UserInfo}
       />
     </Tab.Navigator>
   );

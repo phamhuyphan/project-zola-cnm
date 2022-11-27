@@ -9,15 +9,8 @@ import {
   Avatar,
   Badge,
   Box,
-  ChevronDownIcon,
-  DeleteIcon,
-  Divider,
-  HamburgerIcon,
   HStack,
-  Menu,
-  Pressable,
   ScrollView,
-  Skeleton,
   Text,
   useColorMode,
   VStack,
@@ -100,9 +93,19 @@ function ChatList({ fetchAgain, setFetchAgain }) {
 
   console.log("chatList is rendered");
   return (
-    <ScrollView width={"full"} h="full" bgColor={"white"}>
+    <ScrollView
+      width={"full"}
+      h="full"
+      bg={{
+        linearGradient: {
+          colors: ["lightBlue.600", "violet.900"],
+          start: [1, 0],
+          end: [0, 1],
+        },
+      }}
+    >
       {!loading ? (
-        <VStack zIndex={1} mb={5} spacing="0" pb="20">
+        <VStack zIndex={1} mb={5} spacing="2" pb="10">
           {user &&
             chats.map((chat, index) => (
               <TouchableOpacity
@@ -117,6 +120,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                   setSelectedChat(chat);
                   nav.navigate("MessageScreen");
                 }}
+                className="mx-2 my-1"
               >
                 <Box
                   display={"flex"}
@@ -125,8 +129,8 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                   justifyItems={"center"}
                   alignItems="center"
                   // className="transition-colors "
-
-                  mx={3}
+                  bgColor={"white:alpha.20"}
+                  rounded="md"
                 >
                   <Box
                     key={index}
@@ -186,11 +190,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                       <HStack>
                         <Text
                           fontWeight={"bold"}
-                          textColor={
-                            selectedChat?._id === chat._id
-                              ? "black"
-                              : "white.500"
-                          }
+                          color="white"
                           maxW={"250px"}
                           className="truncate"
                           fontSize={"md"}
@@ -215,9 +215,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                           )}
                       </HStack>
                       <Text
-                        textColor={
-                          selectedChat?._id === chat._id ? "black" : "white.500"
-                        }
+                        color="white"
                         w={{ base: "100%", md: "200px" }}
                         fontSize={{ base: "sm", md: "md" }}
                         textOverflow={"ellipsis"}
@@ -225,7 +223,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                         whiteSpace={"nowrap"}
                       >
                         {chat.latestMessage?.content === undefined ? (
-                          <Text color={"gray.500"}>{"Chat something 🥺"}</Text>
+                          <Text color={"white"}>{"Chat something 🥺"}</Text>
                         ) : chat.isGroupChat ? (
                           chat.latestMessage &&
                           `@${chat.latestMessage?.sender.username}: ${chat.latestMessage?.content} `
@@ -242,6 +240,7 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                       fontSize="12"
                       textAlign={"right"}
                       w={"100px"}
+                      color="white"
                       p={{ base: "5", md: "1" }}
                     >
                       {chat.latestMessage?.content === undefined
@@ -252,6 +251,11 @@ function ChatList({ fetchAgain, setFetchAgain }) {
                 </Box>
               </TouchableOpacity>
             ))}
+          <Box className="justify-center items-center">
+            <Text className="italic text-xl text-gray-50">
+              The list is over
+            </Text>
+          </Box>
         </VStack>
       ) : (
         <ChatLoading />

@@ -11,12 +11,14 @@ import AddGroup from "../screens/AddGroup";
 import ChatDrawerNavigator from "./ChatDrawerNavigator";
 import ChatNavigator from "./ChatNavigator";
 import ChatPersonDetail from "../screens/ChatPersonDetail";
+import ChangeInfo from "../screens/ChangeInfo";
+import ChangePassword from "../screens/ChangePassword";
 const Stack = createNativeStackNavigator();
 export function LoginNavigator() {
   return (
     <Stack.Navigator
       initialRouteName="ScreenStart"
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ headerShown: false, statusBarTranslucent: true }}
     >
       <Stack.Screen name="ScreenStart" component={ScreenStart} />
       <Stack.Screen name="SignIn" component={SignIn} />
@@ -26,6 +28,9 @@ export function LoginNavigator() {
       <Stack.Screen name="ChatPersonDetail" component={ChatPersonDetail} />
 
       <Stack.Screen name="SearchChat" component={SearchChat} />
+
+      <Stack.Screen name="ChangeInfo" component={ChangeInfo} />
+      <Stack.Screen name="ChangePassword" component={ChangePassword} />
 
       <Stack.Screen name="ChatNavigator" component={ChatNavigator} />
       <Stack.Screen

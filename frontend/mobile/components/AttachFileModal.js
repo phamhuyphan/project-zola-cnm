@@ -1,38 +1,36 @@
-import { View, Text, Platform, Image } from "react-native";
-import React, { Children, useEffect, useState } from "react";
-import { Box, Button, Icon, IconButton, Modal, VStack } from "native-base";
+import { Text, Image } from "react-native";
+import React, { useState } from "react";
+import {
+  AlertDialog,
+  Button,
+  Center,
+  Icon,
+  IconButton,
+  Modal,
+  Spinner,
+  VStack,
+} from "native-base";
 import { Entypo } from "@expo/vector-icons";
-import ImagePicker from "react-native-image-picker";
-const AttachFileModal = ({ setImage }) => {
-  const [tempImage, setTempImage] = useState(null);
+import * as ImagePicker from "expo-image-picker";
+const AttachFileModal = ({ setImage, image }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const _uploadImage = () => {
-    const options = {
-      title: "Select Image",
-      storageOptions: {
-        skipBackup: true,
-      },
-    };
-    ImagePicker.launchImageLibrary((response) => {
-      console.log("Response=", response);
-      if (response.didCancel) {
-        console.log("User cancelled image picker");
-      } else if (response.error) {
-        console.log("Image Picker Error", response.error);
-      } else {
-        const uri = response.uri;
-        const type = "image/jpg";
-        const name = response.fileName;
-        const source = { uri, type, name };
-        console.log(source);
-        handleUpdata(source);
-      }
+  const cancelRef = React.useRef(null);
+  const [loading, setLoading] = useState(false);
+  const pickImage = async () => {
+    setLoading(true);
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
     });
-  };
-
-  const handleUpdata = (photo) => {
     const data = new FormData();
-    data.append("file", photo);
+    console.log(result);
+    data.append("file", {
+      uri: result.uri,
+      type: "image/jpg",
+      name: "tronten123456",
+    });
     data.append("upload_preset", "chat-chit");
     data.append("cloud_name", "voluu");
     fetch("https://api.cloudinary.com/v1_1/voluu/image/upload", {
@@ -43,42 +41,15 @@ const AttachFileModal = ({ setImage }) => {
         "Content-Type": "multipart/form-data",
       },
     })
-      .then((res) => res.json())
+      .then((data) => data.json())
       .then((data) => {
         setImage(data.url);
-        setModalVisible(false);
-        console.log(data);
+        setLoading(false);
       })
       .catch((err) => {
-        Alert.alert("Error While Uploading");
+        console.log(err);
       });
   };
-
-  const _takePhoto = () => {
-    const options = {
-      title: "Select Image",
-      storageOptions: {
-        skipBackup: true,
-        path: "Image_Italy_",
-      },
-    };
-    ImagePicker.launchCamera(options, (response) => {
-      console.log("Response=", response);
-      if (response.didCancel) {
-        console.log("User cancelled image picker");
-      } else if (response.error) {
-        console.log("Image Picker Error", response.error);
-      } else {
-        const uri = response.uri;
-        const type = "image/jpg";
-        const name = response.fileName;
-        const source = { uri, type, name };
-        console.log(source);
-        handleUpdata(source);
-      }
-    });
-  };
-
   return (
     <>
       <Modal
@@ -93,9 +64,9 @@ const AttachFileModal = ({ setImage }) => {
           <Modal.CloseButton />
           <Modal.Header>Select Attachment File</Modal.Header>
           <Modal.Body>
-            {tempImage ? (
+            {image ? (
               <Image
-                source={{ uri: tempImage }}
+                source={{ uri: image }}
                 style={{ width: "100%", height: 200 }}
               />
             ) : (
@@ -103,25 +74,23 @@ const AttachFileModal = ({ setImage }) => {
             )}
           </Modal.Body>
           <Modal.Footer>
-            {tempImage && (
-              <Button
-                mr="2"
-                onPress={() => {
-                  _uploadImage();
-                }}
-              >
+            {image && (
+              <Button mr="2" onPress={pickImage}>
                 Chooose image
               </Button>
             )}
-            <Button onPress={() => _uploadImage()} flex="1">
+            <Button flex="1" onPress={pickImage}>
               <Text className="text-center text-white">
-                Select an {tempImage && "other"} image from camera roll
+                Select an {image && "other"} image from camera roll
               </Text>
             </Button>
             <Button
               variant={"ghost"}
               colorScheme={"danger"}
-              onPress={() => setModalVisible(false)}
+              onPress={() => {
+                setImage("");
+                setModalVisible(false);
+              }}
             >
               Cancel
             </Button>
@@ -145,6 +114,18 @@ const AttachFileModal = ({ setImage }) => {
           }}
         ></IconButton>
       </VStack>
+      <Center>
+        <AlertDialog leastDestructiveRef={cancelRef} isOpen={loading}>
+          <AlertDialog.Content>
+            <AlertDialog.CloseButton />
+            <AlertDialog.Header>Attachment Image</AlertDialog.Header>
+            <AlertDialog.Body>
+              <Spinner></Spinner>
+              <Text>Uploading...</Text>
+            </AlertDialog.Body>
+          </AlertDialog.Content>
+        </AlertDialog>
+      </Center>
     </>
   );
 };

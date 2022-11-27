@@ -24,8 +24,17 @@ function UserListItem({ user, handleFunction }) {
             size="md"
             cursor="pointer"
             name={user.username}
-            src={user.pic}
-          />
+            source={{ uri: user.pic ? user.pic : "no-links" }}
+          >
+            <Text
+              fontSize={35}
+              fontWeight="bold"
+              color="white"
+              textTransform={"uppercase"}
+            >
+              {user.username.split("")[0]}
+            </Text>
+          </Avatar>
           <Box flex="1">
             <Text fontWeight={"bold"}>@{user.username}</Text>
             <Text fontSize="xs" className="truncate">
