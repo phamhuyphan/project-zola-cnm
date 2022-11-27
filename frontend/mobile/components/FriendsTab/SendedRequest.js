@@ -10,6 +10,8 @@ import {
   AlertDialog,
   HStack,
   Spinner,
+  Heading,
+  Spacer,
 } from "native-base";
 import { FlatList, TouchableOpacity } from "react-native";
 import { ChatState } from "../../providers/ChatProvider";
@@ -21,7 +23,7 @@ export default function SendedRequest() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const onClose = () => setIsOpen(false);
-  const { user } = ChatState();
+  const { user, fecthAgain, setFetchAgain } = ChatState();
   const cancelRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -56,7 +58,9 @@ export default function SendedRequest() {
           source={{
             uri: item.pic ? item.pic : "no-links",
           }}
-        ></Avatar>
+        >
+          {item.fullname.split("")[0]}
+        </Avatar>
         <Box>
           <Text color="white" fontWeight={"bold"} fontSize={"lg"}>
             {item.fullname}
@@ -67,7 +71,7 @@ export default function SendedRequest() {
           <Text color="white">{item.email}</Text>
         </Box>
       </Center>
-
+      <Spacer />
       <Center>
         <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
           <Center>
@@ -78,6 +82,42 @@ export default function SendedRequest() {
             />
           </Center>
         </TouchableOpacity>
+      </Center>
+      <Center>
+        <AlertDialog
+          leastDestructiveRef={cancelRef}
+          isOpen={isOpen}
+          onClose={onClose}
+        >
+          <AlertDialog.Content>
+            <AlertDialog.CloseButton />
+            <AlertDialog.Header>
+              <Heading>Remove Friend's Request to {item.fullname}</Heading>
+            </AlertDialog.Header>
+            <AlertDialog.Body>This action cannot be reversed.</AlertDialog.Body>
+            <AlertDialog.Footer>
+              <Button.Group space={2}>
+                <Button
+                  variant="unstyled"
+                  colorScheme="coolGray"
+                  onPress={onClose}
+                  ref={cancelRef}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  colorScheme="danger"
+                  onPress={() => {
+                    onClose();
+                    setFetchAgain(!fecthAgain);
+                  }}
+                >
+                  Remove request
+                </Button>
+              </Button.Group>
+            </AlertDialog.Footer>
+          </AlertDialog.Content>
+        </AlertDialog>
       </Center>
     </Box>
   );
@@ -98,36 +138,6 @@ export default function SendedRequest() {
           keyExtractor={(item) => item._id}
         ></FlatList>
       )}
-      <Center>
-        <AlertDialog
-          leastDestructiveRef={cancelRef}
-          isOpen={isOpen}
-          onClose={onClose}
-        >
-          <AlertDialog.Content>
-            <AlertDialog.CloseButton />
-            <AlertDialog.Header>Delete Friend</AlertDialog.Header>
-            <AlertDialog.Body>
-              This action cannot be reversed. Deleted data can not be recovered.
-            </AlertDialog.Body>
-            <AlertDialog.Footer>
-              <Button.Group space={2}>
-                <Button
-                  variant="unstyled"
-                  colorScheme="coolGray"
-                  onPress={onClose}
-                  ref={cancelRef}
-                >
-                  Cancel
-                </Button>
-                <Button colorScheme="danger" onPress={onClose}>
-                  Delete
-                </Button>
-              </Button.Group>
-            </AlertDialog.Footer>
-          </AlertDialog.Content>
-        </AlertDialog>
-      </Center>
     </Box>
   );
 }

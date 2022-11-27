@@ -23,11 +23,11 @@ export default function FriendTab() {
     },
     {
       key: "second",
-      title: "Request",
+      title: "Requests",
     },
     {
       key: "third",
-      title: "Sended",
+      title: "Sent Requests",
     },
   ]);
 

@@ -15,7 +15,7 @@ import {
 import axios from "axios";
 import { ChatState } from "../providers/ChatProvider";
 import { useNavigation } from "@react-navigation/native";
-
+const link = "https://zolachatapp.herokuapp.com";
 export default function ChangeInfo({ navigation }) {
   const [fullname, setFullname] = useState("");
   const [username, setUsername] = useState("");
@@ -43,7 +43,7 @@ export default function ChangeInfo({ navigation }) {
         };
         await axios
           .post(
-            "https://zolachatapp.herokuapp.comapi/user/checkusername/:username",
+            `${link}/api/user/checkusername/:username`,
             { username: value },
             config
           )
@@ -158,7 +158,7 @@ export default function ChangeInfo({ navigation }) {
             onPress={() => {
               axios
                 .put(
-                  "https://zolachatapp.herokuapp.comapi/user/update/",
+                  `${link}/api/user/update/`,
                   {
                     _id: user._id,
                     fullname: fullname,

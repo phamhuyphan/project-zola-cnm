@@ -1,15 +1,9 @@
-import {
-  View,
-  ImageBackground,
-  FlatList,
-  TouchableOpacity,
-} from "react-native";
-import React, { useLayoutEffect, useState } from "react";
+import { FlatList } from "react-native";
+import React, { useState } from "react";
 
 import {
   Box,
   HStack,
-  IconButton,
   Input,
   Text,
   Pressable,
@@ -17,7 +11,7 @@ import {
   StatusBar,
   useToast,
 } from "native-base";
-import { AntDesign, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 import { ChatState } from "../providers/ChatProvider";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";

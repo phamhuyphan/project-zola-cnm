@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import "localstorage-polyfill";
 import { useNavigation } from "@react-navigation/native";
-import { useToast } from "native-base";
+
 const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
@@ -14,19 +13,22 @@ const ChatProvider = ({ children }) => {
   const [response, setResponse] = useState(null);
   const [message1, setMessage1] = useState([]);
   const nav = useNavigation();
+  const [fecthAgain, setFetchAgain] = useState(false);
   useEffect(() => {
     //fecth local storage
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     setUser(userInfo);
     if (!userInfo) {
       nav.navigate({ name: "SignIn" });
-    }
+    } else nav.navigate("ChatNavigator");
   }, [nav]);
 
   return (
     <ChatContext.Provider
       value={{
         message1,
+        fecthAgain,
+        setFetchAgain,
         setMessage1,
         notification,
         response,

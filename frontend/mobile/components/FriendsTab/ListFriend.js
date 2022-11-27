@@ -11,12 +11,14 @@ import {
   Heading,
   Spinner,
   HStack,
+  VStack,
 } from "native-base";
 import { FlatList, TouchableOpacity } from "react-native";
 import axios from "axios";
 import { ChatState } from "../../providers/ChatProvider";
 import {
   FontAwesome,
+  FontAwesome5,
   Ionicons,
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
@@ -32,7 +34,15 @@ export default function ListFriend() {
   const [loadingUnfriend, setLoadingUnfriend] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const onClose = () => setIsOpen(false);
-  const { user, selectedChat, setSelectedChat, setChats, chats } = ChatState();
+  const {
+    user,
+    selectedChat,
+    setSelectedChat,
+    setChats,
+    chats,
+    fecthAgain,
+    setFetchAgain,
+  } = ChatState();
   const cancelRef = React.useRef(null);
   const accessChat = async (userId) => {
     try {
@@ -97,18 +107,28 @@ export default function ListFriend() {
       setLoadingUnfriend(false);
     };
   };
-  React.useEffect(() => {
+  const fecthList = () => {
     setLoading(true);
     const config = {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    axios.get(`${link}/api/friends`, config).then((data) => {
-      setFriends(data.data);
-      setLoading(false);
-    });
+    axios
+      .get(`${link}/api/friends`, config)
+      .then((data) => {
+        setFriends(data.data);
+        setLoading(false);
+      })
+      .then((err) => setLoading(false));
+  };
+  React.useEffect(() => {
+    fecthList();
   }, []);
+
+  React.useEffect(() => {
+    fecthList();
+  }, [fecthAgain]);
 
   const FriendItem = ({ item }) => (
     <Box
@@ -129,7 +149,9 @@ export default function ListFriend() {
           source={{
             uri: item.pic ? item.pic : "no-links",
           }}
-        ></Avatar>
+        >
+          {item.fullname.split("")[0]}
+        </Avatar>
         <Box>
           <Box>
             <Text color="white" fontWeight={"bold"} fontSize={"lg"}>
@@ -197,6 +219,7 @@ export default function ListFriend() {
                   colorScheme="danger"
                   onPress={() => {
                     unfriendHandler();
+                    setFetchAgain(!fecthAgain);
                     onClose();
                   }}
                 >
@@ -219,12 +242,19 @@ export default function ListFriend() {
             Loading list friend...
           </Text>
         </HStack>
-      ) : (
+      ) : friends.length !== 0 ? (
         <FlatList
           data={friends}
           renderItem={FriendItem}
           keyExtractor={(item) => item._id}
         ></FlatList>
+      ) : (
+        <VStack opacity={50} justifyContent={"center"} alignItems="center">
+          <FontAwesome5 name="clipboard-list" size={120} color="white" />
+          <Text color={"white"} fontSize="xl" fontWeight={"bold"}>
+            The list is empty
+          </Text>
+        </VStack>
       )}
     </Box>
   );

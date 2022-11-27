@@ -3,6 +3,7 @@ import {
   Avatar,
   Box,
   Button,
+  Divider,
   FormControl,
   HStack,
   IconButton,
@@ -28,17 +29,19 @@ const ChatInfoScreen = () => {
   const [renameLoading, setRenameLoading] = useState(false);
 
   return (
-    <VStack flex="1" space={2} w="full">
+    <VStack
+      flex="1"
+      space={2}
+      w="full"
+      bg={{
+        linearGradient: {
+          end: { x: 0.5, y: 1 },
+          colors: ["#1E2B6F", "#193F5F"],
+        },
+      }}
+      px="4"
+    >
       <Box
-        bg={{
-          linearGradient: {
-            end: { x: 0.5, y: 1 },
-            colors:
-              colorMode === "light"
-                ? ["rgba(238,174,202,0.75)", "rgba(148,187,233,0.75)"]
-                : ["#1E2B6F", "#193F5F"],
-          },
-        }}
         display={"flex"}
         justifyContent={"center"}
         alignItems="center"
@@ -46,23 +49,14 @@ const ChatInfoScreen = () => {
         py="5"
       >
         <HStack>
-          <Text
-            fontSize={"3xl"}
-            color={colorMode === "light" ? "black" : "white"}
-          >
+          <Text fontSize={"3xl"} color={"white"}>
             {selectedChat.chatName}
           </Text>
           <IconButton
             rounded={"full"}
             variant={"ghost"}
             onPress={() => setShowModal(true)}
-            icon={
-              <Feather
-                name="edit"
-                size={18}
-                color={colorMode === "light" ? "black" : "white"}
-              />
-            }
+            icon={<Feather name="edit" size={18} color={"white"} />}
           ></IconButton>
         </HStack>
         <Avatar.Group
@@ -84,33 +78,38 @@ const ChatInfoScreen = () => {
           ))}
         </Avatar.Group>
       </Box>
-      <Pressable
-        onPress={() => nav.navigate("MembersScreen")}
-        width={"full"}
-        bg={colorMode === "light" ? "white" : "gray.300"}
-        px="10"
-        py="5"
-        flexDirection="row"
-        alignItems={"center"}
+      <VStack
+        space="2"
+        divider={<Divider w="93%" m="auto"></Divider>}
+        rounded={5}
+        bg={"white:alpha.20"}
       >
-        <Ionicons name="people-outline" size={24} color="black" />
-        <Text mx="2" fontSize="20">
-          Check Group Member's ({selectedChat.users.length})
-        </Text>
-      </Pressable>
-      <Pressable
-        width={"full"}
-        bg={colorMode === "light" ? "white" : "gray.300"}
-        px="10"
-        py="5"
-        flexDirection="row"
-        alignItems={"center"}
-      >
-        <SimpleLineIcons name="logout" size={24} color="red" />
-        <Text mx="2" fontSize="20" color={"red.500"}>
-          Leave Group
-        </Text>
-      </Pressable>
+        <Pressable
+          onPress={() => nav.navigate("MembersScreen")}
+          width={"full"}
+          px="10"
+          py="5"
+          flexDirection="row"
+          alignItems={"center"}
+        >
+          <Ionicons name="people-outline" size={24} color="white" />
+          <Text color="white" mx="2" fontSize="20">
+            Check Group Member's ({selectedChat.users.length})
+          </Text>
+        </Pressable>
+        <Pressable
+          width={"full"}
+          px="10"
+          py="5"
+          flexDirection="row"
+          alignItems={"center"}
+        >
+          <SimpleLineIcons name="logout" size={24} color="red" />
+          <Text mx="2" fontSize="20" color={"red.300"}>
+            Leave Group
+          </Text>
+        </Pressable>
+      </VStack>
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
         <Modal.Content maxWidth="400px">
           <Modal.CloseButton />
