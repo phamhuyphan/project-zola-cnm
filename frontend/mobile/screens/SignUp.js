@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import "localstorage-polyfill"; //import { useToast } from "@chakra-ui/react";
 import { useToast } from "native-base";
+import { LinearGradient } from "expo-linear-gradient";
 const link = "https://zolachatapp.herokuapp.com";
 const SignUp = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -150,7 +151,7 @@ const SignUp = ({ navigation }) => {
           onChange={(e) => postDetails(e.target.file[0])}
         />
       </View>
-      <View className="bg-white rounded-full w-[110%] h-[60%] mt-[110%]  absolute right-20 items-center ">
+      <View className=" w-[110%] h-[60%] mt-[110%]  absolute right-20 items-center ">
         <TouchableOpacity
           className="w-[120px] h-[50px] items-center mt-7"
           onPress={submitHandler}
@@ -158,7 +159,32 @@ const SignUp = ({ navigation }) => {
           <Text className="text-[30px] font-bold text-blue-700">Sign Up</Text>
         </TouchableOpacity>
       </View>
-      <View className="bg-orange-600 rounded-full w-[107%] h-[60%] mt-[130%] absolute left-36"></View>
+      <Box className=" rounded-full -bottom-[70%]  absolute -left-2/3 items-center z-0">
+        <LinearGradient
+          end={{ x: 1, y: 1 }}
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            borderRadius: 9999,
+          }}
+          colors={["#4158D0", "#C850C0", "#FFCC70"]}
+        >
+          <Box className="w-[800px] h-[1000px]"></Box>
+        </LinearGradient>
+      </Box>
+      <Box className="absolute -right-1/2  rounded-lg items-center z-0 -bottom-[20%] ">
+        <LinearGradient
+          end={{ x: 0.5, y: 1 }}
+          style={{
+            width: "100%",
+            justifyContent: "center",
+            borderRadius: 9999,
+          }}
+          colors={["rgba(238,174,202,1)", "rgba(148,187,233,1)"]}
+        >
+          <Box className="w-[500px] h-[500px]"></Box>
+        </LinearGradient>
+      </Box>
     </View>
   );
 };

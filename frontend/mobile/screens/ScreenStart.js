@@ -31,33 +31,32 @@ const ScreenStart = ({ navigation }) => {
           <Text className="text-[25px] font-bold text-white">
             "Zo" a room, "la" together
           </Text>
-          <View className="top-[80%]">
+          <View className="top-[70%]">
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("SignIn");
               }}
             >
-              <Text className="text-[30px] font-bold text-blue-700">
-                Sign In
+              <Text className="text-[30px] font-bold text-white">
+                Get Started!
               </Text>
             </TouchableOpacity>
-            <View className="flex-row">
-              {/* <Text className="ml-16 bg-gray-500">Already have an account ?</Text> */}
-              <TouchableOpacity
-                className="flex flex-row"
-                onPress={() => {
-                  navigation.navigate("SignUp");
-                }}
-              >
-                <Text> already have account, </Text>
-                <Text className="text-[15px] font-bold text-blue-700">
-                  Sign Up
-                </Text>
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
-        <Box className="bg-white rounded-full w-[800px] h-[1000px] -bottom-[70%]  absolute -left-2/3 items-center z-0"></Box>
+
+        <Box className=" rounded-full -bottom-[70%]  absolute -left-2/3 items-center z-0">
+          <LinearGradient
+            end={{ x: 1, y: 1 }}
+            style={{
+              width: "100%",
+              justifyContent: "center",
+              borderRadius: 9999,
+            }}
+            colors={["#4158D0", "#C850C0", "#FFCC70"]}
+          >
+            <Box className="w-[800px] h-[1000px]"></Box>
+          </LinearGradient>
+        </Box>
         <Box className="absolute -right-1/2  rounded-lg items-center z-0 -bottom-[20%] ">
           <LinearGradient
             end={{ x: 0.5, y: 1 }}

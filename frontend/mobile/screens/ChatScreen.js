@@ -1,24 +1,12 @@
-import { View, Text, ImageBackground, TouchableOpacity } from "react-native";
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import { Text, ImageBackground } from "react-native";
+import React, { useEffect } from "react";
 import { ChatState } from "../providers/ChatProvider";
 import axios from "axios";
 import ChatsList from "../components/ChatsList";
-import {
-  Box,
-  Icon,
-  IconButton,
-  Input,
-  SearchIcon,
-  StatusBar,
-} from "native-base";
+import { Box, IconButton, Input, SearchIcon } from "native-base";
 
 import { LinearGradient } from "expo-linear-gradient";
-import {
-  FontAwesome,
-  Ionicons,
-  FontAwesome5,
-  MaterialIcons,
-} from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 const link = "https://zolachatapp.herokuapp.com";
 import { io } from "socket.io-client";

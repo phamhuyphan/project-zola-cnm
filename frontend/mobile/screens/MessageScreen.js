@@ -10,7 +10,6 @@ import {
   IconButton,
   Input,
   InputGroup,
-  ScrollView,
   Skeleton,
   StatusBar,
   Text,
@@ -19,20 +18,24 @@ import {
   CloseIcon,
   useToast,
   FormControl,
+  Button,
+  Image,
 } from "native-base";
 import { io } from "socket.io-client";
 import { useNavigation } from "@react-navigation/native";
 import { ChatState } from "../providers/ChatProvider";
 import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
+
 import MessageItem from "../components/MessageItem";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
 import moment from "moment";
 import { Entypo, FontAwesome, Foundation, Octicons } from "@expo/vector-icons";
-import { Pressable } from "react-native";
+import { Keyboard, Platform, Pressable, ScrollView } from "react-native";
 import MessageLoading from "../loading/MessageLoading";
 import "localstorage-polyfill";
 import AddFriendButton from "../components/AddFriendButton";
+import AttachFileModal from "../components/AttachFileModal";
 let socket, selectedChatCompare;
 const link = "https://zolachatapp.herokuapp.com";
 
@@ -41,14 +44,18 @@ const MessageScreen = () => {
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [pic, setPic] = useState("");
+
   const [video, setVideo] = useState("");
   const [file, setFile] = useState("");
   const inputRef = useRef(null);
   const nav = useNavigation();
   const [toggleExpand, setToggleExpand] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingPic, setLoadingPic] = useState(false);
   const toast = useToast();
+  const [image, setImage] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [loadingNewMessage, setLoadingNewMessage] = useState(false);
 
   const sendMessage = async (e) => {
     if (e === "Send") {
@@ -89,7 +96,7 @@ const MessageScreen = () => {
           });
       } catch (error) {
         toast.show({
-          title: "Error Occured!" + err,
+          title: "Error Occured!" + error,
           placement: "bottom",
         });
         setLoadingNewMessage(false);
@@ -195,7 +202,7 @@ const MessageScreen = () => {
 
   return (
     <>
-      <Box flex="1">
+      <Box flex="1" safeAreaTop>
         <StatusBar />
         <LinearGradient
           end={{ x: 0.5, y: 1 }}
@@ -230,7 +237,7 @@ const MessageScreen = () => {
                   ? socket.emit("outchat", selectedChat._id)
                   : console.log("out out out");
                 setSelectedChat(null);
-                nav.goBack();
+                nav.navigate("ChatScreen");
               }}
             />
             {selectedChat.isGroupChat ? (
@@ -338,6 +345,10 @@ const MessageScreen = () => {
                 onPress={() => {
                   if (selectedChat.isGroupChat)
                     nav.navigate("ChatDrawerNavigator");
+                  else
+                    nav.navigate("ChatPersonDetail", {
+                      params: getSenderInfo(user, selectedChat.users),
+                    });
                 }}
                 mx={1}
                 my={2}
@@ -360,7 +371,7 @@ const MessageScreen = () => {
           selectedChat={selectedChat}
         />
 
-        <ScrollView w={"full"} flex={1} pr="2">
+        <ScrollView className={"w-full flex-1 pr-2"}>
           {!loading ? (
             messages.map((m, i) => (
               <MessageItem key={i} messages={messages} m={m} i={i} />
@@ -372,6 +383,7 @@ const MessageScreen = () => {
 
         <FormControl
           //on={sendMessage}
+
           isRequired
           bottom={0}
           left={0}
@@ -404,6 +416,7 @@ const MessageScreen = () => {
           ) : (
             <></>
           )}
+
           <InputGroup w={"full"} alignItems={"center"}>
             {response && (
               <Box
@@ -444,23 +457,45 @@ const MessageScreen = () => {
                 </Box>
               </Box>
             )}
+            {image && (
+              <>
+                <Image
+                  position="absolute"
+                  top={-47}
+                  right={0}
+                  borderRadius="sm"
+                  border="1px solid white"
+                  maxH="100px"
+                  maxW="100px"
+                  objectFit="cover"
+                  alt=""
+                  source={{ uri: image }}
+                />
+                <IconButton
+                  position="absolute"
+                  top={-47}
+                  right={0}
+                  rounded="full"
+                  icon={<CloseIcon />}
+                  onClick={() => setImage("")}
+                ></IconButton>
+              </>
+            )}
             <Input
               flex="1"
               value={newMessage}
               variant="filled"
+              onSubmitEditing={() => {
+                sendMessage("Send");
+                Keyboard.dismiss();
+              }}
               onChangeText={typingHandler}
               bg={"white"}
               placeholder="Type something to your friend..."
               fontSize={"lg"}
               InputLeftElement={
                 <Box mx="2">
-                  <Pressable>
-                    <Icon
-                      as={<Entypo name="attachment" size={24} color="black" />}
-                      size={5}
-                      color="blue.400"
-                    />
-                  </Pressable>
+                  <AttachFileModal setImage={setImage} />
                 </Box>
               }
               InputRightElement={

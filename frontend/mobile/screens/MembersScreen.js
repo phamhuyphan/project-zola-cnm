@@ -33,20 +33,25 @@ const MembersScreen = () => {
           {selectedChat.users.map((u, index) => (
             <HStack px="2" py="4" w="full" key={index} alignItems={"center"}>
               <Avatar mx="2" source={{ uri: u?.pic }} size={"md"} />
-              <Text fontSize="20" color="black" flex="1">
-                {u.fullname}
-              </Text>
+              <VStack flex="1">
+                <Text fontSize="12" color="black">
+                  @{u.username}
+                </Text>
+                <Text fontSize="20" color="black" flex="1">
+                  {u.fullname}
+                </Text>
+              </VStack>
               {user._id === selectedChat.chatAdmin._id && (
                 <>
                   <IconButton
                     // onClick={onOpen}
                     variant={"ghost"}
-                    icon={<CheckIcon size={12} />}
+                    icon={<CheckIcon size={5} />}
                   ></IconButton>
                   <IconButton
                     // onClick={handleFunction}
                     variant={"ghost"}
-                    icon={<CloseIcon size={12} color="black" />}
+                    icon={<CloseIcon size={5} color="black" />}
                   ></IconButton>
                 </>
               )}

@@ -12,6 +12,7 @@ import {
   Pressable,
   Text,
   useColorMode,
+  useToast,
   VStack,
 } from "native-base";
 import { getSender, getSenderInfo } from "../logic/ChatLogic";
@@ -21,15 +22,7 @@ import { Feather, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 const link = "https://zolachatapp.herokuapp.com";
 const ChatInfoScreen = () => {
-  const {
-    selectedChat,
-    setSelectedChat,
-    user,
-    chats,
-    setChats,
-    response,
-    setResponse,
-  } = ChatState();
+  const { selectedChat, setSelectedChat, user } = ChatState();
   const [showModal, setShowModal] = useState(false);
   const [newName, setNewName] = useState("");
   const nav = useNavigation();
@@ -37,39 +30,9 @@ const ChatInfoScreen = () => {
     setNewName(selectedChat.chatName);
   }, [selectedChat]);
   const toast = useToast();
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { colorMode } = useColorMode();
   const [renameLoading, setRenameLoading] = useState(false);
 
-  const handleRename = async () => {
-    if (!newName) return;
-    try {
-      setRenameLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.put(
-        `${link}/api/chat/rename`,
-        {
-          chatId: selectedChat._id,
-          chatName: newName,
-        },
-        config
-      );
-      setSelectedChat(data);
-
-      setRenameLoading(false);
-    } catch (err) {
-      toast.show({
-        title: "Error Occured! Cannot group new due to this error:" + err,
-        placement: "bottom",
-      });
-
-      setRenameLoading(false);
-    }
-    setNewName("");
-  };
   return (
     <VStack flex="1" space={2} w="full">
       <Box

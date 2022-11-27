@@ -2,9 +2,11 @@ import { FontAwesome5, Ionicons } from "@expo/vector-icons";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import { useLayoutEffect } from "react";
+import ChatInfoScreen from "../screens/ChatInfoScreen";
+import ChatPersonDetail from "../screens/ChatPersonDetail";
 
 import ChatScreen from "../screens/ChatScreen";
-import FriendListScreen from "../screens/FriendListScreen";
+import Friends from "../screens/Friends";
 import SettingScreen from "../screens/SettingScreen";
 
 const Tab = createMaterialBottomTabNavigator();
@@ -43,8 +45,8 @@ export default function ChatNavigator() {
             <FontAwesome5 name="users" size={18} color={color} />
           ),
         }}
-        name="FriendListScreen"
-        component={FriendListScreen}
+        name="Friends"
+        component={Friends}
       />
       <Tab.Screen
         options={{
@@ -53,8 +55,8 @@ export default function ChatNavigator() {
             <Ionicons name="settings-sharp" size={24} color={color} />
           ),
         }}
-        name="SettingScreen"
-        component={SettingScreen}
+        name="ChatInfoScreen"
+        component={ChatInfoScreen}
       />
     </Tab.Navigator>
   );
