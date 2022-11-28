@@ -150,7 +150,7 @@ function SignIn({ setShow, isOpen }) {
         "Content-type": "application/json",
       },
     };
-    setForgotPass(true);
+    setForgotPass(true);localStorage.setItem("forgotInfo", true);
     await axios
       .post(
         "/api/user/forgot-password/:email",
@@ -160,7 +160,7 @@ function SignIn({ setShow, isOpen }) {
         config
       )
       .then(() => {
-        localStorage.setItem("forgotInfo", forgotPass);
+        
         toast({
           title: "Please check email.",
           status: "success",

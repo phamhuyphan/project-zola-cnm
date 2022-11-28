@@ -212,10 +212,9 @@ function SideBarClosed({ fetchAgain }) {
                 className="transition-opacity pullRight"
                 onClick={() => {
                   selectedChat
-                    ? io("http://localhost:5000").emit(
-                        "outchat",
-                        selectedChat._id
-                      )
+                    ? io(
+                        "https://trongten-cautious-winner-r9r9wjvrr3wp7-5000.preview.app.github.dev"
+                      ).emit("outchat", selectedChat._id)
                     : console.log("out out out");
                   setSelectedChat(chat);
                 }}

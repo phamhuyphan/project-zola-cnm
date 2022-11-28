@@ -51,7 +51,8 @@ import { MdAddPhotoAlternate } from "react-icons/md";
 import UploadMenuButton from "./UploadMenuButton";
 import AddFriendButton from "./AddFriendButton";
 import { HiVideoCamera } from "react-icons/hi";
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT =
+  "https://trongten-cautious-winner-r9r9wjvrr3wp7-5000.preview.app.github.dev";
 
 let socket, selectedChatCompare;
 function ChatZone({ fetchAgain, setFetchAgain }) {

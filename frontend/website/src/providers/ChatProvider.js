@@ -15,11 +15,13 @@ const ChatProvider = ({ children }) => {
   useEffect(() => {
     //fecth local storage
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-    const forgotStatus = JSON.parse(localStorage.getItem("forgotStatus"));
+    const forgotStatus = JSON.parse(localStorage.getItem("forgotInfo"));
     setUser(userInfo);
     setForgotPass(forgotStatus);
-    if (forgotPass && !userInfo) navigator("/reset-password/:userId");
-    else if (!userInfo) navigator("/");
+    if (forgotPass ){
+      if (!userInfo) navigator("/");
+    }
+    
   }, [navigator]);
 
   return (

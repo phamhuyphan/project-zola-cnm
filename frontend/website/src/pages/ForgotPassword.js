@@ -4,7 +4,6 @@ import axios from "axios";
 import gsap from "gsap";
 import { useIsPresent } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
-const link = "https://zolachatapp.herokuapp.com";
 function ForgotPage({ setShow }) {
   const [password, setPassword] = useState("");
   const [confirmpassword, setConfirmPassword] = useState("");
@@ -12,13 +11,10 @@ function ForgotPage({ setShow }) {
   const isPresent = useIsPresent();
   let navigate = useNavigate();
   const handleSubmit = async () => {
-    const data = await axios.post(
-      `${link}}/api/user/forgot-password/${id}/reset`,
-      {
-        password: password,
-      }
-    );
-    navigate("/");
+    const data = await axios.post(`/api/user/forgot-password/${id}/reset`, {
+      password: password,
+    });
+    navigate("/");localStorage.setItem("forgotInfo", true);
   };
   useEffect(() => {
     isPresent &&
