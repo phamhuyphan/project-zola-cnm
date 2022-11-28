@@ -103,7 +103,7 @@ function UserBadgeItem({
         >
           <Avatar
             src={_user?.pic}
-            size={user._id === selectedChat.chatAdmin._id ? "xs" : "md"}
+            size={_user._id === selectedChat.chatAdmin._id ? "xs" : "md"}
           />
           <Box flex="1" px="2">
             <ProfileModal user={_user}>

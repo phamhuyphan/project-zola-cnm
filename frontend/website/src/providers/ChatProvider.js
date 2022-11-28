@@ -9,13 +9,17 @@ const ChatProvider = ({ children }) => {
   const [chats, setChats] = useState([]);
   const [closeSideBar, setCloseSideBar] = useState(false);
   const [notification, setNotification] = useState([]);
+  const [forgotPass, setForgotPass] = useState(false);
   const [response, setResponse] = useState(null);
   const navigator = useNavigate();
   useEffect(() => {
     //fecth local storage
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    const forgotStatus = JSON.parse(localStorage.getItem("forgotStatus"));
     setUser(userInfo);
-    if (!userInfo) navigator("/");
+    setForgotPass(forgotStatus);
+    if (forgotPass && !userInfo) navigator("/reset-password/:userId");
+    else if (!userInfo) navigator("/");
   }, [navigator]);
 
   return (
@@ -33,6 +37,8 @@ const ChatProvider = ({ children }) => {
         setUser,
         response,
         setResponse,
+        forgotPass,
+        setForgotPass,
       }}
     >
       {children}

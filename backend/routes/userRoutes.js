@@ -10,6 +10,8 @@ const {
   getUserByEmailForLogin,
   getUserByUsernameForLogin,
   getUserById,
+  forgotPassword,
+  reserPassword,
 } = require("../controllers/userControllers");
 const { protect } = require("../middleware/authMiddleware");
 
@@ -27,4 +29,6 @@ router.post("/checkusername/:username", getUserByUsernameForLogin);
 
 router.post("/:userId/qrcode", generateQRCode);
 router.get("/:userId/id", getUserById);
+router.post("/forgot-password/:userId", forgotPassword);
+router.post("/forgot-password/:userId/reset", reserPassword);
 module.exports = router;
