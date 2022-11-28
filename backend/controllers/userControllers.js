@@ -136,7 +136,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
       return res.json({ status: "User Not Exists!!" });
     }
 
-    const link = `https://zolachatapp.netlify.app/reset-password/${oldUser._id}`;
+    const link = `https://trongten-animated-tribble-vw744j7p79qhwpwv-3000.preview.app.github.dev/${oldUser._id}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",

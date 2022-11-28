@@ -34,7 +34,8 @@ const server = app.listen(
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:3000",
+    origin:
+      "https://trongten-animated-tribble-vw744j7p79qhwpwv-3000.preview.app.github.dev",
   },
 });
 
